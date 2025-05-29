@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
@@ -12,11 +10,9 @@ import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
     private final List<User> userList;
-    private final MessageService messageService;
 
-    public JCFUserService(MessageService messageService) {
+    public JCFUserService() {
         this.userList = new ArrayList<>();
-        this.messageService = messageService;
     }
 
     @Override
@@ -76,6 +72,5 @@ public class JCFUserService implements UserService {
         if (!removed) {
             throw new IllegalArgumentException("User with id " + id + " not found");
         }
-        messageService.deleteMessagesByUserId(id);
     }
 }

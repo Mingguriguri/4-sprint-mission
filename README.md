@@ -17,9 +17,9 @@
 1. 프로젝트 초기화 (Java, Gradle)
 2. 도메인 모델 구현
 3. 서비스 인터페이스 설계 및 구현체 구현
-4. 각 도메인 모델별 CRUD
-5. JCF × 메모리 기반
-6. 의존성 주입
+  - 각 도메인 모델별 CRUD
+  - JCF × 메모리 기반
+4. 의존성 주입
 
 # 요구사항
 
@@ -31,10 +31,10 @@
 - [x] IntelliJ에서 제공하는 프로젝트 템플릿 중 Java를 선택합니다.
 - [x] 프로젝트의 경로는 스프린트 미션 리포지토리의 경로와 같게 설정합니다.
 
-예를 들어 스프린트 미션 리포지토리의 경로가 `/some/path/1-sprint-mission` 이라면:
+  - 예를 들어 스프린트 미션 리포지토리의 경로가 `/some/path/1-sprint-mission` 이라면:
 
-- Name은 `1-sprint-mission`
-- Location은 `/some/path` 로 설정합니다.
+    - Name은 `1-sprint-mission`
+    - Location은 `/some/path` 로 설정합니다.
 
 - [x] Create Git Repository 옵션은 체크하지 않습니다.
 - [x] Build system은 Gradle을 사용합니다. Gradle DSL은 Groovy를 사용합니다.
@@ -110,6 +110,6 @@
 
 ### 서비스 간 의존성 주입
 
-- [ ] 도메인 모델 간 관계를 고려해서 검증하는 로직을 추가하고, 테스트해보세요.
+- [x] 도메인 모델 간 관계를 고려해서 검증하는 로직을 추가하고, 테스트해보세요.
 
 힌트: `Message`를 생성할 때 연관된 도메인 모델 데이터 확인하기

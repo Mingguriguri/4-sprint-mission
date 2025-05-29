@@ -11,11 +11,9 @@ import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
     private List<Channel> channelList;
-    private MessageService messageService;
 
-    public JCFChannelService(MessageService messageService) {
+    public JCFChannelService() {
         this.channelList = new ArrayList<>();
-        this.messageService = messageService;
     }
 
     @Override
@@ -67,6 +65,5 @@ public class JCFChannelService implements ChannelService {
         if (!removed) {
             throw new IllegalArgumentException("Channel with id " + id + " not found");
         }
-        messageService.deleteMessageByChannelId(id);
     }
 }
