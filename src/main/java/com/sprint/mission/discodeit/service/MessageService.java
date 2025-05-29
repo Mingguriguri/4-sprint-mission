@@ -16,7 +16,7 @@ public interface MessageService {
 
     List<Message> getMessageByChannelId(String channelId);
 
-    Message sendMessage(String channelId, String senderId, String content);
+    Message createMessage(String channelId, String senderId, String content);
 
     Message updateMessage(String messageId, String channelId, String senderId, String content);
 
