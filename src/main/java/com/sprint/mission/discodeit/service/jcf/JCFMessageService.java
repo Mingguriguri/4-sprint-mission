@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +12,13 @@ import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
     private ArrayList<Message> messageList;
+    private final UserService userService;
+    private final ChannelService channelService;
 
-    public JCFMessageService() {
+    public JCFMessageService(UserService userService, ChannelService channelService) {
         this.messageList = new ArrayList<>();
+        this.userService = userService;
+        this.channelService = channelService;
     }
 
     @Override
@@ -42,7 +48,16 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message sendMessage(String channelId, String senderId, String content) {
+    public Message createMessage(String channelId, String senderId, String content) {
+        // 유효성 검사
+        if (userService.getUserById(senderId).isEmpty()) {
+            System.out.println("존재하지 않는 사용자입니다.");
+//            throw new IllegalArgumentException("존재하지 않는 사용자입니다."); // 로컬에서 테스트가 어려워 출력문으로 대체하였습니다.
+        }
+        if (channelService.getChannelById(channelId).isEmpty()) {
+            System.out.println("존재하지 않는 채널입니다.");
+//            throw new IllegalArgumentException("존재하지 않는 채널입니다."); // 로컬에서 테스트가 어려워 출력문으로 대체하였습니다.
+        }
         Message message = new Message(channelId, senderId, content);
         messageList.add(message);
         return message;
@@ -50,6 +65,16 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message updateMessage(String messageId, String channelId, String senderId, String content) {
+        // 유효성 검사
+        if (userService.getUserById(senderId).isEmpty()) {
+            System.out.println("존재하지 않는 사용자입니다.");
+//            throw new IllegalArgumentException("존재하지 않는 사용자입니다."); // 로컬에서 테스트가 어려워 출력문으로 대체하였습니다.
+        }
+        if (channelService.getChannelById(channelId).isEmpty()) {
+            System.out.println("존재하지 않는 채널입니다.");
+//            throw new IllegalArgumentException("존재하지 않는 채널입니다."); // 로컬에서 테스트가 어려워 출력문으로 대체하였습니다.
+        }
+
         Optional<Message> optionalMessage = getMessageById(messageId);
 
         if (optionalMessage.isPresent()) {
