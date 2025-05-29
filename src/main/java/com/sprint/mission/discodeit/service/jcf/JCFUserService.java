@@ -49,6 +49,7 @@ public class JCFUserService implements UserService {
     public User createUser(String username, String email, String password) {
         User user = new User(username, email, password);
         userList.add(user);
+        System.out.println("Successfully Create User, " + user);
         return user;
     }
 
