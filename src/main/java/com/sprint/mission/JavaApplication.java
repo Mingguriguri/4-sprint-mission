@@ -8,7 +8,9 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.factory.DiscodeitFactory;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class JavaApplication {
     public static void main(String[] args) {
@@ -27,11 +29,14 @@ public class JavaApplication {
         User user5 = userService.createUser("David", "david@example.com", "1q2w3e4r!");
 
         System.out.println("-------------------------------[ 채널 생성 ]------------------------------- ");
-        Channel channel1 = channelService.createChannel("#announcements", "서버의 중요한 소식이나 업데이트를 공지하는 채널입니다. 모두 확인 필수!");
-        Channel channel2 = channelService.createChannel("#now-playing", "지금 듣고 있는 노래를 공유하거나, 추천 음악을 소개하는 뮤직 채널입니다.");
-        Channel channel3 = channelService.createChannel("#daily-goals", "오늘 할 일, 목표, 공부 계획을 공유하고 서로 동기 부여하는 채널이에요.");
-        Channel channel4 = channelService.createChannel("#off-topic", "주제 자유! 게임, 밈, 일상 얘기 등 아무 이야기나 나눠요.");
-        Channel channel5 = channelService.createChannel("#qna", "질문이 있다면 이 채널에 남겨주세요.");
+        String ownerId = user1.getId();
+        List<String> memberList = List.of(user1.getId(), user2.getId(), user3.getId(), user4.getId());
+        Set<String> members = new HashSet<>(memberList);
+        Channel channel1 = channelService.createChannel("#announcements", "서버의 중요한 소식이나 업데이트를 공지하는 채널입니다. 모두 확인 필수!", members, ownerId);
+        Channel channel2 = channelService.createChannel("#now-playing", "지금 듣고 있는 노래를 공유하거나, 추천 음악을 소개하는 뮤직 채널입니다.", members, ownerId);
+        Channel channel3 = channelService.createChannel("#daily-goals", "오늘 할 일, 목표, 공부 계획을 공유하고 서로 동기 부여하는 채널이에요.", members, ownerId);
+        Channel channel4 = channelService.createChannel("#off-topic", "주제 자유! 게임, 밈, 일상 얘기 등 아무 이야기나 나눠요.", members, ownerId);
+        Channel channel5 = channelService.createChannel("#qna", "질문이 있다면 이 채널에 남겨주세요.", members, ownerId);
 
         System.out.println("\n===================================================================================================");
         System.out.println("-------------------------------[ 유저 단건 조회 ]------------------------------- ");
@@ -76,10 +81,31 @@ public class JavaApplication {
             System.out.println(channel);
         }
 
-        System.out.println("\n-------------------------------[ 채널 수정 ]------------------------------- ");
-        System.out.println("수정 전 채널4: " + channel4);
-        channelService.updateChannel(channel4.getId(), "#free-topic", "자유롭게 게임, 밈, 일상 얘기 등 아무 이야기나 나눠요.");
-        System.out.println("수정 후 채널4: " + channel4);
+        System.out.println("\n-------------------------------[ 채널 기본 정보 수정 (name, description) ]------------------------------- ");
+        System.out.println("1. 수정 전 채널4: " + channel4);
+        System.out.println("2. 채널명과 설명 변경");
+        channelService.updateChannelInfo(channel4.getId(), "#free-topic", "자유롭게 게임, 밈, 일상 얘기 등 아무 이야기나 나눠요.");
+        System.out.println("3. 수정 후 채널4: " + channel4);
+
+        System.out.println("\n-------------------------------[ 채널 Owner 수정 (ownerId) ]------------------------------- ");
+        System.out.println("1. 수정 전 채널4 Owner(user1): " + channel4.getOwnerId());
+
+        System.out.println("2. owner를 user1 에서 user2로 변경");
+        channelService.updateChannelOwner(channel4.getId(), user2.getId());
+
+        System.out.println("3. 수정 후 채널4 Owner(user2): " + channel4.getOwnerId());
+
+        System.out.println("\n-------------------------------[ 채널 Members 수정 (Set<String> memberIds) ]------------------------------- ");
+        System.out.println("1. 수정 전 채널4 Members: " );
+        channel4.getMemberIds().forEach(System.out::println);
+
+        System.out.println("\n2. user3을 제거하고 user5를 추가");
+        members.remove(user3.getId());
+        members.add(user5.getId());
+        channelService.updateChannelMembers(channel4.getId(), members);
+
+        System.out.println("\n3. 수정 후 채널4 Members: ");
+        channel4.getMemberIds().forEach(System.out::println);
 
         System.out.println("\n-------------------------------[ 채널 삭제 ]------------------------------- ");
         System.out.println("삭제할 채널5: " + channel5);

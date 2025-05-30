@@ -2,15 +2,15 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
-    private List<Channel> channelList;
+    private final List<Channel> channelList;
 
     public JCFChannelService() {
         this.channelList = new ArrayList<>();
@@ -36,8 +36,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(String channelName, String description) {
-        Channel channel = new Channel(channelName, description);
+    public Channel createChannel(String channelName, String description, Set<String> memberIds, String ownerId) {
+        Channel channel = new Channel(channelName, description, memberIds, ownerId);
         channelList.add(channel);
         System.out.println("Successfully Create Channel, " + channel);
 
@@ -45,12 +45,60 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannel(String id, String channelName, String description) {
+    public Channel updateChannel(String id, String channelName, String description, Set<String> memberIds, String ownerId) {
+        Optional<Channel> optionalChannel = getChannelById(id);
+
+        if (optionalChannel.isPresent()) {
+            Channel channel = optionalChannel.get();
+            channel.setChannelName(channelName);
+            channel.setDescription(description);
+            channel.setMemberIds(memberIds);
+            channel.setOwnerId(ownerId);
+            channel.setUpdatedAt(System.currentTimeMillis());
+
+            return channel;
+        } else {
+            throw new IllegalArgumentException("Channel with id " + id + "not found");
+        }
+    }
+
+    @Override
+    public Channel updateChannelInfo(String id, String channelName, String description) {
         Optional<Channel> optionalChannel = getChannelById(id);
         if (optionalChannel.isPresent()) {
             Channel channel = optionalChannel.get();
             channel.setChannelName(channelName);
             channel.setDescription(description);
+            channel.setUpdatedAt(System.currentTimeMillis());
+
+            return channel;
+        } else {
+            throw new IllegalArgumentException("Channel with id " + id + "not found");
+        }
+    }
+
+    @Override
+    public Channel updateChannelMembers(String id, Set<String> memberIds) {
+        Optional<Channel> optionalChannel = getChannelById(id);
+
+        if (optionalChannel.isPresent()) {
+            Channel channel = optionalChannel.get();
+            channel.setMemberIds(memberIds);
+            channel.setUpdatedAt(System.currentTimeMillis());
+
+            return channel;
+        } else {
+            throw new IllegalArgumentException("Channel with id " + id + "not found");
+        }
+    }
+
+    @Override
+    public Channel updateChannelOwner(String id, String ownerId) {
+        Optional<Channel> optionalChannel = getChannelById(id);
+
+        if (optionalChannel.isPresent()) {
+            Channel channel = optionalChannel.get();
+            channel.setOwnerId(ownerId);
             channel.setUpdatedAt(System.currentTimeMillis());
 
             return channel;
