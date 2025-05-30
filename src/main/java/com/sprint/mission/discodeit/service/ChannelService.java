@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,11 +15,11 @@ public interface ChannelService {
 
     List<Channel> getChannelByName(String channelName);
 
-    Channel createChannel(String channelName, String description, Set<String> memberIds, String ownerId);
+    Channel createChannel(String channelName, String description, Set<User> members, String ownerId);
 
-    Channel updateChannel(String id, String channelName, String description, Set<String> memberIds, String ownerId);       // 채널 전체 수정
     Channel updateChannelInfo(String id, String channelName, String description);   // 채널 기본 정보 수정
-    Channel updateChannelMembers(String id, Set<String> memberIds);                 // 채널 멤버 수정
+    void joinUser(String channelId, User user);
+    void leaveUser(String channelId, User user);
     Channel updateChannelOwner(String id, String ownerId);                          // 채널 주인 수정
 
     void deleteChannel(String id);
