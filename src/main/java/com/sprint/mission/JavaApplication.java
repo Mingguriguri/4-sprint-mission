@@ -24,19 +24,24 @@ public class JavaApplication {
         System.out.println("-------------------------------[ 유저 생성 ]------------------------------- ");
         User user1 = userService.createUser("Minjeong", "minjeong@gmail.com", "1q2w3e4r!");
         User user2 = userService.createUser("Joy", "joy@gmail.com", "1q2w3e4r!");
-        User user3 = userService.createUser("Jhon", "jhon@gmail.com", "1q2w3e4r!");
+        User user3 = userService.createUser("John", "jhon@gmail.com", "1q2w3e4r!");
         User user4 = userService.createUser("Alice", "alice@example.com", "1q2w3e4r!");
         User user5 = userService.createUser("David", "david@example.com", "1q2w3e4r!");
 
         System.out.println("-------------------------------[ 채널 생성 ]------------------------------- ");
         String ownerId = user1.getId();
-        List<String> memberList = List.of(user1.getId(), user2.getId(), user3.getId(), user4.getId());
-        Set<String> members = new HashSet<>(memberList);
-        Channel channel1 = channelService.createChannel("#announcements", "서버의 중요한 소식이나 업데이트를 공지하는 채널입니다. 모두 확인 필수!", members, ownerId);
-        Channel channel2 = channelService.createChannel("#now-playing", "지금 듣고 있는 노래를 공유하거나, 추천 음악을 소개하는 뮤직 채널입니다.", members, ownerId);
-        Channel channel3 = channelService.createChannel("#daily-goals", "오늘 할 일, 목표, 공부 계획을 공유하고 서로 동기 부여하는 채널이에요.", members, ownerId);
-        Channel channel4 = channelService.createChannel("#off-topic", "주제 자유! 게임, 밈, 일상 얘기 등 아무 이야기나 나눠요.", members, ownerId);
-        Channel channel5 = channelService.createChannel("#qna", "질문이 있다면 이 채널에 남겨주세요.", members, ownerId);
+        List<User> memberList = List.of(user1, user2, user3, user4);
+        Set<User> members1 = new HashSet<>(memberList);
+        Set<User> members2 = new HashSet<>(memberList);
+        Set<User> members3 = new HashSet<>(memberList);
+        Set<User> members4 = new HashSet<>(memberList);
+        Set<User> members5 = new HashSet<>(memberList);
+
+        Channel channel1 = channelService.createChannel("#announcements", "서버의 중요한 소식이나 업데이트를 공지하는 채널입니다. 모두 확인 필수!", members1, ownerId);
+        Channel channel2 = channelService.createChannel("#now-playing", "지금 듣고 있는 노래를 공유하거나, 추천 음악을 소개하는 뮤직 채널입니다.", members2, ownerId);
+        Channel channel3 = channelService.createChannel("#daily-goals", "오늘 할 일, 목표, 공부 계획을 공유하고 서로 동기 부여하는 채널이에요.", members3, ownerId);
+        Channel channel4 = channelService.createChannel("#off-topic", "주제 자유! 게임, 밈, 일상 얘기 등 아무 이야기나 나눠요.", members4, ownerId);
+        Channel channel5 = channelService.createChannel("#qna", "질문이 있다면 이 채널에 남겨주세요.", members5, ownerId);
 
         System.out.println("\n===================================================================================================");
         System.out.println("-------------------------------[ 유저 단건 조회 ]------------------------------- ");
@@ -95,25 +100,37 @@ public class JavaApplication {
 
         System.out.println("3. 수정 후 채널4 Owner(user2): " + channel4.getOwnerId());
 
-        System.out.println("\n-------------------------------[ 채널 Members 수정 (Set<String> memberIds) ]------------------------------- ");
-        System.out.println("1. 수정 전 채널4 Members: " );
-        channel4.getMemberIds().forEach(System.out::println);
+        System.out.println("\n-------------------------------[ 채널4에 유저 추가 ]------------------------------ ");
+        System.out.println("1. 수정 전 채널4 Users: " );
+        channel4.getUsers().forEach(System.out::println);
 
-        System.out.println("\n2. user3을 제거하고 user5를 추가");
-        members.remove(user3.getId());
-        members.add(user5.getId());
-        channelService.updateChannelMembers(channel4.getId(), members);
+        System.out.println("\n2. user5(David) 추가");
+        channelService.joinUser(channel4.getId(), user5);
 
-        System.out.println("\n3. 수정 후 채널4 Members: ");
-        channel4.getMemberIds().forEach(System.out::println);
+        System.out.println("\n3. 수정 후 채널4 Users: ");
+        channel4.getUsers().forEach(System.out::println);
+        System.out.println(channel5.getUsers());
+
+        System.out.println("\n-------------------------------[ 채널5에 유저 제거 ]------------------------------ ");
+        System.out.println("1. 수정 전 채널5 Users: " );
+        channel5.getUsers().forEach(System.out::println);
+
+        System.out.println("\n2. user3(John) 제거");
+        channelService.leaveUser(channel5.getId(), user3);
+
+        System.out.println("\n3. 수정 후 채널5 Users: ");
+        channel5.getUsers().forEach(System.out::println);
+
 
         System.out.println("\n-------------------------------[ 채널 삭제 ]------------------------------- ");
-        System.out.println("삭제할 채널5: " + channel5);
+        System.out.println("1. 삭제 전 채널 리스트");
+        channels.forEach(System.out::println);
+
+        System.out.println("\n2. 삭제할 채널: " + channel5.getChannelName());
         channelService.deleteChannel(channel5.getId());
-        System.out.println("삭제 후 채널 리스트");
-        for (Channel channel: channels) {
-            System.out.println(channel);
-        }
+
+        System.out.println("\n3. 삭제 후 채널 리스트");
+        channels.forEach(System.out::println);
 
         System.out.println("\n===================================================================================================");
         System.out.println("-------------------------------[ 메시지 등록 ]-------------------------------");
@@ -150,7 +167,7 @@ public class JavaApplication {
         Message message8 = messageService.createMessage(messageChannel, user5.getId(), "이모지 테스트 중 😂🔥💯");
         System.out.println("[" + channelService.getChannelById(message8.getChannelId()).get().getChannelName() + "] 채널에 [" + message8 + "] => 메시지 등록 완료");
 
-        System.out.println("-------------------------------[ 메시지 단건 조회 ]-------------------------------");
+        System.out.println("\n-------------------------------[ 메시지 단건 조회 ]-------------------------------");
         String findMessageId = message1.getId();
         String findMessageSenderId = message2.getSenderId();
         String findMessageChannelId = message3.getChannelId();
@@ -161,20 +178,20 @@ public class JavaApplication {
         System.out.println("\n3. 메시지 채널 아이디로 조회: " + findMessageChannelId);
         System.out.println(messageService.getMessageByChannelId(findMessageChannelId));
 
-        System.out.println("-------------------------------[ 메시지 다건 조회 ]-------------------------------");
+        System.out.println("\n-------------------------------[ 메시지 다건 조회 ]-------------------------------");
         List<Message> messageList = messageService.getAllMessages();
         for (Message message : messageList) {
             System.out.println(message);
         }
 
-        System.out.println("-------------------------------[ 메시지 수정 ]-------------------------------");
+        System.out.println("\n-------------------------------[ 메시지 수정 ]-------------------------------");
 
         System.out.println("수정 전 메시지4: " + message4);
         Message updatedMessage = messageService.updateMessage(message4.getId(), message4.getChannelId(), message4.getSenderId(), "운동 루틴 3일차 성공! 내일도 화이팅!");
         System.out.println("수정 후 메시지4: " + updatedMessage);
 
 
-        System.out.println("-------------------------------[ 메시지 삭제 ]-------------------------------");
+        System.out.println("\n-------------------------------[ 메시지 삭제 ]-------------------------------");
 
         System.out.println("삭제할 메시지7: " + message7);
         messageService.deleteMessageById(message7.getId());
