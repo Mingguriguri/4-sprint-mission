@@ -76,8 +76,8 @@ public class JavaApplication {
         System.out.println("\n2. 채널 이름으로 조회: " + findChannelName);
         System.out.println(channelService.getChannelByName(findChannelName));
         System.out.println("\n-------------------------------[ 채널 다건 조회 ]-------------------------------");
-        List<Channel> channelList = channelService.getAllChannels();
-        for (Channel channel: channelList) {
+        Set<Channel> channels = channelService.getAllChannels();
+        for (Channel channel: channels) {
             System.out.println(channel);
         }
 
@@ -111,7 +111,7 @@ public class JavaApplication {
         System.out.println("삭제할 채널5: " + channel5);
         channelService.deleteChannel(channel5.getId());
         System.out.println("삭제 후 채널 리스트");
-        for (Channel channel: channelList) {
+        for (Channel channel: channels) {
             System.out.println(channel);
         }
 
@@ -239,7 +239,7 @@ public class JavaApplication {
 
         // 채널 삭제 확인
         System.out.println("4. 채널3 삭제 확인을 위해 채널 리스트 조회");
-        for (Channel channel: channelList) {
+        for (Channel channel: channels) {
             System.out.println(channel);
         }
 

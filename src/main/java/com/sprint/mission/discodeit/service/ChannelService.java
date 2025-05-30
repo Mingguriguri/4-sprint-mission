@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface ChannelService {
 
-    List<Channel> getAllChannels();
+    Set<Channel> getAllChannels();
 
     Optional<Channel> getChannelById(String id);
 

@@ -3,34 +3,31 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
-    private final List<Channel> channelList;
+    private final Set<Channel> channelSet;
 
     public JCFChannelService() {
-        this.channelList = new ArrayList<>();
+        this.channelSet = new HashSet<>();
     }
 
     @Override
-    public List<Channel> getAllChannels() {
-        return channelList;
+    public Set<Channel> getAllChannels() {
+        return channelSet;
     }
 
     @Override
     public Optional<Channel> getChannelById(String id) {
-        return channelList.stream()
+        return channelSet.stream()
                 .filter(channel -> channel.getId().equals(id))
                 .findFirst();
     }
 
     @Override
     public List<Channel> getChannelByName(String channelName) {
-        return channelList.stream()
+        return channelSet.stream()
                 .filter(channel -> channel.getChannelName().equals(channelName))
                 .collect(Collectors.toList());
     }
@@ -38,7 +35,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel createChannel(String channelName, String description, Set<String> memberIds, String ownerId) {
         Channel channel = new Channel(channelName, description, memberIds, ownerId);
-        channelList.add(channel);
+        channelSet.add(channel);
         System.out.println("Successfully Create Channel, " + channel);
 
         return channel;
@@ -109,7 +106,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(String id) {
-        boolean removed = channelList.removeIf(channel -> channel.getId().equals(id));
+        boolean removed = channelSet.removeIf(channel -> channel.getId().equals(id));
         if (!removed) {
             throw new IllegalArgumentException("Channel with id " + id + " not found");
         }
