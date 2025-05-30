@@ -1,19 +1,24 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class Channel extends Base {
     private String channelName;
     private String description;
-    private Set<String> memberIds;
+    private Set<User> users;
     private String ownerId;
 
-    public Channel(String channelName, String description, Set<String> memberIds, String ownerId) {
+    private final List<String> messages;
+
+    public Channel(String channelName, String description, Set<User> users, String ownerId) {
         super();
         this.channelName = channelName;
         this.description = description;
-        this.memberIds = memberIds;
+        this.users = users;
         this.ownerId = ownerId;
+        this.messages = new ArrayList<>();
     }
 
     public String getChannelName() {
@@ -32,12 +37,22 @@ public class Channel extends Base {
         this.description = description;
     }
 
-    public Set<String> getMemberIds() {
-        return memberIds;
+    public Set<User> getUsers() {
+        return users;
     }
 
-    public void setMemberIds(Set<String> memberIds) {
-        this.memberIds = memberIds;
+    public void addUser(User user) {
+        users.add(user);
+        if (!user.getChannels().contains(this)) {
+            user.addChannel(this);
+        }
+    }
+
+    public void removeUser(User user) {
+        users.remove(user);
+        if (user.getChannels().contains(this)) {
+            user.removeChannel(this);
+        }
     }
 
     public String getOwnerId() {
@@ -48,12 +63,16 @@ public class Channel extends Base {
         this.ownerId = ownerId;
     }
 
+    public List<String> getMessages() {
+        return messages;
+    }
+
     @Override
     public String toString() {
         return "Channel{" +
                 "channelName='" + channelName + '\'' +
                 ", description='" + description + '\'' +
-                ", memberIds=" + memberIds +
+                ", users=" + users +
                 ", ownerId='" + ownerId + '\'' +
                 '}';
     }
