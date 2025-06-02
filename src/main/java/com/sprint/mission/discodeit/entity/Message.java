@@ -16,10 +16,17 @@ public class Message extends Base{
         return channel;
     }
 
-    public void setChannel(Channel channel) {
-        if (this.channel != null) {
-            this.channel = channel;
+    public void addChannel(Channel channel) {
+        this.channel = channel;
+        if (!channel.getMessages().contains(this)) {
             channel.addMessage(this);
+        }
+    }
+
+    public void removeChannel(Channel channel) {
+        this.channel = channel;
+        if (channel.getMessages().contains(this)) {
+            channel.removeMessage(this);
         }
     }
 
@@ -27,10 +34,16 @@ public class Message extends Base{
         return user;
     }
 
-    public void setUser(User user) {
-        if (this.user != null) {
-            this.user = user;
+    public void addUser(User user) {
+        this.user = user;
+        if (!user.getMessages().contains(this)) {
             user.addMessage(this);
+        }
+    }
+    public void removeUser(User user) {
+        this.user = user;
+        if (user.getMessages().contains(this)) {
+            user.removeMessage(this);
         }
     }
 

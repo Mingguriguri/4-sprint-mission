@@ -71,14 +71,18 @@ public class Channel extends Base {
     public void addMessage(Message message) {
         if (!messages.contains(message)) {
             messages.add(message);
-            message.setChannel(this);
+            if (!message.getChannel().equals(this)) {
+                message.addChannel(this);
+            }
         }
     }
 
     public void removeMessage(Message message) {
         if (messages.contains(message)) {
             messages.remove(message);
-            message.setChannel(null);
+            if (message.getChannel().equals(this)) {
+                message.removeChannel(this);
+            }
         }
     }
 

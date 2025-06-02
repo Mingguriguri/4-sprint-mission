@@ -71,14 +71,18 @@ public class User extends Base {
     public void addMessage(Message message) {
         if (!messages.contains(message)) {
             messages.add(message);
-            message.setUser(this);
+            if (!message.getUser().equals(this)) {
+                message.addUser(this);
+            }
         }
     }
 
     public void removeMessage(Message message) {
         if (messages.contains(message)) {
             messages.remove(message);
-            message.setUser(null);
+            if (message.getUser().equals(this)) {
+                message.removeUser(this);
+            }
         }
     }
 
