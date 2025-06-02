@@ -70,16 +70,10 @@ public class User extends Base {
     // Message 관련 관계 메서드
     public void addMessage(Message message) {
         messages.add(message);
-        if (!message.getUserList().contains(this)) {
-            message.addUser(this);
-        }
     }
 
     public void removeMessage(Message message) {
         messages.remove(message);
-        if (message.getUserList().contains(this)) {
-            message.removeUser(this);
-        }
     }
 
     @Override

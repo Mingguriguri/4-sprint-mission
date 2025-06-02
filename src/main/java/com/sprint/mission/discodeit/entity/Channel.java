@@ -70,16 +70,10 @@ public class Channel extends Base {
     // Message 관련 관계 메서드
     public void addMessage(Message message) {
         messages.add(message);
-        if (!message.getChannelSet().contains(this)) {
-            message.addChannel(this);
-        }
     }
 
     public void removeMessage(Message message) {
         messages.remove(message);
-        if (message.getChannelSet().contains(this)) {
-            message.removeChannel(this);
-        }
     }
 
     @Override
