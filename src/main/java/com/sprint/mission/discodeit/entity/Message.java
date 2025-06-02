@@ -39,8 +39,9 @@ public class Message extends Base{
     @Override
     public String toString() {
         return "Message{" +
-                "channel=" + channel +
-                ", user=" + user +
+                "id=" + super.getId() +
+                ", channelName=" + channel.getChannelName() +
+                ", senderName=" + user.getUsername() +
                 ", content='" + content + '\'' +
                 '}';
     }

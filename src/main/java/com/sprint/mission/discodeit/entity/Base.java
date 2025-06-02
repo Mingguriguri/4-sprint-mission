@@ -25,13 +25,4 @@ public class Base {
     public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-    @Override
-    public String toString() {
-        return "Base{" +
-                "id='" + id + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 }

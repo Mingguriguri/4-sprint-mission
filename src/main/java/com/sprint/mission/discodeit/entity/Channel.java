@@ -79,7 +79,8 @@ public class Channel extends Base {
     @Override
     public String toString() {
         return "Channel{" +
-                "channelName='" + channelName + '\'' +
+                "id=" + super.getId() +
+                ", channelName='" + channelName + '\'' +
                 ", description='" + description + '\'' +
                 ", users=" + users +
                 ", ownerId='" + ownerId + '\'' +
