@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -67,10 +69,21 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void deleteUser(String id) {
-        boolean removed = userList.removeIf(user -> user.getId().equals(id));
-        if (!removed) {
-            throw new IllegalArgumentException("User with id " + id + " not found");
+    public void deleteUser(User user) {
+        Optional<User> optionalUser = getUserById(user.getId());
+        if (optionalUser.isPresent()) {
+            // 메시지 삭제
+            List<Message> copyOfMessages = new ArrayList<>(user.getMessages());
+            copyOfMessages.forEach(user::removeMessage);
+
+            // 채널 삭제
+            List<Channel> copyOfChannels = new ArrayList<>(user.getChannels());
+            copyOfChannels.forEach(user::removeChannel);
+
+            userList.remove(user);
+        }
+        else {
+            throw new IllegalArgumentException("User with id " + user.getId() + " not found");
         }
     }
 }

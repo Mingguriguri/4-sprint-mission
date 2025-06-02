@@ -44,17 +44,15 @@ public class User extends Base {
         this.password = password;
     }
 
+    public Set<Channel> getChannels() {
+        return channels;
+    }
+
     public List<Message> getMessages() {
         return messages;
     }
 
-    public void addMessage(Message message) {
-        this.messages.add(message);
-    }
-
-    public Set<Channel> getChannels() {
-        return channels;
-    }
+    // Channel 관련 관계 메서드
     public void addChannel(Channel channel) {
         channels.add(channel);
         if (!channel.getUsers().contains(this)) {
@@ -69,12 +67,26 @@ public class User extends Base {
         }
     }
 
+    // Message 관련 관계 메서드
+    public void addMessage(Message message) {
+        messages.add(message);
+        if (!message.getUserList().contains(this)) {
+            message.addUser(this);
+        }
+    }
+
+    public void removeMessage(Message message) {
+        messages.remove(message);
+        if (message.getUserList().contains(this)) {
+            message.removeUser(this);
+        }
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 '}';
     }
 }

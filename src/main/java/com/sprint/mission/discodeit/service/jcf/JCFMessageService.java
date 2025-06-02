@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -36,51 +38,52 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> getMessageByUserId(String senderId) {
         return messageList.stream()
-                .filter(message -> message.getSenderId().equals(senderId))
+                .filter(message -> message.getUser().getId().equals(senderId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Message> getMessageByChannelId(String channelId) {
         return messageList.stream()
-                .filter(message -> message.getChannelId().equals(channelId))
+                .filter(message -> message.getChannel().getId().equals(channelId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Message createMessage(String channelId, String senderId, String content) {
+    public Message createMessage(Channel channel, User user, String content) {
         // 유효성 검사
-        if (userService.getUserById(senderId).isEmpty()) {
+        if (userService.getUserById(user.getId()).isEmpty()) {
             System.out.println("존재하지 않는 사용자입니다.");
 //            throw new IllegalArgumentException("존재하지 않는 사용자입니다."); // 로컬에서 테스트가 어려워 출력문으로 대체하였습니다.
         }
-        if (channelService.getChannelById(channelId).isEmpty()) {
-            System.out.println("존재하지 않는 채널입니다.");
-//            throw new IllegalArgumentException("존재하지 않는 채널입니다."); // 로컬에서 테스트가 어려워 출력문으로 대체하였습니다.
+        if (channelService.getChannelById(channel.getId()).isEmpty()) {
+            System.out.println("존재하지 않는 채널입니다: " + channel.getId());
+            throw new IllegalArgumentException("존재하지 않는 채널입니다: " + channel.getId());
         }
-        Message message = new Message(channelId, senderId, content);
+        Message message = new Message(channel, user, content);
+
+        channel.addMessage(message);
+        user.addMessage(message);
         messageList.add(message);
         return message;
     }
 
     @Override
-    public Message updateMessage(String messageId, String channelId, String senderId, String content) {
+    public Message updateMessage(String messageId, Channel channel, User user, String content) {
         // 유효성 검사
-        if (userService.getUserById(senderId).isEmpty()) {
-            System.out.println("존재하지 않는 사용자입니다.");
-//            throw new IllegalArgumentException("존재하지 않는 사용자입니다."); // 로컬에서 테스트가 어려워 출력문으로 대체하였습니다.
+        if (userService.getUserById(user.getId()).isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
         }
-        if (channelService.getChannelById(channelId).isEmpty()) {
-            System.out.println("존재하지 않는 채널입니다.");
-//            throw new IllegalArgumentException("존재하지 않는 채널입니다."); // 로컬에서 테스트가 어려워 출력문으로 대체하였습니다.
+        if (channelService.getChannelById(channel.getId()).isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
         }
 
         Optional<Message> optionalMessage = getMessageById(messageId);
 
         if (optionalMessage.isPresent()) {
             Message message = optionalMessage.get();
-            message.setChannelId(channelId);
-            message.setSenderId(senderId);
+            message.setChannel(channel);
+            message.setUser(user);
             message.setContent(content);
             message.setUpdatedAt(System.currentTimeMillis());
 
@@ -95,22 +98,6 @@ public class JCFMessageService implements MessageService {
         boolean removed = messageList.removeIf(message -> message.getId().equals(messageId));
         if (!removed) {
             throw new IllegalArgumentException("Message with id " + messageId + " not found");
-        }
-    }
-
-    @Override
-    public void deleteMessagesByUserId(String senderId) {
-        boolean removed = messageList.removeIf(message -> message.getSenderId().equals(senderId));
-        if (!removed) {
-            System.out.println("삭제할 메시지가 없습니다. (senderId: " + senderId + ")");
-        }
-    }
-
-    @Override
-    public void deleteMessageByChannelId(String channelId) {
-        boolean removed = messageList.removeIf(message -> message.getChannelId().equals(channelId));
-        if (!removed) {
-            System.out.println("삭제할 메시지가 없습니다. (channelId: " + channelId + ")");
         }
     }
 }

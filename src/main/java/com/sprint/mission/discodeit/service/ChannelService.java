@@ -22,6 +22,6 @@ public interface ChannelService {
     void leaveUser(String channelId, User user);
     Channel updateChannelOwner(String id, String ownerId);                          // 채널 주인 수정
 
-    void deleteChannel(String id);
+    void deleteChannel(Channel channel);
 
 }

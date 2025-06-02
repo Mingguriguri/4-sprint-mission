@@ -10,7 +10,7 @@ public class Channel extends Base {
     private Set<User> users;
     private String ownerId;
 
-    private final List<String> messages;
+    private final List<Message> messages = new ArrayList<>();
 
     public Channel(String channelName, String description, Set<User> users, String ownerId) {
         super();
@@ -18,7 +18,6 @@ public class Channel extends Base {
         this.description = description;
         this.users = users;
         this.ownerId = ownerId;
-        this.messages = new ArrayList<>();
     }
 
     public String getChannelName() {
@@ -41,6 +40,19 @@ public class Channel extends Base {
         return users;
     }
 
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    // User 관련 관계 메서드
     public void addUser(User user) {
         users.add(user);
         if (!user.getChannels().contains(this)) {
@@ -55,16 +67,19 @@ public class Channel extends Base {
         }
     }
 
-    public String getOwnerId() {
-        return ownerId;
+    // Message 관련 관계 메서드
+    public void addMessage(Message message) {
+        messages.add(message);
+        if (!message.getChannelSet().contains(this)) {
+            message.addChannel(this);
+        }
     }
 
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
-    }
-
-    public List<String> getMessages() {
-        return messages;
+    public void removeMessage(Message message) {
+        messages.remove(message);
+        if (message.getChannelSet().contains(this)) {
+            message.removeChannel(this);
+        }
     }
 
     @Override

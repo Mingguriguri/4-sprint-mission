@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -99,10 +100,21 @@ public class JCFChannelService implements ChannelService {
 
 
     @Override
-    public void deleteChannel(String id) {
-        boolean removed = channelSet.removeIf(channel -> channel.getId().equals(id));
-        if (!removed) {
-            throw new IllegalArgumentException("Channel with id " + id + " not found");
+    public void deleteChannel(Channel channel) {
+        Optional<Channel> optionalChannel = getChannelById(channel.getId());
+        if (optionalChannel.isPresent()) {
+            // 메시지 삭제
+            List<Message> copyOfMessages = new ArrayList<>(channel.getMessages());
+            copyOfMessages.forEach(channel::removeMessage);
+
+            // 유저 삭제
+            List<User> copyOfUsers = new ArrayList<>(channel.getUsers());
+            copyOfUsers.forEach(channel::removeUser);
+
+            channelSet.remove(channel);
+        }
+        else {
+            throw new IllegalArgumentException("Channel with id " + channel.getId() + " not found");
         }
     }
 }
