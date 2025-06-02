@@ -17,7 +17,10 @@ public class Message extends Base{
     }
 
     public void setChannel(Channel channel) {
-        this.channel = channel;
+        if (this.channel != null) {
+            this.channel = channel;
+            channel.addMessage(this);
+        }
     }
 
     public User getUser() {
@@ -25,7 +28,10 @@ public class Message extends Base{
     }
 
     public void setUser(User user) {
-        this.user = user;
+        if (this.user != null) {
+            this.user = user;
+            user.addMessage(this);
+        }
     }
 
     public String getContent() {
