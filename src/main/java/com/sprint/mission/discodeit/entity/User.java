@@ -13,7 +13,7 @@ public class User extends Base {
     private final Set<Channel> channels = new HashSet<>();
     private final List<Message> messages = new ArrayList<>();
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password, UserStatus status) {
         super();
         this.username = username;
         this.email = email;
@@ -54,16 +54,20 @@ public class User extends Base {
 
     // Channel 관련 관계 메서드
     public void addChannel(Channel channel) {
-        channels.add(channel);
-        if (!channel.getUsers().contains(this)) {
-            channel.addUser(this);
+        if (!channels.contains(channel)) {
+            channels.add(channel);
+            if (!channel.getUsers().contains(this)) {
+                channel.addUser(this);
+            }
         }
     }
 
     public void removeChannel(Channel channel) {
-        channels.remove(channel);
-        if (channel.getUsers().contains(this)) {
-            channel.removeUser(this);
+        if (channels.contains(channel)) {
+            channels.remove(channel);
+            if (channel.getUsers() != null) {
+                channel.removeUser(this);
+            }
         }
     }
 
@@ -80,7 +84,7 @@ public class User extends Base {
     public void removeMessage(Message message) {
         if (messages.contains(message)) {
             messages.remove(message);
-            if (message.getUser().equals(this)) {
+            if (message.getUser() != null) {
                 message.removeUser(this);
             }
         }

@@ -62,7 +62,7 @@ public class Channel extends Base {
 
     public void removeUser(User user) {
         users.remove(user);
-        if (user.getChannels().contains(this)) {
+        if (user.getChannels() != null) {
             user.removeChannel(this);
         }
     }
@@ -80,7 +80,7 @@ public class Channel extends Base {
     public void removeMessage(Message message) {
         if (messages.contains(message)) {
             messages.remove(message);
-            if (message.getChannel().equals(this)) {
+            if (message.getChannel() != null) {
                 message.removeChannel(this);
             }
         }

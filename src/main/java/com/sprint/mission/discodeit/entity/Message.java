@@ -24,9 +24,11 @@ public class Message extends Base{
     }
 
     public void removeChannel(Channel channel) {
-        this.channel = channel;
         if (channel.getMessages().contains(this)) {
-            channel.removeMessage(this);
+            this.channel = channel;
+            if (channel.getMessages() != null) {
+                channel.removeMessage(null);
+            }
         }
     }
 
@@ -43,7 +45,7 @@ public class Message extends Base{
     public void removeUser(User user) {
         this.user = user;
         if (user.getMessages().contains(this)) {
-            user.removeMessage(this);
+            user.removeMessage(null);
         }
     }
 
