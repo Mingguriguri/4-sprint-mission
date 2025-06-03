@@ -9,6 +9,7 @@ public class User extends Base {
     private String username;
     private String email;
     private String password;
+    private UserStatus status;
 
     private final Set<Channel> channels = new HashSet<>();
     private final List<Message> messages = new ArrayList<>();
@@ -18,6 +19,7 @@ public class User extends Base {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.status = status;
     }
 
     public String getUsername() {
@@ -50,6 +52,14 @@ public class User extends Base {
 
     public List<Message> getMessages() {
         return messages;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     // Channel 관련 관계 메서드
@@ -96,6 +106,7 @@ public class User extends Base {
                 "id=" + super.getId() +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
+                ", status=" + status +
                 '}';
     }
 }

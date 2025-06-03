@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
@@ -45,20 +46,21 @@ public class JCFUserService implements UserService {
 
     @Override
     public User createUser(String username, String email, String password) {
-        User user = new User(username, email, password);
+        User user = new User(username, email, password, UserStatus.ACTIVE);
         userList.add(user);
         System.out.println("Successfully Create User, " + user);
         return user;
     }
 
     @Override
-    public User updateUser(String id, String username, String email, String password) {
+    public User updateUser(String id, String username, String email, String password, UserStatus status) {
         Optional<User> optionalUser = getUserById(id);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.setUsername(username);
             user.setEmail(email);
             user.setPassword(password);
+            user.setStatus(status);
             user.setUpdatedAt(System.currentTimeMillis());
 
             return user;
@@ -72,6 +74,9 @@ public class JCFUserService implements UserService {
     public void deleteUser(User user) {
         Optional<User> optionalUser = getUserById(user.getId());
         if (optionalUser.isPresent()) {
+//            user.setStatus(UserStatus.DELETED);
+//            user.setDeleted(true);
+
             // 메시지 삭제
             List<Message> copyOfMessages = new ArrayList<>(user.getMessages());
             copyOfMessages.forEach(user::removeMessage);

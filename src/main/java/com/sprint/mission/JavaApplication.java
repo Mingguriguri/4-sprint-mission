@@ -3,6 +3,7 @@ package com.sprint.mission;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -61,7 +62,12 @@ public class JavaApplication {
         }
         System.out.println("\n-------------------------------[ 유저 수정 ]------------------------------- ");
         System.out.println("수정 전 유저4: " + user4);
-        userService.updateUser(user4.getId(), "Codeit", "codeit@gmail.com", "1q2w3e4r!");
+        userService.updateUser(user4.getId(), "Codeit", "codeit@gmail.com", "1q2w3e4r!", UserStatus.ACTIVE);
+        System.out.println("수정 후 유저4: " + user4);
+
+        System.out.println("\n-------------------------------[ 유저 비활성화 ]------------------------------- ");
+        System.out.println("수정 전 유저4: " + user4);
+        userService.updateUser(user4.getId(), "Codeit", "codeit@gmail.com", "1q2w3e4r!", UserStatus.INACTIVE);
         System.out.println("수정 후 유저4: " + user4);
 
         System.out.println("\n-------------------------------[ 유저 삭제 ]------------------------------- ");
@@ -162,9 +168,9 @@ public class JavaApplication {
         Message message7 = messageService.createMessage(channel4, user3, "고양이 사진 보러 왔어요 🐱");
         System.out.println("[" + channelService.getChannelById(message7.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message7 + "] => 메시지 등록 완료");
 
-        Message message8 = messageService.createMessage(channel4, user5, "이모지 테스트 중 😂🔥💯");
+        Message message8 = messageService.createMessage(channel4, user4, "이모지 테스트 중 😂🔥💯");
         System.out.println("[" + channelService.getChannelById(message8.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message8 + "] => 메시지 등록 완료");
-
+//
         System.out.println("\n-------------------------------[ 메시지 단건 조회 ]-------------------------------");
         String findMessageId = message1.getId();
         String findMessageSenderId = message2.getUser().getId();
@@ -175,7 +181,7 @@ public class JavaApplication {
         System.out.println(messageService.getMessageByUserId(findMessageSenderId));
         System.out.println("\n3. 메시지 채널 아이디로 조회: " + findMessageChannelId);
         System.out.println(messageService.getMessageByChannelId(findMessageChannelId));
-
+//
         System.out.println("\n-------------------------------[ 메시지 다건 조회 ]-------------------------------");
         List<Message> messageList = messageService.getAllMessages();
         for (Message message : messageList) {
@@ -199,7 +205,7 @@ public class JavaApplication {
         }
         System.out.println("\n2. 삭제할 메시지: " + message7);
         messageService.deleteMessageById(message7.getId());
-
+        messageList = messageService.getAllMessages(); // 매번 다시 불러오는 게 맞음.
         System.out.println("\n3. 삭제 후 메시지 리스트("+messageList.size()+"개)");
         for (Message message : messageList) {
             System.out.println(message);
