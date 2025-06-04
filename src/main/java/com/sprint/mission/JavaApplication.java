@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.factory.DiscodeitFactory;
+import com.sprint.mission.discodeit.factory.DiscodeitFactory;
 
 import java.util.HashSet;
 import java.util.List;
@@ -106,7 +106,7 @@ public class JavaApplication {
         System.out.println("\n===================================================================================================");
         System.out.println("-------------------------------[ 채널 생성 ]------------------------------- ");
         String ownerId = user1.getId();
-        List<User> memberList = List.of(user1, user2, user3, user4);
+        List<User> memberList = List.of(user1, user2, user3);
         Set<User> members1 = new HashSet<>(memberList);
         Set<User> members2 = new HashSet<>(memberList);
         Set<User> members3 = new HashSet<>(memberList);
@@ -125,7 +125,7 @@ public class JavaApplication {
         List<Channel> findChannelByUserId = channelService.getChannelByUserId(user1.getId());
 
         System.out.println("1. 채널 아이디로 조회: " + findChannelId);
-        System.out.println(channelService.getChannelByIdWithActive(findChannelId));
+        System.out.println(channelService.getChannelById(findChannelId));
 
         System.out.println("\n2. 채널 이름으로 조회: " + findChannelName);
         System.out.println(channelService.getChannelByName(findChannelName));
@@ -157,8 +157,8 @@ public class JavaApplication {
         System.out.println("1. 수정 전 채널4 Users: " );
         channel4.getUsers().forEach(System.out::println);
 
-        System.out.println("\n2. user5(David) 추가");
-        channelService.joinUser(channel4.getId(), user5);
+        System.out.println("\n2. user4(Alice) 추가");
+        channelService.joinUser(channel4.getId(), user4);
 
         System.out.println("\n3. 수정 후 채널4 Users: ");
         channel4.getUsers().forEach(System.out::println);
@@ -215,34 +215,34 @@ public class JavaApplication {
         System.out.println("-------------------------------[ 메시지 등록 ]-------------------------------");
 
         // ===  #daily-goals 채널 ===
-        System.out.println("💬메시지를 보낼 채널: " + channelService.getChannelByIdWithActive(channel3.getId()) + "\n");
+        System.out.println("💬메시지를 보낼 채널: " + channelService.getChannelById(channel3.getId()) + "\n");
 
         Message message1 = messageService.createMessage(channel3, user1, "목표 1: 알고리즘 문제 2개 풀기");
-        System.out.println("[" + channelService.getChannelByIdWithActive(message1.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message1 + "] => 메시지 등록 완료");
+        System.out.println("[" + channelService.getChannelById(message1.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message1 + "] => 메시지 등록 완료");
 
         Message message2 = messageService.createMessage(channel3, user2, "오늘은 영어 회화 연습 30분!");
-        System.out.println("[" + channelService.getChannelByIdWithActive(message2.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message2 + "] => 메시지 등록 완료");
+        System.out.println("[" + channelService.getChannelById(message2.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message2 + "] => 메시지 등록 완료");
 
         Message message3 = messageService.createMessage(channel3, user3, "책 20페이지 읽고 요약 올릴게요");
-        System.out.println("[" + channelService.getChannelByIdWithActive(message3.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message3 + "] => 메시지 등록 완료");
+        System.out.println("[" + channelService.getChannelById(message3.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message3 + "] => 메시지 등록 완료");
 
         Message message4 = messageService.createMessage(channel3, user4, "운동 루틴 3일차 돌입!");
-        System.out.println("[" + channelService.getChannelByIdWithActive(message4.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message4 + "] => 메시지 등록 완료\n");
+        System.out.println("[" + channelService.getChannelById(message4.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message4 + "] => 메시지 등록 완료\n");
 
         // === #off-topic(= #free-topic) 채널 ===
-        System.out.println("💬메시지를 보낼 채널: " + channelService.getChannelByIdWithActive(channel4.getId()) + "\n");
+        System.out.println("💬메시지를 보낼 채널: " + channelService.getChannelById(channel4.getId()) + "\n");
 
         Message message5 = messageService.createMessage(channel4, user1, "점심 뭐 먹지 고민 중 🍜");
-        System.out.println("[" + channelService.getChannelByIdWithActive(message5.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message5 + "] => 메시지 등록 완료");
+        System.out.println("[" + channelService.getChannelById(message5.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message5 + "] => 메시지 등록 완료");
 
         Message message6 = messageService.createMessage(channel4, user2, "어제 본 드라마 진짜 꿀잼이었음ㅋㅋ");
-        System.out.println("[" + channelService.getChannelByIdWithActive(message6.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message6 + "] => 메시지 등록 완료");
+        System.out.println("[" + channelService.getChannelById(message6.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message6 + "] => 메시지 등록 완료");
 
         Message message7 = messageService.createMessage(channel4, user3, "고양이 사진 보러 왔어요 🐱");
-        System.out.println("[" + channelService.getChannelByIdWithActive(message7.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message7 + "] => 메시지 등록 완료");
+        System.out.println("[" + channelService.getChannelById(message7.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message7 + "] => 메시지 등록 완료");
 
         Message message8 = messageService.createMessage(channel4, user4, "이모지 테스트 중 😂🔥💯");
-        System.out.println("[" + channelService.getChannelByIdWithActive(message8.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message8 + "] => 메시지 등록 완료");
+        System.out.println("[" + channelService.getChannelById(message8.getChannel().getId()).get().getChannelName() + "] 채널에 [" + message8 + "] => 메시지 등록 완료");
 //
         System.out.println("\n-------------------------------[ 메시지 단건 조회 ]-------------------------------");
         String findMessageId = message1.getId();
