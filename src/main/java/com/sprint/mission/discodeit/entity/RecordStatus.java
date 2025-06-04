@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
 /**
- * 레코드(엔티티)의 삭제/보관/복구 라이프사이클 상태를 상세히 표현하는 ENUM
+ * 레코드(엔티티)의 Soft Delete/Restore 상태를 나타내는 Enum.
+ * <ul>
+ *   <li>ACTIVE: 정상 상태 (삭제되지 않음)</li>
+ *   <li>DELETED: 소프트 삭제된 상태 (일반 조회에서 제외됨)</li>
+ * </ul>
  */
+
 public enum RecordStatus {
-    // 정상(아직 삭제 요청도, 삭제 처리도 되지 않은 상태)
     ACTIVE("정상"),
-    // 소프트 삭제 처리되어 일반 조회에서 제외된 상태
     DELETED("소프트 삭제됨");
 
     private final String recordStatus;
