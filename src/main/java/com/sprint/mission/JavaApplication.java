@@ -26,23 +26,7 @@ public class JavaApplication {
         User user4 = userService.createUser("Alice", "alice@example.com", "1q2w3e4r!");
         User user5 = userService.createUser("David", "david@example.com", "1q2w3e4r!");
 
-        System.out.println("-------------------------------[ 채널 생성 ]------------------------------- ");
-        String ownerId = user1.getId();
-        List<User> memberList = List.of(user1, user2, user3, user4);
-        Set<User> members1 = new HashSet<>(memberList);
-        Set<User> members2 = new HashSet<>(memberList);
-        Set<User> members3 = new HashSet<>(memberList);
-        Set<User> members4 = new HashSet<>(memberList);
-        Set<User> members5 = new HashSet<>(memberList);
-
-        Channel channel1 = channelService.createChannel("#announcements", "서버의 중요한 소식이나 업데이트를 공지하는 채널입니다. 모두 확인 필수!", members1, ownerId);
-        Channel channel2 = channelService.createChannel("#now-playing", "지금 듣고 있는 노래를 공유하거나, 추천 음악을 소개하는 뮤직 채널입니다.", members2, ownerId);
-        Channel channel3 = channelService.createChannel("#daily-goals", "오늘 할 일, 목표, 공부 계획을 공유하고 서로 동기 부여하는 채널이에요.", members3, ownerId);
-        Channel channel4 = channelService.createChannel("#off-topic", "주제 자유! 게임, 밈, 일상 얘기 등 아무 이야기나 나눠요.", members4, ownerId);
-        Channel channel5 = channelService.createChannel("#qna", "질문이 있다면 이 채널에 남겨주세요.", members5, ownerId);
-
-        System.out.println("\n===================================================================================================");
-        System.out.println("-------------------------------[ 유저 단건 조회 ]------------------------------- ");
+        System.out.println("\n-------------------------------[ 유저 단건 조회 ]------------------------------- ");
         String findUserId = user1.getId();
         String findUserName = user2.getUsername();
         String findUserEmail = user3.getEmail();
@@ -120,6 +104,21 @@ public class JavaApplication {
         userList.forEach(System.out::println);
 
         System.out.println("\n===================================================================================================");
+        System.out.println("-------------------------------[ 채널 생성 ]------------------------------- ");
+        String ownerId = user1.getId();
+        List<User> memberList = List.of(user1, user2, user3, user4);
+        Set<User> members1 = new HashSet<>(memberList);
+        Set<User> members2 = new HashSet<>(memberList);
+        Set<User> members3 = new HashSet<>(memberList);
+        Set<User> members4 = new HashSet<>(memberList);
+        Set<User> members5 = new HashSet<>(memberList);
+
+        Channel channel1 = channelService.createChannel("#announcements", "서버의 중요한 소식이나 업데이트를 공지하는 채널입니다. 모두 확인 필수!", members1, ownerId);
+        Channel channel2 = channelService.createChannel("#now-playing", "지금 듣고 있는 노래를 공유하거나, 추천 음악을 소개하는 뮤직 채널입니다.", members2, ownerId);
+        Channel channel3 = channelService.createChannel("#daily-goals", "오늘 할 일, 목표, 공부 계획을 공유하고 서로 동기 부여하는 채널이에요.", members3, ownerId);
+        Channel channel4 = channelService.createChannel("#off-topic", "주제 자유! 게임, 밈, 일상 얘기 등 아무 이야기나 나눠요.", members4, ownerId);
+        Channel channel5 = channelService.createChannel("#qna", "질문이 있다면 이 채널에 남겨주세요.", members5, ownerId);
+
         System.out.println("-------------------------------[ 채널 단건 조회 ]-------------------------------");
         String findChannelId = channel1.getId();
         String findChannelName = channel2.getChannelName();
@@ -131,7 +130,7 @@ public class JavaApplication {
         System.out.println("\n2. 채널 이름으로 조회: " + findChannelName);
         System.out.println(channelService.getChannelByName(findChannelName));
 
-        System.out.println("\n3. 특정 유저의 채널 목록 조회 (유저명: " + user1.getUsername() + ", 유저의 채널 개수: (" + findChannelByUserId.size() + "개))");
+        System.out.println("\n3. 특정 유저 아이디로 조회 (유저명: " + user1.getUsername() + ", 유저의 채널 개수: (" + findChannelByUserId.size() + "개))");
         findChannelByUserId.forEach(System.out::println);
 
         System.out.println("\n-------------------------------[ 채널 다건 조회 ]-------------------------------");
