@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.RecordStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -17,12 +18,35 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Set<Channel> getAllChannels() {
-        return channelSet;
+        return channelSet.stream()
+                .filter(channel -> channel.getRecordStatus().equals(RecordStatus.ACTIVE))
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public Optional<Channel> getChannelById(String id) {
+    public List<Channel> getChannelByUserId(String userId) {
         return channelSet.stream()
+                .filter(channel -> channel.getRecordStatus().equals(RecordStatus.ACTIVE))
+                .filter(channel ->
+                        channel.getUsers().stream()
+                                .anyMatch(user -> user.getId().equals(userId))
+                )
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Channel> getChannelByIdWithActive(String id) {
+        return channelSet.stream()
+                .filter(channel -> channel.getRecordStatus().equals(RecordStatus.ACTIVE))
+                .filter(channel -> channel.getId().equals(id))
+                .findFirst();
+    }
+
+    // JCFChannelService 내부에서만 씀
+    @Override
+    public Optional<Channel> getChannelByIdWithStatus(String id, RecordStatus recordStatus) {
+        return channelSet.stream()
+                .filter(channel -> channel.getRecordStatus().equals(recordStatus))
                 .filter(channel -> channel.getId().equals(id))
                 .findFirst();
     }
@@ -30,6 +54,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public List<Channel> getChannelByName(String channelName) {
         return channelSet.stream()
+                .filter(channel -> channel.getRecordStatus().equals(RecordStatus.ACTIVE))
                 .filter(channel -> channel.getChannelName().equals(channelName))
                 .collect(Collectors.toList());
     }
@@ -45,7 +70,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel updateChannelInfo(String id, String channelName, String description) {
-        Optional<Channel> optionalChannel = getChannelById(id);
+        Optional<Channel> optionalChannel = getChannelByIdWithActive(id);
         if (optionalChannel.isPresent()) {
             Channel channel = optionalChannel.get();
             channel.setChannelName(channelName);
@@ -60,7 +85,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void joinUser(String channelId, User user) {
-        Optional<Channel> optionalChannel = getChannelById(channelId);
+        Optional<Channel> optionalChannel = getChannelByIdWithActive(channelId);
 
         if (optionalChannel.isPresent()) {
             Channel channel = optionalChannel.get();
@@ -73,7 +98,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void leaveUser(String channelId, User user) {
-        Optional<Channel> optionalChannel = getChannelById(channelId);
+        Optional<Channel> optionalChannel = getChannelByIdWithActive(channelId);
         if (optionalChannel.isPresent()) {
             Channel channel = optionalChannel.get();
             channel.removeUser(user);
@@ -85,7 +110,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel updateChannelOwner(String id, String ownerId) {
-        Optional<Channel> optionalChannel = getChannelById(id);
+        Optional<Channel> optionalChannel = getChannelByIdWithActive(id);
 
         if (optionalChannel.isPresent()) {
             Channel channel = optionalChannel.get();
@@ -101,17 +126,77 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(Channel channel) {
-        Optional<Channel> optionalChannel = getChannelById(channel.getId());
+        Optional<Channel> optionalChannel = getChannelByIdWithActive(channel.getId());
         if (optionalChannel.isPresent()) {
-            // 메시지 삭제
+            // 메시지 Soft Delete
+            List<Message> copyOfMessages = new ArrayList<>(channel.getMessages());
+            copyOfMessages.forEach(msg -> {
+                        msg.setRecordStatus(RecordStatus.DELETED);
+                        msg.setUpdatedAt(System.currentTimeMillis());
+                    });
+
+            // 유저 Soft Delete
+//            List<User> copyOfUsers = new ArrayList<>(channel.getUsers());
+//            for (User user: copyOfUsers) {
+//                // TODO 여기서 채널 상관없이 다 지워져버림 유저가.
+////                user.setRecordStatus(RecordStatus.DELETED);
+////                user.setUpdatedAt(System.currentTimeMillis());
+//                channel.removeUser(user);
+//
+//            }
+
+            // 채널 Soft Delete
+            channel.setRecordStatus(RecordStatus.DELETED);
+            channel.setUpdatedAt(System.currentTimeMillis());
+        }
+        else {
+            throw new IllegalArgumentException("Channel with id " + channel.getId() + " not found");
+        }
+    }
+
+    @Override
+    public void restoreChannel(Channel channel) {
+        Optional<Channel> optionalMessage = getChannelByIdWithStatus(channel.getId(), RecordStatus.DELETED);
+
+        if (optionalMessage.isPresent()) {
+            // 메시지 복원
+            List<Message> copyOfMessages = new ArrayList<>(channel.getMessages());
+            for (Message msg: copyOfMessages) {
+                msg.setRecordStatus(RecordStatus.ACTIVE);
+                msg.setUpdatedAt(System.currentTimeMillis());
+            }
+
+            // 유저 복원
+//            List<User> copyOfUsers = new ArrayList<>(channel.getUsers());
+//            for (User user: copyOfUsers) {
+//                user.setRecordStatus(RecordStatus.ACTIVE);
+//                user.setUpdatedAt(System.currentTimeMillis());
+//            }
+
+            // 채널 복원
+            channel.setRecordStatus(RecordStatus.ACTIVE);
+            channel.setUpdatedAt(System.currentTimeMillis());
+
+        }
+        else {
+            throw new IllegalArgumentException("Channel with id " + channel.getId() + " not found");
+        }
+    }
+
+    @Override
+    public void hardDeleteChannel(Channel channel) {
+        Optional<Channel> optionalChannel = getChannelByIdWithStatus(channel.getId(), RecordStatus.DELETED);
+        if (optionalChannel.isPresent()) {
+            // 메시지 Hard Delete
             List<Message> copyOfMessages = new ArrayList<>(channel.getMessages());
             copyOfMessages.forEach(channel::removeMessage);
 
-            // 유저 삭제
+            // 유저 Hard Delete
             List<User> copyOfUsers = new ArrayList<>(channel.getUsers());
             copyOfUsers.forEach(channel::removeUser);
 
-            channelSet.remove(channel);
+            // 채널 Hard Delete
+             channelSet.remove(channel);
         }
         else {
             throw new IllegalArgumentException("Channel with id " + channel.getId() + " not found");
