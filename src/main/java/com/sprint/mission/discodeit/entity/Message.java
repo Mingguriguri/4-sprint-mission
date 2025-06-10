@@ -55,9 +55,11 @@ public class Message extends BaseEntity {
      * @param channel 연결할 Channel 객체
      */
     public void addChannel(Channel channel) {
-        this.channel = channel;
         if (!channel.getMessages().contains(this)) {
-            channel.addMessage(this);
+            this.channel = channel;
+            if (!channel.getMessages().contains(this)) {
+                channel.addMessage(this);
+            }
         }
     }
 
