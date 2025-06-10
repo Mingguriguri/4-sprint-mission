@@ -22,9 +22,9 @@ import java.util.Set;
 public class Channel extends BaseEntity {
     private String channelName;
     private String description;
-    private Set<User> users;
     private String ownerId;
 
+    private final Set<User> users;
     private final List<Message> messages = new ArrayList<>();
 
     public Channel(String channelName, String description, Set<User> users, String ownerId) {
