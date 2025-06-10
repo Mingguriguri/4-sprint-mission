@@ -19,7 +19,7 @@ import java.util.Set;
  * @see Message
  */
 
-public class Channel extends Base {
+public class Channel extends BaseEntity {
     private String channelName;
     private String description;
     private Set<User> users;

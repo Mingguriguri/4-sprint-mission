@@ -10,7 +10,7 @@ package com.sprint.mission.discodeit.entity;
  * </ul>
  * <p>Soft Delete/Hard Delete 로직은 MessageService 책임지며, 이 엔티티는 RecordStatus를 통해 상태 관리를 한다.</p>
  */
-public class Message extends Base{
+public class Message extends BaseEntity {
     private Channel channel;
     private User user;
     private String content;

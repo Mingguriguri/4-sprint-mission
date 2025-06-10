@@ -18,7 +18,7 @@ import java.util.Set;
  * </ul>
  * <p>Soft Delete/Hard Delete 로직은 UserService 책임지며, 이 엔티티는 RecordStatus를 통해 상태 관리를 한다.</p>
  */
-public class User extends Base {
+public class User extends BaseEntity {
     private String username;
     private String email;
     private String password;

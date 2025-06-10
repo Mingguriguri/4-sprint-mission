@@ -17,13 +17,13 @@ import java.util.UUID;
  * </p>
  */
 
-public class Base {
+public class BaseEntity {
     private final String id;
     private final long createdAt;
     private long updatedAt;
     private RecordStatus recordStatus;
 
-    public Base() {
+    public BaseEntity() {
         this.id = UUID.randomUUID().toString();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = System.currentTimeMillis();
