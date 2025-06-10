@@ -30,6 +30,10 @@ public class BaseEntity {
         this.recordStatus = RecordStatus.ACTIVE;
     }
 
+    /* =========================================================
+     * Getter
+     * =========================================================*/
+
     public String getId() {
         return id;
     }
@@ -42,15 +46,24 @@ public class BaseEntity {
         return updatedAt;
     }
 
-    public void setUpdatedAt(long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public RecordStatus getRecordStatus() {
         return recordStatus;
     }
 
-    public void setRecordStatus(RecordStatus recordStatus) {
-        this.recordStatus = recordStatus;
+    /* =========================================================
+     * Setter
+     * =========================================================*/
+
+    public void touch() {
+        this.updatedAt = System.currentTimeMillis();
+    }
+
+    // recordStatus
+    public void softDelete() {
+        this.recordStatus = RecordStatus.DELETED;
+    }
+
+    public void restore() {
+        this.recordStatus = RecordStatus.ACTIVE;
     }
 }

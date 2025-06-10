@@ -124,9 +124,9 @@ public class JCFChannelService implements ChannelService {
         }
 
         Channel channel = optionalChannel.get();
-        channel.setChannelName(channelName);
-        channel.setDescription(description);
-        channel.setUpdatedAt(System.currentTimeMillis());
+        channel.changeChannelName(channelName);
+        channel.updateChannelDesc(description);
+        channel.touch();
 
         return channel;
     }
@@ -153,7 +153,7 @@ public class JCFChannelService implements ChannelService {
         }
 
         channel.addUser(user);
-        channel.setUpdatedAt(System.currentTimeMillis());
+        channel.touch();
     }
 
     @Override
@@ -185,7 +185,7 @@ public class JCFChannelService implements ChannelService {
         }
 
         channel.removeUser(user);
-        channel.setUpdatedAt(System.currentTimeMillis());
+        channel.touch();
     }
 
     @Override
@@ -205,8 +205,8 @@ public class JCFChannelService implements ChannelService {
             throw new IllegalArgumentException("Owner ID cannot be null");
         }
         Channel channel = optionalChannel.get();
-        channel.setOwnerId(ownerId);
-        channel.setUpdatedAt(System.currentTimeMillis());
+        channel.changeChannelOwnerId(ownerId);
+        channel.touch();
 
         return channel;
     }
@@ -227,13 +227,13 @@ public class JCFChannelService implements ChannelService {
         // 메시지 Soft Delete
         channel.getMessages().stream()
                 .forEach(msg -> {
-                    msg.setRecordStatus(RecordStatus.DELETED);
-                    msg.setUpdatedAt(System.currentTimeMillis());
+                    msg.softDelete();
+                    msg.touch();
         });
 
         // 채널 Soft Delete
-        channel.setRecordStatus(RecordStatus.DELETED);
-        channel.setUpdatedAt(System.currentTimeMillis());
+        channel.softDelete();
+        channel.touch();
     }
 
     @Override
@@ -249,13 +249,13 @@ public class JCFChannelService implements ChannelService {
         // 메시지 복원
         channel.getMessages().stream()
                 .forEach(msg -> {
-                    msg.setRecordStatus(RecordStatus.ACTIVE);
-                    msg.setUpdatedAt(System.currentTimeMillis());
+                    msg.restore();
+                    msg.touch();
         });
 
         // 채널 복원
-        channel.setRecordStatus(RecordStatus.ACTIVE);
-        channel.setUpdatedAt(System.currentTimeMillis());
+        channel.restore();
+        channel.touch();
     }
 
     @Override

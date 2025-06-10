@@ -143,8 +143,8 @@ public class JCFMessageService implements MessageService {
 
         message.addChannel(channel);
         message.addUser(user);
-        message.setContent(content);
-        message.setUpdatedAt(System.currentTimeMillis());
+        message.sendMessageContent(content);
+        message.touch();
 
         return message;
 
@@ -172,8 +172,8 @@ public class JCFMessageService implements MessageService {
             throw new IllegalArgumentException("Message with id " + messageId + " not found or not ACTIVE");
         }
         Message message = optionalMessage.get();
-        message.setUpdatedAt(System.currentTimeMillis());
-        message.setRecordStatus(RecordStatus.DELETED);
+        message.touch();
+        message.softDelete();
     }
 
     @Override
@@ -194,8 +194,8 @@ public class JCFMessageService implements MessageService {
             throw new IllegalArgumentException("Message with id " + messageId + " not found or not DELETED");
         }
         Message message = optionalMessage.get();
-        message.setUpdatedAt(System.currentTimeMillis());
-        message.setRecordStatus(RecordStatus.ACTIVE);
+        message.touch();
+        message.restore();
     }
 
     @Override

@@ -22,11 +22,19 @@ public class Message extends BaseEntity {
         this.content = content;
     }
 
+    /* =========================================================
+     * Getter
+     * =========================================================*/
+
     public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    /* =========================================================
+     * Setter
+     * =========================================================*/
+
+    public void sendMessageContent(String content) {
         this.content = content;
     }
 

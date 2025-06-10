@@ -108,10 +108,10 @@ public class JCFUserService implements UserService {
         if (user.getStatus() == UserStatus.WITHDREW) {
             throw new IllegalArgumentException("This user is withdrew. Cannot update a deleted user: " + id);
         }
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setUpdatedAt(System.currentTimeMillis());
+        user.changeUsername(username);
+        user.updateUserEmail(email);
+        user.changeUserPassword(password);
+        user.touch();
 
         return user;
     }
@@ -132,8 +132,8 @@ public class JCFUserService implements UserService {
             // 이미 비활성화되어있다면 예외
             throw new IllegalArgumentException("User is already inactive: " + user.getId());
         }
-        user.setStatus(UserStatus.INACTIVE);
-        user.setUpdatedAt(System.currentTimeMillis());
+        user.inactivate();
+        user.touch();
     }
 
     // 비활성화된 사용자 다시 활성화
@@ -151,8 +151,8 @@ public class JCFUserService implements UserService {
             // 기존에 비활성화되지 않았다면 예외
             throw new IllegalArgumentException("User is already active: " + user.getId());
         }
-        user.setStatus(UserStatus.ACTIVE);
-        user.setUpdatedAt(System.currentTimeMillis());
+        user.activate();
+        user.touch();
     }
 
     /* =========================================================
@@ -171,20 +171,20 @@ public class JCFUserService implements UserService {
 
         // 메시지 Soft Delete
         user.getMessages().forEach(msg -> {
-            msg.setRecordStatus(RecordStatus.DELETED);
-            msg.setUpdatedAt(System.currentTimeMillis());
+            msg.softDelete();
+            msg.touch();
         });
 
         // 채널 Soft Delete
         user.getChannels().forEach(msg -> {
-                    msg.setRecordStatus(RecordStatus.DELETED);
-                    msg.setUpdatedAt(System.currentTimeMillis());
+                    msg.softDelete();
+                    msg.touch();
                 });
 
         // 유저 Soft Delete
-        user.setStatus(UserStatus.INACTIVE);
-        user.setRecordStatus(RecordStatus.DELETED);
-        user.setUpdatedAt(System.currentTimeMillis());
+        user.inactivate();
+        user.softDelete();
+        user.touch();
 
     }
 
@@ -199,20 +199,20 @@ public class JCFUserService implements UserService {
 
         // 메시지 복원
         user.getMessages().forEach(msg -> {
-            msg.setRecordStatus(RecordStatus.ACTIVE);
-            msg.setUpdatedAt(System.currentTimeMillis());
+            msg.restore();
+            msg.touch();
         });
 
         // 채널 복원
         user.getChannels().forEach(msg -> {
-            msg.setRecordStatus(RecordStatus.ACTIVE);
-            msg.setUpdatedAt(System.currentTimeMillis());
+            msg.restore();
+            msg.touch();
         });
 
         // 유저 복원
-        user.setStatus(UserStatus.ACTIVE);
-        user.setRecordStatus(RecordStatus.ACTIVE);
-        user.setUpdatedAt(System.currentTimeMillis());
+        user.activate();
+        user.restore();
+        user.touch();
     }
 
     @Override

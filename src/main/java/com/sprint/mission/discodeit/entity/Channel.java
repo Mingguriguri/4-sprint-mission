@@ -35,27 +35,38 @@ public class Channel extends BaseEntity {
         this.ownerId = ownerId;
     }
 
+    /* =========================================================
+     * Getter
+     * =========================================================*/
+
     public String getChannelName() {
         return channelName;
-    }
-
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
+    /* =========================================================
+     * Setter
+     * =========================================================*/
+
+    // 채널명 변경하는 메서드
+    public void changeChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
+    // 채널 설명을 업데이트하는 메서드
+    public void updateChannelDesc(String description) {
+        this.description = description;
+    }
+
+    // 채널 소유자를 변경하는 메서드
+    public void changeChannelOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
 
