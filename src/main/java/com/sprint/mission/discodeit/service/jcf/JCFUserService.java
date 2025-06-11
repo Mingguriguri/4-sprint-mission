@@ -66,7 +66,7 @@ public class JCFUserService implements UserService {
         validateNotNullUserEmailorName(username);
         validateNotNullUserEmailorName(email);
 
-        User user = new User(username, email, password, UserStatus.ACTIVE);
+        User user = new User(username, email, password);
         userList.add(user);
         System.out.println("Successfully Create User, " + user);
         return user;
