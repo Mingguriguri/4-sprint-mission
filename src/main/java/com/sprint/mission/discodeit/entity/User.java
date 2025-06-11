@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * User 엔티티는 디스코드잇 회원을 나타낸다.
@@ -18,21 +17,24 @@ import java.util.Set;
  * </ul>
  * <p>Soft Delete/Hard Delete 로직은 UserService 책임지며, 이 엔티티는 RecordStatus를 통해 상태 관리를 한다.</p>
  */
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private String username;
     private String email;
-    private String password;
+    private transient String password;
     private UserStatus status;
 
     private final Set<Channel> channels = new HashSet<>();
     private final List<Message> messages = new ArrayList<>();
 
-    public User(String username, String email, String password, UserStatus status) {
+    public User(String username, String email, String password) {
         super();
         this.username = username;
         this.email = email;
         this.password = password;
-        this.status = status;
+        this.status = UserStatus.ACTIVE;
     }
 
     /* =========================================================
@@ -181,5 +183,17 @@ public class User extends BaseEntity {
                 ", email='" + email + '\'' +
                 ", status=" + status +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User u)) return false;
+        return Objects.equals(getId(), u.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }
