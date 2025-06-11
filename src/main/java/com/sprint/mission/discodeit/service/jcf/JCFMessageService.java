@@ -28,54 +28,34 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> getAllMessages() {
         return messageList.stream()
-                .filter(message -> message.getRecordStatus().equals(RecordStatus.ACTIVE))
+                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
                 .toList();
     }
 
     @Override
     public Optional<Message> getMessageById(String messageId) {
-        if (messageId == null) {
-            throw new IllegalArgumentException("Message ID cannot be null");
-        }
+        validateNotNullId(messageId);
         return messageList.stream()
-                .filter(message -> message.getRecordStatus().equals(RecordStatus.ACTIVE))
-                .filter(message -> message.getId().equals(messageId))
+                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
+                .filter(msg -> msg.getUser().getId().equals(messageId))
                 .findFirst();
     }
 
     @Override
-    public Optional<Message> getMessageByIdWithStatus(String messageId, RecordStatus recordStatus) {
-        if (messageId == null) {
-            throw new IllegalArgumentException("Message ID cannot be null");
-        }
-        if (recordStatus == null) {
-            throw new IllegalArgumentException("RecordStatus cannot be null");
-        }
+    public List<Message> getMessageByUserId(String userId) {
+        validateNotNullId(userId);
         return messageList.stream()
-                .filter(message -> message.getRecordStatus().equals(recordStatus))
-                .filter(message -> message.getId().equals(messageId))
-                .findFirst();
-    }
-
-    @Override
-    public List<Message> getMessageByUserId(String senderId) {
-        if (senderId == null) {
-            throw new IllegalArgumentException("User ID cannot be null");
-        }
-        return messageList.stream()
-                .filter(message -> message.getRecordStatus().equals(RecordStatus.ACTIVE))
-                .filter(message -> message.getUser().getId().equals(senderId))
+                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
+                .filter(msg -> msg.getUser().getId().equals(userId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Message> getMessageByChannelId(String channelId) {
-        if (channelId == null) {
-            throw new IllegalArgumentException("Channel ID cannot be null");
-        }
+        validateNotNullId(channelId);
         return messageList.stream()
-                .filter(message -> message.getRecordStatus().equals(RecordStatus.ACTIVE))
-                .filter(message -> message.getChannel().getId().equals(channelId))
+                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
+                .filter(msg -> msg.getChannel().getId().equals(channelId))
                 .collect(Collectors.toList());
     }
 
@@ -85,28 +65,14 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message createMessage(Channel channel, User user, String content) {
-        // channel이 null이거나 recordStatus != ACTIVE일 경우
-        if (channel == null) {
-            throw new IllegalArgumentException("Channel cannot be null");
-        }
-        if (!channel.getRecordStatus().equals(RecordStatus.ACTIVE)) {
-            throw new IllegalArgumentException("Channel is not ACTIVE: " + channel.getId());
-        }
-
-        // user가 null이거나 recordStatus != ACTIVE일 경우
-        if (user == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        }
-        if (!user.getRecordStatus().equals(RecordStatus.ACTIVE)) {
-            throw new IllegalArgumentException("User is not ACTIVE: " + user.getId());
-        }
-
+        validateActiveChannel(channel);
+        validateActiveUser(user);
         Message message = new Message(channel, user, content);
-
         channel.addMessage(message);
         user.addMessage(message);
         messageList.add(message);
         return message;
+
     }
 
     /* =========================================================
@@ -115,31 +81,11 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message updateMessage(String messageId, Channel channel, User user, String content) {
-        // messageId가 null이거나 존재하지 않거나 recordStatus != ACTIVE인 경우
-        if (messageId == null) {
-            throw new IllegalArgumentException("Message ID cannot be null");
-        }
-        Optional<Message> optionalMessage = getMessageByIdWithStatus(messageId, RecordStatus.ACTIVE);
-        if (optionalMessage.isEmpty()) {
-            throw new IllegalArgumentException("Message with id " + messageId + " not found or not ACTIVE");
-        }
-        Message message = optionalMessage.get();
+        validateNotNullId(messageId);
 
-        // channel이 null이거나 recordStatus != ACTIVE인 경우
-        if (channel == null) {
-            throw new IllegalArgumentException("Channel cannot be null");
-        }
-        if (!channel.getRecordStatus().equals(RecordStatus.ACTIVE)) {
-            throw new IllegalArgumentException("Channel is not ACTIVE: " + channel.getId());
-        }
-
-        // user가 null이거나 recordStatus != ACTIVE인 경우
-        if (user == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        }
-        if (!user.getRecordStatus().equals(RecordStatus.ACTIVE)) {
-            throw new IllegalArgumentException("User is not ACTIVE: " + user.getId());
-        }
+        Message message = findMessageOrThrow(messageId, RecordStatus.ACTIVE);
+        validateActiveChannel(channel);
+        validateActiveUser(user);
 
         message.addChannel(channel);
         message.addUser(user);
@@ -147,75 +93,92 @@ public class JCFMessageService implements MessageService {
         message.touch();
 
         return message;
-
     }
 
     /* =========================================================
-     * DELETE
+     * DELETE / RESTORE
      * ========================================================= */
 
     @Override
     public void deleteMessageById(String messageId) {
-        // messageId가 null이거나 존재하지 않는 경우
-        if (messageId == null) {
-            throw new IllegalArgumentException("Message ID cannot be null");
-        }
-        // 이미 recordStatus가 DELETED인 경우
-        Optional<Message> deletedCheck = getMessageByIdWithStatus(messageId, RecordStatus.DELETED);
-        if (deletedCheck.isPresent()) {
-            throw new IllegalArgumentException("Message with id " + messageId + " is already DELETED");
-        }
-
-        // ACTIVE 상태인지 확인 -> 삭제
-        Optional<Message> optionalMessage = getMessageByIdWithStatus(messageId, RecordStatus.ACTIVE);
-        if (optionalMessage.isEmpty()) {
-            throw new IllegalArgumentException("Message with id " + messageId + " not found or not ACTIVE");
-        }
-        Message message = optionalMessage.get();
+        validateNotNullId(messageId);
+        Message message = findMessageOrThrow(messageId, RecordStatus.ACTIVE);
         message.touch();
         message.softDelete();
     }
 
     @Override
     public void restoreMessageById(String messageId) {
-        // messageId가 null이거나 존재하지 않는 경우
-        if (messageId == null) {
-            throw new IllegalArgumentException("Message ID cannot be null");
-        }
-        // recordStatus가 ACTIVE인 경우 (이미 복원된 상태)
-        Optional<Message> activeCheck = getMessageByIdWithStatus(messageId, RecordStatus.ACTIVE);
-        if (activeCheck.isPresent()) {
-            throw new IllegalArgumentException("Message with id " + messageId + " is already ACTIVE");
-        }
-
-        // DELETED 상태인지 확인 -> 복원
-        Optional<Message> optionalMessage = getMessageByIdWithStatus(messageId, RecordStatus.DELETED);
-        if (optionalMessage.isEmpty()) {
-            throw new IllegalArgumentException("Message with id " + messageId + " not found or not DELETED");
-        }
-        Message message = optionalMessage.get();
+        validateNotNullId(messageId);
+        Message message = findMessageOrThrow(messageId, RecordStatus.DELETED);
         message.touch();
         message.restore();
     }
 
     @Override
     public void hardDeleteMessageById(String messageId) {
-        // messageId가 null이거나 존재하지 않는 경우
-        if (messageId == null) {
-            throw new IllegalArgumentException("Message ID cannot be null");
+        validateNotNullId(messageId);
+        Message message = findMessageOrThrow(messageId, RecordStatus.DELETED);
+        messageList.remove(message);
+    }
+
+    /* =========================================================
+     * INTERNAL VALIDATION HELPERS
+     * ========================================================= */
+    /**
+     * 주어진 messageId와 RecordStatus에 해당하는 메시지를 찾고 반환합니다.
+     * 없으면 IllegalArgumentException을 던집니다.
+     *
+     * @param messageId       조회할 메시지의 ID
+     * @param expectedStatus  기대하는 메시지의 상태 (ACTIVE, DELETED)
+     * @return                조건에 맞는 Message 객체
+     */
+    private Message findMessageOrThrow(String messageId, RecordStatus expectedStatus) {
+        return messageList.stream()
+                .filter(msg -> msg.getId().equals(messageId))
+                .filter(msg -> msg.getRecordStatus() == expectedStatus)
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Message with id " + messageId +
+                                " not found in status: " + expectedStatus));
+    }
+
+    /**
+     * 메시지 ID가 null인지 검사합니다.
+     * 주로 외부에서 전달된 ID 인자의 유효성을 사전에 보장하기 위해 사용합니다.
+     *
+     * @param id 검사할 ID 문자열
+     * @throws IllegalArgumentException ID가 null인 경우
+     */
+    private void validateNotNullId(String id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID cannot be null");
         }
-        // recordStatus가 ACTIVE인(Soft Delete되지 않은) 메시지인 경우
-        Optional<Message> activeCheck = getMessageByIdWithStatus(messageId, RecordStatus.ACTIVE);
-        if (activeCheck.isPresent()) {
-            throw new IllegalArgumentException(
-                    "Cannot hard delete message with id " + messageId + " because it is still ACTIVE (soft delete first)");
+    }
+
+    /**
+     * 채널이 null이거나 ACTIVE 상태가 아닌 경우 예외를 발생시킵니다.
+     * 메시지를 생성하거나 수정할 때 유효한 채널인지 확인하는 데 사용됩니다.
+     *
+     * @param channel 검사할 Channel 객체
+     * @throws IllegalArgumentException 유효하지 않은 경우
+     */
+    private void validateActiveChannel(Channel channel) {
+        if (channel == null || channel.getRecordStatus() != RecordStatus.ACTIVE) {
+            throw new IllegalArgumentException("Channel must be ACTIVE and not null");
         }
-        // DELETED 상태인지 확인
-        Optional<Message> deletedCheck = getMessageByIdWithStatus(messageId, RecordStatus.DELETED);
-        if (deletedCheck.isEmpty()) {
-            throw new IllegalArgumentException("Message with id " + messageId + " not found or not DELETED");
+    }
+
+    /**
+     * 유저가 null이거나 ACTIVE 상태가 아닌 경우 예외를 발생시킵니다.
+     * 메시지를 생성하거나 수정할 때 유효한 사용자여야 함을 보장합니다.
+     *
+     * @param user 검사할 User 객체
+     * @throws IllegalArgumentException 유효하지 않은 경우
+     */
+    private void validateActiveUser(User user) {
+        if (user == null || user.getRecordStatus() != RecordStatus.ACTIVE) {
+            throw new IllegalArgumentException("User must be ACTIVE and not null");
         }
-        // 최종 삭제
-        messageList.remove(deletedCheck.get());
     }
 }

@@ -35,18 +35,6 @@ public interface ChannelService {
     Optional<Channel> getChannelById(String id);
 
     /**
-     * 주어진 채널 ID와 recordStatus 조건을 만족하는 채널을 조회한다.
-     *
-     * @param id           조회하려는 채널의 ID
-     * @param recordStatus 조회하려는 레코드 상태 (RecordStatus.ACTIVE, RecordStatus.DELETED)
-     * @return 주어진 ID와 recordStatus가 일치하는 채널을 Optional로 반환. 없으면 Optional.empty()
-     * @throws IllegalArgumentException
-     *         - id가 null인 경우
-     *         - recordStatus가 null인 경우
-     */
-    Optional<Channel> getChannelByIdWithStatus(String id, RecordStatus recordStatus);
-
-    /**
      * 주어진 채널 이름에 해당하고, recordStatus가 ACTIVE인 채널 목록을 조회한다.
      *
      * @param channelName 조회하려는 채널 이름 (예: "#qna")

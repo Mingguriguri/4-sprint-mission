@@ -35,18 +35,6 @@ public interface MessageService {
     Optional<Message> getMessageById(String messageId);
 
     /**
-     * 주어진 메시지 ID와 recordStatus 조건을 만족하는 메시지를 조회한다.
-     *
-     * @param messageId    조회하려는 메시지 ID
-     * @param recordStatus 조회하려는 메시지 상태 (RecordStatus.ACTIVE or RecordStatus.DELETED)
-     * @return 주어진 ID와 recordStatus가 일치하는 메시지 Optional. 없으면 Optional.empty()
-     * @throws IllegalArgumentException
-     *         - id가 null인 경우
-     *         - recordStatus가 null인 경우
-     */
-    Optional<Message> getMessageByIdWithStatus(String messageId, RecordStatus recordStatus);
-
-    /**
      * 주어진 userId에 해당하면서, recordStatus가 ACTIVE인 메시지 목록을 조회한다.
      *
      * @param userId 조회할 메시지 전송자의 User ID

@@ -33,15 +33,6 @@ public interface UserService {
     Optional<User> getUserById(String id);
 
     /**
-     * 주어진 유저 ID와 recordStatus 조건을 만족하는 유저를 조회한다.
-     *
-     * @param id           조회하려는 유저의 ID
-     * @param recordStatus 조회하려는 레코드 상태 (RecordStatus.ACTIVE, RecordStatus.DELETED)
-     * @return 주어진 ID와 recordStatus가 일치하는 유저를 Optional로 반환. 없으면 Optional.empty()
-     */
-    Optional<User> getUserByIdWithStatus(String id, RecordStatus recordStatus);
-
-    /**
      * 주어진 이메일에 해당하고, recordStatus가 ACTIVE인 유저 목록을 조회한다.
      *
      * @param email 조회하려는 유저 이메일 (예: "minjeong@gmail.com")
