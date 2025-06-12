@@ -4,16 +4,19 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.RecordStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
-    private final Set<Channel> channelSet;
+    private final ChannelRepository channelRepository;
+    private final MessageRepository messageRepository;
 
-    public JCFChannelService() {
-        this.channelSet = new HashSet<>();
+    public JCFChannelService(ChannelRepository channelRepository, MessageRepository messageRepository) {
+        this.channelRepository = channelRepository;
+        this.messageRepository = messageRepository;
     }
 
     /* =========================================================
@@ -22,39 +25,25 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Set<Channel> getAllChannels() {
-        return channelSet.stream()
-                .filter(channel -> channel.getRecordStatus().equals(RecordStatus.ACTIVE))
-                .collect(Collectors.toSet());
+        return channelRepository.findAllByRecordStatusIsActive();
     }
 
     @Override
     public Optional<Channel> getChannelById(String channelId) {
-        validateNotNullId(channelId);
-        return channelSet.stream()
-                .filter(channel -> channel.getRecordStatus().equals(RecordStatus.ACTIVE))
-                .filter(channel -> channel.getId().equals(channelId))
-                .findFirst();
+        validateNotNullChannelField(channelId);
+        return channelRepository.findById(channelId);
     }
 
     @Override
     public List<Channel> getChannelByName(String channelName) {
-        validateNotNullName(channelName);
-        return channelSet.stream()
-                .filter(channel -> channel.getRecordStatus().equals(RecordStatus.ACTIVE))
-                .filter(channel -> channel.getChannelName().equals(channelName))
-                .collect(Collectors.toList());
+        validateNotNullChannelField(channelName);
+        return channelRepository.findByChannelName(channelName);
     }
 
     @Override
     public List<Channel> getChannelByUserId(String userId) {
-        validateNotNullId(userId);
-        return channelSet.stream()
-                .filter(channel -> channel.getRecordStatus().equals(RecordStatus.ACTIVE))
-                .filter(channel ->
-                        channel.getUsers().stream()
-                                .anyMatch(user -> user.getId().equals(userId))
-                )
-                .collect(Collectors.toList());
+        validateNotNullChannelField(userId);
+        return channelRepository.findByUserId(userId);
     }
 
     /* =========================================================
@@ -64,13 +53,11 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel createChannel(String channelName, String description, Set<User> users, String ownerId) {
         validateActiveUsers(users);
-        validateNotNullId(ownerId);
+        validateNotNullChannelField(ownerId);
 
         Channel channel = new Channel(channelName, description, users, ownerId);
-        channelSet.add(channel);
-        System.out.println("Successfully Create Channel, " + channel);
 
-        return channel;
+        return channelRepository.save(channel);
     }
 
     /* =========================================================
@@ -79,69 +66,64 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel updateChannelInfo(String channelId, String channelName, String description) {
-        validateNotNullId(channelId);
+        validateNotNullChannelField(channelId);
 
-        Optional<Channel> optionalChannel = getChannelById(channelId);
-        validateActiveChannel(optionalChannel.get());
+        Channel targetChannel = channelRepository.findByRecordStatusIsActiveId(channelId)
+                        .orElseThrow(() -> new IllegalArgumentException("Channel not found or not ACTIVE"));
+        targetChannel.changeChannelName(channelName);
+        targetChannel.updateChannelDesc(description);
+        targetChannel.touch();
 
-        Channel channel = optionalChannel.get();
-        channel.changeChannelName(channelName);
-        channel.updateChannelDesc(description);
-        channel.touch();
-
-        return channel;
+        return channelRepository.save(targetChannel);
     }
 
     @Override
     public void joinUser(String channelId, User user) {
-        validateNotNullId(channelId);
-
-        Optional<Channel> optionalChannel = getChannelById(channelId);
-        validateActiveChannel(optionalChannel.get());
-
-        Channel channel = optionalChannel.get();
-
-        // user가 null이거나 recordStatus != ACTIVE인 경우
+        validateNotNullChannelField(channelId);
         validateActiveUser(user);
 
-        channel.addUser(user);
-        channel.touch();
+        Channel targetChannel = channelRepository.findByRecordStatusIsActiveId(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("Channel not found or not ACTIVE"));
+
+        targetChannel.addUser(user);
+        targetChannel.touch();
+
+        channelRepository.save(targetChannel);
     }
 
     @Override
     public void leaveUser(String channelId, User user) {
-        validateNotNullId(channelId);
-
-        Optional<Channel> optionalChannel = getChannelById(channelId);
-        validateActiveChannel(optionalChannel.get());
+        validateNotNullChannelField(channelId);
         validateActiveUser(user);
 
-        Channel channel = optionalChannel.get();
+        Channel targetChannel = channelRepository.findByRecordStatusIsActiveId(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("Channel not found or not ACTIVE"));
 
         // user가 해당 채널에 참여 중이 아닌 경우
-        boolean isMember = channel.getUsers().stream()
+        boolean isMember = targetChannel.getUsers().stream()
                         .anyMatch(u -> u.getId().equals(user.getId()));
         if (!isMember) {
             throw new IllegalArgumentException("User with id " + user.getId() + " is not a member of channel " + channelId);
         }
 
-        channel.removeUser(user);
-        channel.touch();
+        targetChannel.removeUser(user);
+        targetChannel.touch();
+
+        channelRepository.save(targetChannel);
     }
 
     @Override
     public Channel updateChannelOwner(String channelId, String ownerId) {
-        validateNotNullId(channelId);
-        validateNotNullId(ownerId);
+        validateNotNullChannelField(channelId);
+        validateNotNullChannelField(ownerId);
 
-        Optional<Channel> optionalChannel = getChannelById(channelId);
-        validateActiveChannel(optionalChannel.get());
+        Channel targetChannel = channelRepository.findByRecordStatusIsActiveId(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("Channel not found or not ACTIVE"));
 
-        Channel channel = optionalChannel.get();
-        channel.changeChannelOwnerId(ownerId);
-        channel.touch();
+        targetChannel.changeChannelOwnerId(ownerId);
+        targetChannel.touch();
 
-        return channel;
+        return channelRepository.save(targetChannel);
     }
 
     /* =========================================================
@@ -149,19 +131,21 @@ public class JCFChannelService implements ChannelService {
      * ========================================================= */
 
     @Override
-    public void deleteChannel(Channel channel) {
+    public void softDeleteChannel(Channel channel) {
         validateActiveChannel(channel);
 
         // 메시지 Soft Delete
-        channel.getMessages().stream()
-                .forEach(msg -> {
+        List<Message> messages = messageRepository.findByChannelId(channel.getId());
+        channel.getMessages().forEach(msg -> {
                     msg.softDelete();
                     msg.touch();
         });
+        for (Message m : messages) {
+            messageRepository.softDeleteById(m.getId());
+        }
 
         // 채널 Soft Delete
-        channel.softDelete();
-        channel.touch();
+        channelRepository.softDeleteById(channel.getId());
     }
 
     @Override
@@ -169,15 +153,17 @@ public class JCFChannelService implements ChannelService {
         validateDeletedChannel(channel);
 
         // 메시지 복원
-        channel.getMessages().stream()
-                .forEach(msg -> {
+        List<Message> messages = messageRepository.findByChannelId(channel.getId());
+        channel.getMessages().forEach(msg -> {
                     msg.restore();
                     msg.touch();
         });
+        for (Message m : messages) {
+            messageRepository.restoreById(m.getId());
+        }
 
         // 채널 복원
-        channel.restore();
-        channel.touch();
+        channelRepository.restoreById(channel.getId());
     }
 
     @Override
@@ -193,54 +179,23 @@ public class JCFChannelService implements ChannelService {
         copyOfUsers.forEach(channel::removeUser);
 
         // 채널 제거 Hard Delete
-         channelSet.remove(channel);
+        channelRepository.deleteById(channel.getId());
     }
 
     /* =========================================================
      * INTERNAL VALIDATION HELPERS
      * ========================================================= */
-    /**
-     * 주어진 channelId RecordStatus에 해당하는 채널을 찾고 반환합니다.
-     * 없으면 IllegalArgumentException을 던집니다.
-     *
-     * @param channelId       조회할 채널의 ID
-     * @param expectedStatus  기대하는 채널의 상태 (ACTIVE, DELETED)
-     * @return                조건에 맞는 Message 객체
-     * @throws IllegalArgumentException 유효하지 않은 경우
-     */
-    private Channel findChannelorThrow(String channelId, RecordStatus expectedStatus) {
-        return channelSet.stream()
-                .filter(channel -> channel.getId().equals(channelId))
-                .filter(channel -> channel.getRecordStatus() == expectedStatus)
-                .findFirst()
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Channel with id " + channelId +
-                                " not found in status: " + expectedStatus));
-    }
 
     /**
-     * 채널 ID가 null인지 검사합니다.
+     * 채널의 ID 또는 이름이 null인지 검사합니다.
      * 주로 외부에서 전달된 ID 인자의 유효성을 사전에 보장하기 위해 사용합니다.
      *
-     * @param id 검사할 ID 문자열
-     * @throws IllegalArgumentException ID가 null인 경우
-     */
-    private void validateNotNullId(String id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Channel ID cannot be null");
-        }
-    }
-
-    /**
-     * 채널의 이름이 null인지 검사합니다.
-     * 주로 외부에서 전달된 ID 인자의 유효성을 사전에 보장하기 위해 사용합니다.
-     *
-     * @param channelName 검사할 문자열
+     * @param channelField 검사할 문자열
      * @throws IllegalArgumentException channelName이 null인 경우
      */
-    private void validateNotNullName(String channelName) {
-        if (channelName == null) {
-            throw new IllegalArgumentException("Channel name cannot be null");
+    private void validateNotNullChannelField(String channelField) {
+        if (channelField == null || channelField.trim().isEmpty()) {
+            throw new IllegalArgumentException("Channel Id or Channel Name cannot be null");
         }
     }
 

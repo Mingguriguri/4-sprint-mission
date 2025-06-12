@@ -1,24 +1,17 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
-    private final ArrayList<Message> messageList;
-    private final UserService userService;
-    private final ChannelService channelService;
+    private final MessageRepository messageRepository;
 
-    public JCFMessageService(UserService userService, ChannelService channelService) {
-        this.messageList = new ArrayList<>();
-        this.userService = userService;
-        this.channelService = channelService;
+    public JCFMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
     }
 
     /* =========================================================
@@ -27,36 +20,25 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> getAllMessages() {
-        return messageList.stream()
-                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
-                .toList();
+        return messageRepository.findAllByRecordStatusIsActive();
     }
 
     @Override
     public Optional<Message> getMessageById(String messageId) {
         validateNotNullId(messageId);
-        return messageList.stream()
-                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
-                .filter(msg -> msg.getUser().getId().equals(messageId))
-                .findFirst();
+        return messageRepository.findById(messageId);
     }
 
     @Override
     public List<Message> getMessageByUserId(String userId) {
         validateNotNullId(userId);
-        return messageList.stream()
-                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
-                .filter(msg -> msg.getUser().getId().equals(userId))
-                .collect(Collectors.toList());
+        return messageRepository.findByUserId(userId);
     }
 
     @Override
     public List<Message> getMessageByChannelId(String channelId) {
         validateNotNullId(channelId);
-        return messageList.stream()
-                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
-                .filter(msg -> msg.getChannel().getId().equals(channelId))
-                .collect(Collectors.toList());
+        return messageRepository.findByChannelId(channelId);
     }
 
     /* =========================================================
@@ -67,12 +49,12 @@ public class JCFMessageService implements MessageService {
     public Message createMessage(Channel channel, User user, String content) {
         validateActiveChannel(channel);
         validateActiveUser(user);
+
         Message message = new Message(channel, user, content);
         channel.addMessage(message);
         user.addMessage(message);
-        messageList.add(message);
-        return message;
 
+        return messageRepository.save(message);
     }
 
     /* =========================================================
@@ -82,17 +64,18 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message updateMessage(String messageId, Channel channel, User user, String content) {
         validateNotNullId(messageId);
-
-        Message message = findMessageOrThrow(messageId, RecordStatus.ACTIVE);
         validateActiveChannel(channel);
         validateActiveUser(user);
 
-        message.addChannel(channel);
-        message.addUser(user);
-        message.sendMessageContent(content);
-        message.touch();
+        Message targetMessage = messageRepository.findByRecordStatusIsActiveAndId(messageId)
+                .orElseThrow(() -> new IllegalArgumentException("Message not found or not ACTIVE"));
 
-        return message;
+        targetMessage.addChannel(channel);
+        targetMessage.addUser(user);
+        targetMessage.sendMessageContent(content);
+        targetMessage.touch();
+
+        return messageRepository.save(targetMessage);
     }
 
     /* =========================================================
@@ -102,46 +85,24 @@ public class JCFMessageService implements MessageService {
     @Override
     public void deleteMessageById(String messageId) {
         validateNotNullId(messageId);
-        Message message = findMessageOrThrow(messageId, RecordStatus.ACTIVE);
-        message.touch();
-        message.softDelete();
+        messageRepository.softDeleteById(messageId);
     }
 
     @Override
     public void restoreMessageById(String messageId) {
         validateNotNullId(messageId);
-        Message message = findMessageOrThrow(messageId, RecordStatus.DELETED);
-        message.touch();
-        message.restore();
+        messageRepository.restoreById(messageId);
     }
 
     @Override
     public void hardDeleteMessageById(String messageId) {
         validateNotNullId(messageId);
-        Message message = findMessageOrThrow(messageId, RecordStatus.DELETED);
-        messageList.remove(message);
+        messageRepository.deleteById(messageId);
     }
 
     /* =========================================================
      * INTERNAL VALIDATION HELPERS
      * ========================================================= */
-    /**
-     * 주어진 messageId와 RecordStatus에 해당하는 메시지를 찾고 반환합니다.
-     * 없으면 IllegalArgumentException을 던집니다.
-     *
-     * @param messageId       조회할 메시지의 ID
-     * @param expectedStatus  기대하는 메시지의 상태 (ACTIVE, DELETED)
-     * @return                조건에 맞는 Message 객체
-     */
-    private Message findMessageOrThrow(String messageId, RecordStatus expectedStatus) {
-        return messageList.stream()
-                .filter(msg -> msg.getId().equals(messageId))
-                .filter(msg -> msg.getRecordStatus() == expectedStatus)
-                .findFirst()
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Message with id " + messageId +
-                                " not found in status: " + expectedStatus));
-    }
 
     /**
      * 메시지 ID가 null인지 검사합니다.
@@ -151,7 +112,7 @@ public class JCFMessageService implements MessageService {
      * @throws IllegalArgumentException ID가 null인 경우
      */
     private void validateNotNullId(String id) {
-        if (id == null) {
+        if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("ID cannot be null");
         }
     }
