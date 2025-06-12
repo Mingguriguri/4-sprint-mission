@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.RecordStatus;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
@@ -105,7 +104,7 @@ public interface UserService {
      *         - user가 null이거나 recordStatus != ACTIVE인 경우
      *         - userStatus가 이미 INACTIVE인 경우
      */
-    void deactivateUser(User user);
+    void inactivateUser(User user);
 
     /**
      * 주어진 유저를 활성화(UserStatus=ACTIVE) 상태로 변경한다.

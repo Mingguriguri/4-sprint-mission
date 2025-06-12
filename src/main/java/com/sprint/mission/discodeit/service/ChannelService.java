@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.RecordStatus;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
@@ -168,7 +167,7 @@ public interface ChannelService {
      * @throws IllegalArgumentException
      *         - channel이 null이거나, recordStatus != ACTIVE인 경우
      */
-    void deleteChannel(Channel channel);
+    void softDeleteChannel(Channel channel);
 
     /**
      * Soft Delete된 채널을 복원한다.
