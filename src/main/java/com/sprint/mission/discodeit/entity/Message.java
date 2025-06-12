@@ -40,7 +40,7 @@ public class Message extends BaseEntity implements Serializable {
      * Setter
      * =========================================================*/
 
-    public void sendMessageContent(String content) {
+    public void changeMessageContent(String content) {
         this.content = content;
     }
 

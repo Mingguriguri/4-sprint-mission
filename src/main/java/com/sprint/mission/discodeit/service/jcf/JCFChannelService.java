@@ -53,7 +53,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel createChannel(String channelName, String description, Set<User> users, String ownerId) {
         validateActiveUsers(users);
-        validateNotNullChannelField(ownerId);
+        validateNotNullChannelField(channelName, ownerId);
 
         Channel channel = new Channel(channelName, description, users, ownerId);
 
@@ -66,7 +66,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel updateChannelInfo(String channelId, String channelName, String description) {
-        validateNotNullChannelField(channelId);
+        validateNotNullChannelField(channelId, channelName);
 
         Channel targetChannel = channelRepository.findByRecordStatusIsActiveId(channelId)
                         .orElseThrow(() -> new IllegalArgumentException("Channel not found or not ACTIVE"));
@@ -114,8 +114,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel updateChannelOwner(String channelId, String ownerId) {
-        validateNotNullChannelField(channelId);
-        validateNotNullChannelField(ownerId);
+        validateNotNullChannelField(channelId, ownerId);
 
         Channel targetChannel = channelRepository.findByRecordStatusIsActiveId(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("Channel not found or not ACTIVE"));
@@ -135,14 +134,11 @@ public class JCFChannelService implements ChannelService {
         validateActiveChannel(channel);
 
         // 메시지 Soft Delete
-        List<Message> messages = messageRepository.findByChannelId(channel.getId());
         channel.getMessages().forEach(msg -> {
-                    msg.softDelete();
-                    msg.touch();
+            msg.softDelete();
+            msg.touch();
+            messageRepository.softDeleteById(msg.getId());
         });
-        for (Message m : messages) {
-            messageRepository.softDeleteById(m.getId());
-        }
 
         // 채널 Soft Delete
         channelRepository.softDeleteById(channel.getId());
@@ -153,14 +149,11 @@ public class JCFChannelService implements ChannelService {
         validateDeletedChannel(channel);
 
         // 메시지 복원
-        List<Message> messages = messageRepository.findByChannelId(channel.getId());
         channel.getMessages().forEach(msg -> {
-                    msg.restore();
-                    msg.touch();
+            msg.restore();
+            msg.touch();
+            messageRepository.restoreById(msg.getId());
         });
-        for (Message m : messages) {
-            messageRepository.restoreById(m.getId());
-        }
 
         // 채널 복원
         channelRepository.restoreById(channel.getId());
@@ -190,12 +183,14 @@ public class JCFChannelService implements ChannelService {
      * 채널의 ID 또는 이름이 null인지 검사합니다.
      * 주로 외부에서 전달된 ID 인자의 유효성을 사전에 보장하기 위해 사용합니다.
      *
-     * @param channelField 검사할 문자열
+     * @param values 검사할 문자열
      * @throws IllegalArgumentException channelName이 null인 경우
      */
-    private void validateNotNullChannelField(String channelField) {
-        if (channelField == null || channelField.trim().isEmpty()) {
-            throw new IllegalArgumentException("Channel Id or Channel Name cannot be null");
+    private void validateNotNullChannelField(String... values) {
+        for (String v : values) {
+            if (v == null || v.trim().isEmpty()) {
+                throw new IllegalArgumentException("Channel Id or Channel Name cannot be null");
+            }
         }
     }
 

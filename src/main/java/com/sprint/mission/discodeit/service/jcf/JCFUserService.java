@@ -54,9 +54,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User createUser(String username, String email, String password) {
-        validateNotNullUserField(username);
-        validateNotNullUserField(email);
-        validateNotNullUserField(password);
+        validateNotNullUserField(username, email, password);
 
         User user = new User(username, email, password);
         return userRepository.save(user);
@@ -68,10 +66,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User updateUserInfo(String userId, String username, String email, String password) {
-        validateNotNullUserField(userId);
-        validateNotNullUserField(username);
-        validateNotNullUserField(email);
-        validateNotNullUserField(password);
+        validateNotNullUserField(userId, username, email, password);
 
         User targetUser = userRepository.findByMemberStatusIsActiveAndId(userId)
                         .orElseThrow(() -> new IllegalArgumentException("User not found or not ACTIVE"));
@@ -117,11 +112,8 @@ public class JCFUserService implements UserService {
         user.getMessages().forEach(msg -> {
             msg.softDelete();
             msg.touch();
+            messageRepository.softDeleteById(msg.getId());
         });
-        List<Message> messages = messageRepository.findByUserId(user.getId());
-        for (Message m : messages) {
-            messageRepository.softDeleteById(m.getId());
-        }
 
         // 채널과 연결 끊기
         user.getChannels().forEach(msg -> {
@@ -138,14 +130,11 @@ public class JCFUserService implements UserService {
         validateDeletedUser(user);
 
         // 메시지 복원
-        List<Message> messages = messageRepository.findByUserId(user.getId());
         user.getMessages().forEach(msg -> {
             msg.restore();
             msg.touch();
+            messageRepository.restoreById(msg.getId());
         });
-        for (Message m : messages) {
-            messageRepository.restoreById(m.getId());
-        }
 
         // 채널과 다시 연결
         user.getChannels().forEach(msg -> {
@@ -181,12 +170,14 @@ public class JCFUserService implements UserService {
      * 유저의 ID나 이메일, 이름 데이터가 null인지 검사합니다.
      * 주로 외부에서 전달된 데이터 인자의 유효성을 사전에 보장하기 위해 사용합니다.
      *
-     * @param data 검사할 ID 문자열
+     * @param values 검사할 ID 문자열
      * @throws IllegalArgumentException ID가 null인 경우
      */
-    private void validateNotNullUserField(String data) {
-        if (data == null || data.trim().isEmpty()) {
-            throw new IllegalArgumentException("User Id or User Email or username cannot be null");
+    private void validateNotNullUserField(String... values) {
+        for (String v : values) {
+            if (v == null || v.trim().isEmpty()) {
+                throw new IllegalArgumentException("User Id or User Email or username cannot be null");
+            }
         }
     }
 

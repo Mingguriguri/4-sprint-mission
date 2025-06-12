@@ -75,7 +75,7 @@ public class FileMessageService implements MessageService {
 
         targetMessage.addChannel(channel);
         targetMessage.addUser(user);
-        targetMessage.sendMessageContent(content);
+        targetMessage.changeMessageContent(content);
         targetMessage.touch();
 
         return messageRepository.save(targetMessage);

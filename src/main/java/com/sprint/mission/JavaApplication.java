@@ -397,7 +397,6 @@ public class JavaApplication {
 
         // 유저 메시지 재조회
         user3Messages = messageService.getMessageByUserId(deleteUser.getId());
-        System.out.println(">>> getMessages로 확인" + deletedUser.getMessages());
 
         System.out.println("\n6. 유저 삭제 후 유저 메시지 목록 (" + user3Messages.size() + "개)");
         user3Messages.forEach(System.out::println);
