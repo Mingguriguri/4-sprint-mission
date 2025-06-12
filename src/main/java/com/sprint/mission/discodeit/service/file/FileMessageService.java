@@ -4,69 +4,17 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.RecordStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 
-import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class FileMessageService implements MessageService {
-    private static final String FILE_PATH = "./data/messages.ser";
-    private final File storageFile;
+    private final MessageRepository messageRepository;
 
-//    private final ArrayList<Message> messageList;
-    private final UserService userService;
-    private final ChannelService channelService;
-
-    public FileMessageService(UserService userService, ChannelService channelService) {
-        this.storageFile = new File(FILE_PATH);
-        if (!storageFile.exists()) {
-            writeMessageList(new ArrayList<>());
-        }
-        // TODO: 테스트끝나면 아래 코드 지우기 . 현재는 실행할 때마다 새로 초기화하기 위해서 추가함
-        writeMessageList(new ArrayList<>());
-
-        this.userService = userService;
-        this.channelService = channelService;
-    }
-
-//    public FileMessageService(UserService userService, ChannelService channelService) {
-////        this.messageList = new ArrayList<>();
-//        this.userService = userService;
-//        this.channelService = channelService;
-//    }
-
-    /* =========================================================
-     * File I/O
-     * ========================================================= */
-    /*
-     * 역직렬화 (파일 -> List<Message>)
-     * */
-    private List<Message> readMesssageList() {
-        if (!storageFile.exists() || storageFile.length() == 0) {
-            return new ArrayList<>();
-        }
-
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(storageFile))) {
-            return (List<Message>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("메시지 목록 조회 실패", e);
-        }
-    }
-
-    /*
-     * 직렬화 (List<Message> -> .ser 파일)
-     * */
-    private void writeMessageList(List<Message> messages) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(storageFile))) {
-            oos.writeObject(messages);
-        } catch (IOException e) {
-            throw new RuntimeException("메시지 목록 저장 실패", e);
-        }
+    public FileMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
     }
 
     /* =========================================================
@@ -75,36 +23,25 @@ public class FileMessageService implements MessageService {
 
     @Override
     public List<Message> getAllMessages() {
-        return readMesssageList().stream()
-                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
-                .toList();
+        return messageRepository.findAllByRecordStatusIsActive();
     }
 
     @Override
     public Optional<Message> getMessageById(String messageId) {
         validateNotNullId(messageId);
-        return readMesssageList().stream()
-//                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
-                .filter(msg -> msg.getId().equals(messageId))
-                .findFirst();
+        return messageRepository.findById(messageId);
     }
 
     @Override
     public List<Message> getMessageByUserId(String userId) {
         validateNotNullId(userId);
-        return readMesssageList().stream()
-                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
-                .filter(msg -> msg.getUser().getId().equals(userId))
-                .collect(Collectors.toList());
+        return messageRepository.findByUserId(userId);
     }
 
     @Override
     public List<Message> getMessageByChannelId(String channelId) {
         validateNotNullId(channelId);
-        return readMesssageList().stream()
-                .filter(msg -> msg.getRecordStatus() == RecordStatus.ACTIVE)
-                .filter(msg -> msg.getChannel().getId().equals(channelId))
-                .collect(Collectors.toList());
+        return messageRepository.findByChannelId(channelId);
     }
 
     /* =========================================================
@@ -116,17 +53,11 @@ public class FileMessageService implements MessageService {
         validateActiveChannel(channel);
         validateActiveUser(user);
 
-        List<Message> messages = readMesssageList();
-
         Message message = new Message(channel, user, content);
         channel.addMessage(message);
         user.addMessage(message);
-        System.out.println("<<<<<<<<<<<< + user add Message" + user.getMessages());
-        messages.add(message);
 
-        writeMessageList(messages);
-
-        return message;
+        return messageRepository.save(message);
     }
 
     /* =========================================================
@@ -136,24 +67,18 @@ public class FileMessageService implements MessageService {
     @Override
     public Message updateMessage(String messageId, Channel channel, User user, String content) {
         validateNotNullId(messageId);
-
-        List<Message> messages = readMesssageList();
-        Message target = messages.stream()
-                .filter(m -> m.getId().equals(messageId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Message not found."));
-
         validateActiveChannel(channel);
         validateActiveUser(user);
 
-        target.addChannel(channel);
-        target.addUser(user);
-        target.sendMessageContent(content);
-        target.touch();
+        Message targetMessage = messageRepository.findByRecordStatusIsActiveAndId(messageId)
+                .orElseThrow(() -> new IllegalArgumentException("Message not found or not ACTIVE"));
 
-        writeMessageList(messages);
+        targetMessage.addChannel(channel);
+        targetMessage.addUser(user);
+        targetMessage.sendMessageContent(content);
+        targetMessage.touch();
 
-        return target;
+        return messageRepository.save(targetMessage);
     }
 
     /* =========================================================
@@ -163,72 +88,24 @@ public class FileMessageService implements MessageService {
     @Override
     public void deleteMessageById(String messageId) {
         validateNotNullId(messageId);
-
-        List<Message> messages = readMesssageList();
-        Message target = messages.stream()
-                .filter(m -> m.getId().equals(messageId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Message not found."));
-
-//        Message message = findMessageOrThrow(messageId, RecordStatus.ACTIVE);
-        target.touch();
-        target.softDelete();
-
-        writeMessageList(messages);
+        messageRepository.softDeleteById(messageId);
     }
 
     @Override
     public void restoreMessageById(String messageId) {
         validateNotNullId(messageId);
-        List<Message> messages = readMesssageList();
-        Message target = messages.stream()
-                .filter(m -> m.getId().equals(messageId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Message not found."));
-
-
-//        Message message = findMessageOrThrow(messageId, RecordStatus.DELETED);
-        target.touch();
-        target.restore();
-
-        writeMessageList(messages);
+        messageRepository.restoreById(messageId);
     }
 
     @Override
     public void hardDeleteMessageById(String messageId) {
         validateNotNullId(messageId);
-        List<Message> messages = readMesssageList();
-        Message target = messages.stream()
-                .filter(m -> m.getId().equals(messageId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Message not found."));
-
-//        Message message = findMessageOrThrow(messageId, RecordStatus.DELETED);
-        messages.remove(target);
-
-        writeMessageList(messages);
+        messageRepository.deleteById(messageId);
     }
 
     /* =========================================================
      * INTERNAL VALIDATION HELPERS
      * ========================================================= */
-    /**
-     * 주어진 messageId와 RecordStatus에 해당하는 메시지를 찾고 반환합니다.
-     * 없으면 IllegalArgumentException을 던집니다.
-     *
-     * @param messageId       조회할 메시지의 ID
-     * @param expectedStatus  기대하는 메시지의 상태 (ACTIVE, DELETED)
-     * @return                조건에 맞는 Message 객체
-     */
-    private Message findMessageOrThrow(String messageId, RecordStatus expectedStatus) {
-        return readMesssageList().stream()
-                .filter(msg -> msg.getId().equals(messageId))
-                .filter(msg -> msg.getRecordStatus() == expectedStatus)
-                .findFirst()
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Message with id " + messageId +
-                                " not found in status: " + expectedStatus));
-    }
 
     /**
      * 메시지 ID가 null인지 검사합니다.
