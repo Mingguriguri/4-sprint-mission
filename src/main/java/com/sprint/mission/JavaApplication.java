@@ -1,6 +1,13 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.factory.PersistenceType;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -8,16 +15,21 @@ import com.sprint.mission.discodeit.factory.DiscodeitFactory;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        DiscodeitFactory factory = new DiscodeitFactory();
+        DiscodeitFactory jcfFactory  = new DiscodeitFactory(PersistenceType.JCF);
+        DiscodeitFactory fileFactory = new DiscodeitFactory(PersistenceType.FILE);
+        // JCF로 할 때
+//        UserService userService = jcfFactory.getUserService();
+//        ChannelService channelService = jcfFactory.getChannelService();
+//        MessageService messageService = jcfFactory.getMessageService();
 
-        UserService userService = factory.getUserService();
-        ChannelService channelService = factory.getChannelService();
-        MessageService messageService = factory.getMessageService();
+        // File I/O로 할 때
+        UserService userService = fileFactory.getUserService();
+        ChannelService channelService = fileFactory.getChannelService();
+        MessageService messageService = fileFactory.getMessageService();
 
         System.out.println("\n===================================================================================================");
         System.out.println("-------------------------------[ 유저 생성 ]------------------------------- ");
@@ -61,7 +73,7 @@ public class JavaApplication {
         System.out.println("\n-------------------------------[ 유저 비활성화 ]------------------------------- ");
         System.out.println("1. 비활성화 전 유저4: " + userService.getUserById(user4.getId()));
 
-        userService.deactivateUser(user4);
+        userService.inactivateUser(user4);
 
         System.out.println("\n2. 비활성화 후 유저4: " + userService.getUserById(user4.getId()));
 
@@ -105,12 +117,13 @@ public class JavaApplication {
         userList.forEach(System.out::println);
 
         System.out.println("\n2. 삭제할 유저: " + userService.getUserById(user5.getId()));
+
+        userService.deleteUser(user5);
+        System.out.println("\n3. 소프트 삭제 후, 영구 삭제 진행");
+
         deletedUser = userService
                 .getUserById(user5.getId())
                 .orElseThrow(() -> new IllegalStateException("삭제된 유저를 못 찾았습니다."));
-
-        userService.deleteUser(deletedUser);
-        System.out.println("\n3. 소프트 삭제 후, 영구 삭제 진행");
         userService.hardDeleteUser(deletedUser);
 
         userList = userService.getAllUsers();
@@ -132,7 +145,7 @@ public class JavaApplication {
         Channel channel3 = channelService.createChannel("#daily-goals", "오늘 할 일, 목표, 공부 계획을 공유하고 서로 동기 부여하는 채널이에요.", members3, ownerId);
         Channel channel4 = channelService.createChannel("#off-topic", "주제 자유! 게임, 밈, 일상 얘기 등 아무 이야기나 나눠요.", members4, ownerId);
         Channel channel5 = channelService.createChannel("#qna", "질문이 있다면 이 채널에 남겨주세요.", members5, ownerId);
-//
+
         System.out.println("\n-------------------------------[ 채널 단건 조회 ]-------------------------------");
         String findChannelId = channel1.getId();
         String findChannelName = channel2.getChannelName();
@@ -171,7 +184,7 @@ public class JavaApplication {
                 .orElseThrow(() -> new IllegalStateException("변경된 채널을 못 찾았습니다."));
 
         System.out.println("3. 수정 후 채널4 Owner(user2): " + updatedChannel4.getOwnerId() + ", " + userService.getUserById(updatedChannel4.getOwnerId()).get().getUsername());
-//
+
         System.out.println("\n-------------------------------[ 채널4에 유저 추가 ]------------------------------ ");
         System.out.println("1. 수정 전 채널4 Users: (" + channel4.getUsers().size() + "명)");
         channel4.getUsers().forEach(System.out::println);
@@ -205,7 +218,7 @@ public class JavaApplication {
         channels.forEach(System.out::println);
 
         System.out.println("\n2. 삭제할 채널: " + channel5.getChannelName());
-        channelService.deleteChannel(channel5);
+        channelService.softDeleteChannel(channel5);
 
         channels = channelService.getAllChannels();
         System.out.println("\n3. 삭제 후 채널 리스트("+channels.size()+"개)");
@@ -232,13 +245,14 @@ public class JavaApplication {
         System.out.println("1. 영구 삭제 전 채널 리스트(" + channels.size()+"개)");
         channels.forEach(System.out::println);
 
+        System.out.println("\n2. 삭제할 채널: " + channel5);
+        channelService.softDeleteChannel(channel5);
+        System.out.println("\n3. 소프트 삭제 후, 영구 삭제 진행");
+
         deletedChannel = channelService
                 .getChannelById(channel5.getId())
                 .orElseThrow(() -> new IllegalStateException("삭제된 채널을 못 찾았습니다."));
 
-        System.out.println("\n2. 삭제할 채널: " + deletedChannel);
-        channelService.deleteChannel(deletedChannel);
-        System.out.println("\n3. 소프트 삭제 후, 영구 삭제 진행");
         channelService.hardDeleteChannel(deletedChannel);
 
         channels = channelService.getAllChannels();
@@ -316,7 +330,7 @@ public class JavaApplication {
         messageList = messageService.getAllMessages();
         System.out.println("\n3. 삭제 후 메시지 리스트("+messageList.size()+"개)");
         messageList.forEach(System.out::println);
-//
+
         System.out.println("\n-------------------------------[ 삭제한 메시지 복원 ]-------------------------------");
         messageList = messageService.getAllMessages();
         System.out.println("1. 복원 전 메시지 리스트("+messageList.size()+"개)");
@@ -367,7 +381,6 @@ public class JavaApplication {
         List<Message> user3Messages = messageService.getMessageByUserId(userToDelete.getId());
         System.out.println("\n3. 삭제할 유저3의 메시지 목록 (" + user3Messages.size() + "개)");
         user3Messages.forEach(System.out::println);
-        System.out.println(">>> getMessages로 확인" + userToDelete.getMessages());
 
         // 유저 삭제
         userService.deleteUser(userToDelete);
@@ -393,35 +406,37 @@ public class JavaApplication {
             System.out.println("-> 채널 관련 메시지 모두 삭제됨\n");
         }
 
-//        System.out.println("-------------------------------[ 채널 삭제 & 메시지 연쇄 삭제 확인 ]-------------------------------");
-//
+        System.out.println("-------------------------------[ 채널 삭제 & 메시지 연쇄 삭제 확인 ]-------------------------------");
+
 //        channels = channelService.getAllChannels();
-//        System.out.println("1. 채널 삭제 전 채널 리스트 목록 (" + channels.size() + "개)");
-//        channels.forEach(System.out::println);
-//
-//        Channel channelToDelete = channel3;
-//        System.out.println("\n2. 삭제할 채널3: " + channel3.getChannelName());
-//
-//        List<Message> channel3Messages = messageService.getMessageByChannelId(channelToDelete.getId());
-//        System.out.println("\n3. 삭제할 채널3의 메시지 목록 (" + channel3Messages.size() + "개)");
-//        channel3Messages.forEach(System.out::println);
-//
-//        // 채널 삭제
-//        channelService.deleteChannel(channelToDelete);
-//        System.out.println("\n4. 채널3 삭제 완료");
-//
-//        // 채널 삭제 확인
-//        channels = channelService.getAllChannels();
-//        System.out.println("\n5. 채널 삭제 후 채널 리스트 목록 (" + channels.size() + "개)");
-//        channels.forEach(System.out::println);
-//
-//        // 채널 메시지 재조회
-//        channel3Messages = messageService.getMessageByChannelId(channelToDelete.getId());
-//        System.out.println("\n6. 채널 삭제 후 채널의 메시지 목록 (" + channel3Messages.size() + "개)");
-//        channel3Messages.forEach(System.out::println);
-//
-//        if (channel3Messages.isEmpty()) {
-//            System.out.println("-> 채널 관련 메시지 모두 삭제됨\n");
-//        }
+        System.out.println("1. 채널 삭제 전 채널 리스트 목록 (" + channels.size() + "개)");
+        channels.forEach(System.out::println);
+
+        System.out.println("\n2. 삭제할 채널3: " + channel3.getChannelName());
+
+        List<Message> channel3Messages = messageService.getMessageByChannelId(channel3.getId());
+        System.out.println("\n3. 삭제할 채널3의 메시지 목록 (" + channel3Messages.size() + "개)");
+        channel3Messages.forEach(System.out::println);
+
+        // 채널 삭제
+        channelService.softDeleteChannel(channel3);
+        System.out.println("\n4. 채널3 삭제 완료");
+
+        // 채널 삭제 확인
+        channels = channelService.getAllChannels();
+        System.out.println("\n5. 채널 삭제 후 채널 리스트 목록 (" + channels.size() + "개)");
+        channels.forEach(System.out::println);
+        Channel channelToDelete = channelService.getChannelById(channel3.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Channel Not Found"));
+
+        // 채널 메시지 재조회
+        channels = channelService.getAllChannels();
+        List<Message> updateChannel3Messages = messageService.getMessageByChannelId(channelToDelete.getId());
+        System.out.println("\n6. 채널 삭제 후 채널의 메시지 목록 (" + updateChannel3Messages.size() + "개)");
+        updateChannel3Messages.forEach(System.out::println);
+
+        if (updateChannel3Messages.isEmpty()) {
+            System.out.println("-> 채널 관련 메시지 모두 삭제됨\n");
+        }
     }
 }
