@@ -161,12 +161,10 @@ public class BasicChannelService implements ChannelService {
         validateDeletedChannel(channel);
 
         // 메시지 관계 제거 - Hard Delete
-        new ArrayList<>(channel.getMessages())
-                .forEach(channel::removeMessage);
+        new ArrayList<>(channel.getMessages()).forEach(channel::removeMessage);
 
         // 유저 관계 제거 - Hard Delete
-        new ArrayList<>(channel.getUsers())
-                .forEach(channel::removeUser);
+        new ArrayList<>(channel.getUsers()).forEach(channel::removeUser);
 
         // 채널 제거 Hard Delete
         channelRepository.deleteById(channel.getId());

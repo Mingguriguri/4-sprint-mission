@@ -150,15 +150,10 @@ public class BasicUserService implements UserService {
         validateDeletedUser(user);
 
         // 메시지 관계 모두 제거
-        // TODO: 좀 더 간추려서 써보기
-//        List<Message> copyOfMessages = new ArrayList<>(user.getMessages());
-//        copyOfMessages.forEach(user::removeMessage);
-//        new ArrayList<>(user.getMessages())
-//                .forEach(user::removeMessage);
+        new ArrayList<>(user.getMessages()).forEach(user::removeMessage);
 
         // 채널 관계 모두 제거
-        List<Channel> copyOfChannels = new ArrayList<>(user.getChannels());
-        copyOfChannels.forEach(user::removeChannel);
+        new ArrayList<>(user.getChannels()).forEach(user::removeChannel);
 
         // 유저 제거
         userRepository.deleteById(user.getId());
