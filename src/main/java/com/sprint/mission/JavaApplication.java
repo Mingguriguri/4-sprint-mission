@@ -2,12 +2,6 @@ package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.factory.PersistenceType;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -22,14 +16,14 @@ public class JavaApplication {
         DiscodeitFactory jcfFactory  = new DiscodeitFactory(PersistenceType.JCF);
         DiscodeitFactory fileFactory = new DiscodeitFactory(PersistenceType.FILE);
         // JCF로 할 때
-//        UserService userService = jcfFactory.getUserService();
-//        ChannelService channelService = jcfFactory.getChannelService();
-//        MessageService messageService = jcfFactory.getMessageService();
+//        UserService userService = jcfFactory.createUserService();
+//        ChannelService channelService = jcfFactory.createChannelService();
+//        MessageService messageService = jcfFactory.creteMessageService();
 
         // File I/O로 할 때
-        UserService userService = fileFactory.getUserService();
-        ChannelService channelService = fileFactory.getChannelService();
-        MessageService messageService = fileFactory.getMessageService();
+        UserService userService = fileFactory.createUserService();
+        ChannelService channelService = fileFactory.createChannelService();
+        MessageService messageService = fileFactory.creteMessageService();
 
         System.out.println("\n===================================================================================================");
         System.out.println("-------------------------------[ 유저 생성 ]------------------------------- ");
