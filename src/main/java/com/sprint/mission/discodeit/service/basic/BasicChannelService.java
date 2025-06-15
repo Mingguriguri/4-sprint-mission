@@ -224,15 +224,15 @@ public class BasicChannelService implements ChannelService {
      * @throws IllegalArgumentException 유효하지 않은 경우
      */
     private void validateActiveUsers(Set<User> users) {
-        if (users == null) {
-            throw new IllegalArgumentException("Users set cannot be null");
+        if (users == null || users.isEmpty()) {
+            throw new IllegalArgumentException("Users set cannot be null or empty");
         }
-        // members 안에 null이거나 상태가 ACTIVE가 아닌 User가 있으면 예외
+
         for (User u : users) {
             if (u == null) {
                 throw new IllegalArgumentException("Users set contains null User");
             }
-            if (!u.getRecordStatus().equals(RecordStatus.ACTIVE)) {
+            if (u.getRecordStatus() != RecordStatus.ACTIVE) {
                 throw new IllegalArgumentException(
                         "Cannot add user (id=" + u.getId() + ") with recordStatus != ACTIVE");
             }
