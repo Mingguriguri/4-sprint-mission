@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.RecordStatus;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
@@ -33,18 +32,6 @@ public interface ChannelService {
      * @throws IllegalArgumentException id가 null인 경우
      */
     Optional<Channel> getChannelById(String id);
-
-    /**
-     * 주어진 채널 ID와 recordStatus 조건을 만족하는 채널을 조회한다.
-     *
-     * @param id           조회하려는 채널의 ID
-     * @param recordStatus 조회하려는 레코드 상태 (RecordStatus.ACTIVE, RecordStatus.DELETED)
-     * @return 주어진 ID와 recordStatus가 일치하는 채널을 Optional로 반환. 없으면 Optional.empty()
-     * @throws IllegalArgumentException
-     *         - id가 null인 경우
-     *         - recordStatus가 null인 경우
-     */
-    Optional<Channel> getChannelByIdWithStatus(String id, RecordStatus recordStatus);
 
     /**
      * 주어진 채널 이름에 해당하고, recordStatus가 ACTIVE인 채널 목록을 조회한다.
@@ -180,7 +167,7 @@ public interface ChannelService {
      * @throws IllegalArgumentException
      *         - channel이 null이거나, recordStatus != ACTIVE인 경우
      */
-    void deleteChannel(Channel channel);
+    void softDeleteChannel(Channel channel);
 
     /**
      * Soft Delete된 채널을 복원한다.

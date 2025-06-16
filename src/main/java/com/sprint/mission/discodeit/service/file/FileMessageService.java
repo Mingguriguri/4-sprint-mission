@@ -1,16 +1,19 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.RecordStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.List;
 import java.util.Optional;
 
-public class JCFMessageService implements MessageService {
+public class FileMessageService implements MessageService {
     private final MessageRepository messageRepository;
 
-    public JCFMessageService(MessageRepository messageRepository) {
+    public FileMessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
 
@@ -112,7 +115,7 @@ public class JCFMessageService implements MessageService {
      * @throws IllegalArgumentException ID가 null인 경우
      */
     private void validateNotNullId(String id) {
-        if (id == null || id.trim().isEmpty()) {
+        if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
     }

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.RecordStatus;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
@@ -31,15 +30,6 @@ public interface UserService {
      * @throws IllegalArgumentException id가 null인 경우
      */
     Optional<User> getUserById(String id);
-
-    /**
-     * 주어진 유저 ID와 recordStatus 조건을 만족하는 유저를 조회한다.
-     *
-     * @param id           조회하려는 유저의 ID
-     * @param recordStatus 조회하려는 레코드 상태 (RecordStatus.ACTIVE, RecordStatus.DELETED)
-     * @return 주어진 ID와 recordStatus가 일치하는 유저를 Optional로 반환. 없으면 Optional.empty()
-     */
-    Optional<User> getUserByIdWithStatus(String id, RecordStatus recordStatus);
 
     /**
      * 주어진 이메일에 해당하고, recordStatus가 ACTIVE인 유저 목록을 조회한다.
@@ -114,7 +104,7 @@ public interface UserService {
      *         - user가 null이거나 recordStatus != ACTIVE인 경우
      *         - userStatus가 이미 INACTIVE인 경우
      */
-    void deactivateUser(User user);
+    void inactivateUser(User user);
 
     /**
      * 주어진 유저를 활성화(UserStatus=ACTIVE) 상태로 변경한다.

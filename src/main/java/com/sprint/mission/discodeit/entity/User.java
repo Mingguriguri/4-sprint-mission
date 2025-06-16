@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * User 엔티티는 디스코드잇 회원을 나타낸다.
@@ -18,54 +17,74 @@ import java.util.Set;
  * </ul>
  * <p>Soft Delete/Hard Delete 로직은 UserService 책임지며, 이 엔티티는 RecordStatus를 통해 상태 관리를 한다.</p>
  */
-public class User extends Base {
+public class User extends BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private String username;
     private String email;
-    private String password;
+    private transient String password;
     private UserStatus status;
 
     private final Set<Channel> channels = new HashSet<>();
     private final List<Message> messages = new ArrayList<>();
 
-    public User(String username, String email, String password, UserStatus status) {
+    public User(String username, String email, String password) {
         super();
         this.username = username;
         this.email = email;
         this.password = password;
-        this.status = status;
+        this.status = UserStatus.ACTIVE;
     }
+
+    /* =========================================================
+     * Getter
+     * =========================================================*/
 
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-
     public UserStatus getStatus() {
         return status;
     }
+    /* =========================================================
+     * Setter
+     * =========================================================*/
 
-    public void setStatus(UserStatus status) {
-        this.status = status;
+    public void changeUsername(String username) {
+        this.username = username;
+    }
+
+    public void updateUserEmail(String email) {
+        this.email = email;
+    }
+
+    public void changeUserPassword(String password) {
+        this.password = password;
+    }
+
+    // 계정 활성화
+    public void activate() {
+        this.status = UserStatus.ACTIVE;
+    }
+
+    // 계정 비활성화(휴먼상태)
+    public void inactivate() {
+        this.status = UserStatus.INACTIVE;
+    }
+
+    // 계정 탈퇴
+    public void deleteAccount() {
+        this.status = UserStatus.WITHDREW;
     }
 
     /* =========================================================
@@ -164,5 +183,17 @@ public class User extends Base {
                 ", email='" + email + '\'' +
                 ", status=" + status +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User u)) return false;
+        return Objects.equals(getId(), u.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

@@ -1,20 +1,22 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.RecordStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-public class JCFChannelService implements ChannelService {
+public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
 
-    public JCFChannelService(ChannelRepository channelRepository, MessageRepository messageRepository) {
+    public BasicChannelService(ChannelRepository channelRepository, MessageRepository messageRepository) {
         this.channelRepository = channelRepository;
         this.messageRepository = messageRepository;
     }
@@ -56,7 +58,6 @@ public class JCFChannelService implements ChannelService {
         validateNotNullChannelField(channelName, ownerId);
 
         Channel channel = new Channel(channelName, description, users, ownerId);
-
         return channelRepository.save(channel);
     }
 
@@ -69,11 +70,10 @@ public class JCFChannelService implements ChannelService {
         validateNotNullChannelField(channelId, channelName);
 
         Channel targetChannel = channelRepository.findByRecordStatusIsActiveId(channelId)
-                        .orElseThrow(() -> new IllegalArgumentException("Channel not found or not ACTIVE"));
+                .orElseThrow(() -> new IllegalArgumentException("Channel not found or not ACTIVE"));
         targetChannel.changeChannelName(channelName);
         targetChannel.updateChannelDesc(description);
         targetChannel.touch();
-
         return channelRepository.save(targetChannel);
     }
 
@@ -87,7 +87,6 @@ public class JCFChannelService implements ChannelService {
 
         targetChannel.addUser(user);
         targetChannel.touch();
-
         channelRepository.save(targetChannel);
     }
 
@@ -101,14 +100,13 @@ public class JCFChannelService implements ChannelService {
 
         // user가 해당 채널에 참여 중이 아닌 경우
         boolean isMember = targetChannel.getUsers().stream()
-                        .anyMatch(u -> u.getId().equals(user.getId()));
+                .anyMatch(u -> u.getId().equals(user.getId()));
         if (!isMember) {
             throw new IllegalArgumentException("User with id " + user.getId() + " is not a member of channel " + channelId);
         }
 
         targetChannel.removeUser(user);
         targetChannel.touch();
-
         channelRepository.save(targetChannel);
     }
 
@@ -121,7 +119,6 @@ public class JCFChannelService implements ChannelService {
 
         targetChannel.changeChannelOwnerId(ownerId);
         targetChannel.touch();
-
         return channelRepository.save(targetChannel);
     }
 
@@ -164,12 +161,10 @@ public class JCFChannelService implements ChannelService {
         validateDeletedChannel(channel);
 
         // 메시지 관계 제거 - Hard Delete
-        List<Message> copyOfMessages = new ArrayList<>(channel.getMessages());
-        copyOfMessages.forEach(channel::removeMessage);
+        new ArrayList<>(channel.getMessages()).forEach(channel::removeMessage);
 
         // 유저 관계 제거 - Hard Delete
-        List<User> copyOfUsers = new ArrayList<>(channel.getUsers());
-        copyOfUsers.forEach(channel::removeUser);
+        new ArrayList<>(channel.getUsers()).forEach(channel::removeUser);
 
         // 채널 제거 Hard Delete
         channelRepository.deleteById(channel.getId());

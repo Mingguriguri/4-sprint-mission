@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,12 +21,15 @@ import java.util.Set;
  * @see Message
  */
 
-public class Channel extends Base {
+public class Channel extends BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private String channelName;
     private String description;
-    private Set<User> users;
     private String ownerId;
 
+    private final Set<User> users;
     private final List<Message> messages = new ArrayList<>();
 
     public Channel(String channelName, String description, Set<User> users, String ownerId) {
@@ -35,27 +40,38 @@ public class Channel extends Base {
         this.ownerId = ownerId;
     }
 
+    /* =========================================================
+     * Getter
+     * =========================================================*/
+
     public String getChannelName() {
         return channelName;
-    }
-
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
+    /* =========================================================
+     * Setter
+     * =========================================================*/
+
+    // 채널명 변경하는 메서드
+    public void changeChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
+    // 채널 설명을 업데이트하는 메서드
+    public void updateChannelDesc(String description) {
+        this.description = description;
+    }
+
+    // 채널 소유자를 변경하는 메서드
+    public void changeChannelOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
 

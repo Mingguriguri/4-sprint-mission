@@ -1,9 +1,6 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.RecordStatus;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -12,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class JCFUserService implements UserService {
+public class FileUserService implements UserService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
 
-    public JCFUserService(UserRepository userRepository, MessageRepository messageRepository) {
+    public FileUserService(UserRepository userRepository, MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
     }
@@ -56,8 +53,8 @@ public class JCFUserService implements UserService {
     public User createUser(String username, String email, String password) {
         validateNotNullUserField(username, email, password);
 
-        User user = new User(username, email, password);
-        return userRepository.save(user);
+        User newUser = new User(username, email, password);
+        return userRepository.save(newUser);
     }
 
     /* =========================================================
@@ -69,7 +66,7 @@ public class JCFUserService implements UserService {
         validateNotNullUserField(userId, username, email, password);
 
         User targetUser = userRepository.findByMemberStatusIsActiveAndId(userId)
-                        .orElseThrow(() -> new IllegalArgumentException("User not found or not ACTIVE"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found or not ACTIVE"));
 
         targetUser.changeUsername(username);
         targetUser.updateUserEmail(email);
@@ -83,7 +80,6 @@ public class JCFUserService implements UserService {
     public void inactivateUser(User user) {
         User targetUser = userRepository.findByMemberStatusIsActiveAndId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found or not ACTIVE"));
-
         targetUser.inactivate();
         targetUser.touch();
         userRepository.save(targetUser);
@@ -93,9 +89,9 @@ public class JCFUserService implements UserService {
     @Override
     public void activateUser(User user) {
         User targetUser = userRepository.findByMemberStatusIsInactiveAndId(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found or not INACTIVE"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found or not ACTIVE"));
 
-        targetUser.inactivate();
+        targetUser.activate();
         targetUser.touch();
         userRepository.save(targetUser);
     }
@@ -109,13 +105,14 @@ public class JCFUserService implements UserService {
         validateActiveUser(user);
 
         // 메시지 Soft Delete
-        user.getMessages().forEach(msg -> {
+        List<Message> messages = messageRepository.findByUserId(user.getId());
+        messages.forEach(msg -> {
             msg.softDelete();
             msg.touch();
             messageRepository.softDeleteById(msg.getId());
         });
 
-        // 채널과 연결 끊기
+        // 채널은 삭제될 때 관계만 끊어주기
         user.getChannels().forEach(msg -> {
             msg.softDelete();
             msg.touch();
@@ -127,8 +124,6 @@ public class JCFUserService implements UserService {
 
     @Override
     public void restoreUser(User user) {
-        validateDeletedUser(user);
-
         // 메시지 복원
         user.getMessages().forEach(msg -> {
             msg.restore();
@@ -136,7 +131,7 @@ public class JCFUserService implements UserService {
             messageRepository.restoreById(msg.getId());
         });
 
-        // 채널과 다시 연결
+        // 채널은 관계 다시 연결
         user.getChannels().forEach(msg -> {
             msg.restore();
             msg.touch();
@@ -204,6 +199,7 @@ public class JCFUserService implements UserService {
     private void validateDeletedUser(User user) {
         if (user == null || user.getRecordStatus() != RecordStatus.DELETED) {
             throw new IllegalArgumentException("User must be ACTIVE and not null");
+//            System.out.println("HERE" + user.getRecordStatus());
         }
     }
 }

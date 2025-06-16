@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -17,18 +19,25 @@ import java.util.UUID;
  * </p>
  */
 
-public class Base {
+public class BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private final String id;
     private final long createdAt;
     private long updatedAt;
     private RecordStatus recordStatus;
 
-    public Base() {
+    public BaseEntity() {
         this.id = UUID.randomUUID().toString();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = System.currentTimeMillis();
         this.recordStatus = RecordStatus.ACTIVE;
     }
+
+    /* =========================================================
+     * Getter
+     * =========================================================*/
 
     public String getId() {
         return id;
@@ -42,15 +51,24 @@ public class Base {
         return updatedAt;
     }
 
-    public void setUpdatedAt(long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public RecordStatus getRecordStatus() {
         return recordStatus;
     }
 
-    public void setRecordStatus(RecordStatus recordStatus) {
-        this.recordStatus = recordStatus;
+    /* =========================================================
+     * Setter
+     * =========================================================*/
+
+    public void touch() {
+        this.updatedAt = System.currentTimeMillis();
+    }
+
+    // recordStatus
+    public void softDelete() {
+        this.recordStatus = RecordStatus.DELETED;
+    }
+
+    public void restore() {
+        this.recordStatus = RecordStatus.ACTIVE;
     }
 }

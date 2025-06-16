@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -10,11 +10,11 @@ import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
 
-public class JCFChannelService implements ChannelService {
+public class FileChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
 
-    public JCFChannelService(ChannelRepository channelRepository, MessageRepository messageRepository) {
+    public FileChannelService(ChannelRepository channelRepository, MessageRepository messageRepository) {
         this.channelRepository = channelRepository;
         this.messageRepository = messageRepository;
     }
@@ -69,7 +69,7 @@ public class JCFChannelService implements ChannelService {
         validateNotNullChannelField(channelId, channelName);
 
         Channel targetChannel = channelRepository.findByRecordStatusIsActiveId(channelId)
-                        .orElseThrow(() -> new IllegalArgumentException("Channel not found or not ACTIVE"));
+                .orElseThrow(() -> new IllegalArgumentException("Channel not found or not ACTIVE"));
         targetChannel.changeChannelName(channelName);
         targetChannel.updateChannelDesc(description);
         targetChannel.touch();
@@ -101,7 +101,7 @@ public class JCFChannelService implements ChannelService {
 
         // user가 해당 채널에 참여 중이 아닌 경우
         boolean isMember = targetChannel.getUsers().stream()
-                        .anyMatch(u -> u.getId().equals(user.getId()));
+                .anyMatch(u -> u.getId().equals(user.getId()));
         if (!isMember) {
             throw new IllegalArgumentException("User with id " + user.getId() + " is not a member of channel " + channelId);
         }

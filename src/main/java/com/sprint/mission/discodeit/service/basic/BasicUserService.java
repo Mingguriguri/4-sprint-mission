@@ -1,9 +1,9 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.RecordStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class JCFUserService implements UserService {
+public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
 
-    public JCFUserService(UserRepository userRepository, MessageRepository messageRepository) {
+    public BasicUserService(UserRepository userRepository, MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
     }
@@ -55,7 +55,6 @@ public class JCFUserService implements UserService {
     @Override
     public User createUser(String username, String email, String password) {
         validateNotNullUserField(username, email, password);
-
         User user = new User(username, email, password);
         return userRepository.save(user);
     }
@@ -69,7 +68,7 @@ public class JCFUserService implements UserService {
         validateNotNullUserField(userId, username, email, password);
 
         User targetUser = userRepository.findByMemberStatusIsActiveAndId(userId)
-                        .orElseThrow(() -> new IllegalArgumentException("User not found or not ACTIVE"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found or not ACTIVE"));
 
         targetUser.changeUsername(username);
         targetUser.updateUserEmail(email);
@@ -151,12 +150,10 @@ public class JCFUserService implements UserService {
         validateDeletedUser(user);
 
         // 메시지 관계 모두 제거
-        List<Message> copyOfMessages = new ArrayList<>(user.getMessages());
-        copyOfMessages.forEach(user::removeMessage);
+        new ArrayList<>(user.getMessages()).forEach(user::removeMessage);
 
         // 채널 관계 모두 제거
-        List<Channel> copyOfChannels = new ArrayList<>(user.getChannels());
-        copyOfChannels.forEach(user::removeChannel);
+        new ArrayList<>(user.getChannels()).forEach(user::removeChannel);
 
         // 유저 제거
         userRepository.deleteById(user.getId());
@@ -174,8 +171,8 @@ public class JCFUserService implements UserService {
      * @throws IllegalArgumentException ID가 null인 경우
      */
     private void validateNotNullUserField(String... values) {
-        for (String v : values) {
-            if (v == null || v.trim().isEmpty()) {
+        for (String value: values) {
+            if (value == null || value.trim().isEmpty()) {
                 throw new IllegalArgumentException("User Id or User Email or username cannot be null");
             }
         }

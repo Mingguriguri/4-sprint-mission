@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * Message 엔티티는 특정 채널에서 특정 유저가 전송한 메시지를 나타낸다.
  * <p>주요 속성:</p>
@@ -10,7 +13,10 @@ package com.sprint.mission.discodeit.entity;
  * </ul>
  * <p>Soft Delete/Hard Delete 로직은 MessageService 책임지며, 이 엔티티는 RecordStatus를 통해 상태 관리를 한다.</p>
  */
-public class Message extends Base{
+public class Message extends BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private Channel channel;
     private User user;
     private String content;
@@ -22,11 +28,19 @@ public class Message extends Base{
         this.content = content;
     }
 
+    /* =========================================================
+     * Getter
+     * =========================================================*/
+
     public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    /* =========================================================
+     * Setter
+     * =========================================================*/
+
+    public void changeMessageContent(String content) {
         this.content = content;
     }
 
@@ -47,9 +61,11 @@ public class Message extends Base{
      * @param channel 연결할 Channel 객체
      */
     public void addChannel(Channel channel) {
-        this.channel = channel;
         if (!channel.getMessages().contains(this)) {
-            channel.addMessage(this);
+            this.channel = channel;
+            if (!channel.getMessages().contains(this)) {
+                channel.addMessage(this);
+            }
         }
     }
 
