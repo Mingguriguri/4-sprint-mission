@@ -1,45 +1,40 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
 import java.io.Serializable;
-import java.util.*;
+import java.time.Instant;
+import java.util.UUID;
 
-/**
- * User 엔티티는 디스코드잇 회원을 나타낸다.
- * <p>주요 속성:</p>
- * <ul>
- *   <li>username: 유저 고유 이름</li>
- *   <li>email: 유저 이메일</li>
- *   <li>password: 유저 비밀번호(암호화 전 텍스트)</li>
- *   <li>status: 유저 상태 (ACTIVE, INACTIVE, WITHDREW)</li>
- *   <li>channels: 이 유저가 속해 있는 채널 집합</li>
- *   <li>messages: 이 유저가 작성한 메시지 목록</li>
- * </ul>
- * <p>Soft Delete/Hard Delete 로직은 UserService 책임지며, 이 엔티티는 RecordStatus를 통해 상태 관리를 한다.</p>
- */
-public class User extends BaseEntity implements Serializable {
-    @Serial
+public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
     private String username;
     private String email;
-    private transient String password;
-    private UserStatus status;
-
-    private final Set<Channel> channels = new HashSet<>();
-    private final List<Message> messages = new ArrayList<>();
+    private String password;
 
     public User(String username, String email, String password) {
-        super();
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
         this.username = username;
         this.email = email;
         this.password = password;
-        this.status = UserStatus.ACTIVE;
     }
 
-    /* =========================================================
-     * Getter
-     * =========================================================*/
+    public UUID getId() {
+        return id;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
 
     public String getUsername() {
         return username;
@@ -53,147 +48,23 @@ public class User extends BaseEntity implements Serializable {
         return password;
     }
 
-    public UserStatus getStatus() {
-        return status;
-    }
-    /* =========================================================
-     * Setter
-     * =========================================================*/
-
-    public void changeUsername(String username) {
-        this.username = username;
-    }
-
-    public void updateUserEmail(String email) {
-        this.email = email;
-    }
-
-    public void changeUserPassword(String password) {
-        this.password = password;
-    }
-
-    // 계정 활성화
-    public void activate() {
-        this.status = UserStatus.ACTIVE;
-    }
-
-    // 계정 비활성화(휴먼상태)
-    public void inactivate() {
-        this.status = UserStatus.INACTIVE;
-    }
-
-    // 계정 탈퇴
-    public void deleteAccount() {
-        this.status = UserStatus.WITHDREW;
-    }
-
-    /* =========================================================
-     * Channel 관계 메소드
-     * =========================================================*/
-
-    public Set<Channel> getChannels() {
-        return channels;
-    }
-
-    /**
-     * 이 유저에서 특정 채널과의 관계를 연결한다.
-     * <p>
-     *  양방향 관계: Channel.getUsers()에서도 자동으로 연결됨<br>
-     *  이미 User에 채널이 연결되어 있다면 아무 동작도 하지 않음
-     * </p>
-     *
-     * @param channel 추가할 Channel 객체
-     */
-    public void addChannel(Channel channel) {
-        if (!channels.contains(channel)) {
-            channels.add(channel);
-            if (!channel.getUsers().contains(this)) {
-                channel.addUser(this);
-            }
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
         }
-    }
-
-    /**
-     * 이 유저에서 특정 채널과의 관계를 해제한다.
-     * <p>
-     *  양방향 관계: Channel.getUsers()에서도 자동으로 연결 해제됨<br>
-     *  유저에 해당 채널이 없다면 아무 동작도 하지 않음
-     * </p>
-     *
-     * @param channel 제거할 Channel 객체
-     */
-    public void removeChannel(Channel channel) {
-        if (channels.contains(channel)) {
-            channels.remove(channel);
-            if (channel.getUsers() != null) {
-                channel.removeUser(this);
-            }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
         }
-    }
-
-    /* =========================================================
-     * Message 관계 메소드
-     * =========================================================*/
-
-    public List<Message> getMessages() {
-        return messages;
-    }
-
-    /**
-     * 이 유저에 Message를 추가한다.
-     * <p>
-     *  양방향 관계: Message.getUser()에도 자동으로 연결됨<br>
-     *  이미 메시지가 User에 속해 있다면 아무 동작도 하지 않음
-     * </p>
-     *
-     * @param message 추가할 Message 객체
-     */
-    public void addMessage(Message message) {
-        if (!messages.contains(message)) {
-            messages.add(message);
-            if (!message.getUser().equals(this)) {
-                message.addUser(this);
-            }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
         }
-    }
 
-    /**
-     * 해당 유저에 Message를 제거한다.
-     * <p>
-     *  양방향 관계: Message.getUser()에서도 연결 해제<br>
-     *  유저에 해당 Message가 속해 있지 않으면 아무 동작도 하지 않음
-     * </p>
-     *
-     * @param message 제거할 Message 객체
-     */
-    public void removeMessage(Message message) {
-        if (messages.contains(message)) {
-            messages.remove(message);
-            if (message.getUser() != null) {
-                message.removeUser(this);
-            }
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + super.getId() +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", status=" + status +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User u)) return false;
-        return Objects.equals(getId(), u.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId());
     }
 }

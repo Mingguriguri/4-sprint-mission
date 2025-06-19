@@ -1,142 +1,100 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.RecordStatus;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
-    private static final String FILE_PATH = "./data/messages.ser";
-    private final File storageFile;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
     public FileMessageRepository() {
-        this.storageFile = new File(FILE_PATH);
-        if (!storageFile.exists()) {
-            writeMessagesToFile(new ArrayList<>());
-        }
-        // TODO: 테스트끝나면 아래 코드 지우기 . 현재는 실행할 때마다 새로 초기화하기 위해서 추가함
-        writeMessagesToFile(new ArrayList<>());
-    }
-
-    /* =========================================================
-     * File I/O
-     * ========================================================= */
-
-    /*
-     * 역직렬화
-     * */
-    private List<Message> readMessagesFromFile() {
-        if (!storageFile.exists() || storageFile.length() == 0) {
-            return new ArrayList<>();
-        }
-
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(storageFile))) {
-            return (List<Message>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("메시지 목록 조회 실패", e);
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    /*
-     * 직렬화
-     * */
-    private void writeMessagesToFile(List<Message> messages) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(storageFile))) {
-            oos.writeObject(messages);
-        } catch (IOException e) {
-            throw new RuntimeException("메시지 목록 저장 실패", e);
-        }
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
     public Message save(Message message) {
-        List<Message> allMessages = readMessagesFromFile();
-        allMessages.removeIf(m -> m.getId().equals(message.getId()));
-        allMessages.add(message);
-        writeMessagesToFile(allMessages);
+        Path path = resolvePath(message.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return message;
     }
 
     @Override
-    public List<Message> findAllByRecordStatusIsActive() {
-        return readMessagesFromFile().stream()
-                .filter(m -> m.getRecordStatus() == RecordStatus.ACTIVE)
-                .toList();
+    public Optional<Message> findById(UUID id) {
+        Message messageNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                messageNullable = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(messageNullable);
     }
 
     @Override
-    public Optional<Message> findById(String id) {
-        return readMessagesFromFile().stream()
-                .filter(m -> m.getId().equals(id))
-                .findFirst();
+    public List<Message> findAll() {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Message) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public Optional<Message> findByRecordStatusIsActiveAndId(String id) {
-        return readMessagesFromFile().stream()
-                .filter(m -> m.getRecordStatus() == RecordStatus.ACTIVE)
-                .filter(m -> m.getId().equals(id))
-                .findFirst();
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
     @Override
-    public Optional<Message> findByRecordStatusIsDeletedAndId(String id) {
-        return readMessagesFromFile().stream()
-                .filter(m -> m.getRecordStatus() == RecordStatus.DELETED)
-                .filter(m -> m.getId().equals(id))
-                .findFirst();
-    }
-
-    @Override
-    public List<Message> findByChannelId(String channelId) {
-        return readMessagesFromFile().stream()
-                .filter(m -> m.getRecordStatus() == RecordStatus.ACTIVE)
-                .filter(m -> m.getChannel().getId().equals(channelId))
-                .toList();
-    }
-
-    @Override
-    public List<Message> findByUserId(String userId) {
-        return readMessagesFromFile().stream()
-                .filter(m -> m.getRecordStatus() == RecordStatus.ACTIVE)
-                .filter(m -> m.getUser().getId().equals(userId))
-                .toList();
-    }
-
-    @Override
-    public void softDeleteById(String id) {
-        List<Message> allMessages = readMessagesFromFile();
-        Message deleteMessage = allMessages.stream()
-                .filter(m -> m.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Message not found"));
-
-        deleteMessage.softDelete();
-        deleteMessage.touch();
-        writeMessagesToFile(allMessages);
-    }
-
-    @Override
-    public void restoreById(String id) {
-        List<Message> allMessages = readMessagesFromFile();
-        Message restoreMessage = allMessages.stream()
-                .filter(m -> m.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Message not found"));
-
-        restoreMessage.restore();
-        restoreMessage.touch();
-        writeMessagesToFile(allMessages);
-    }
-
-    @Override
-    public void deleteById(String id) {
-        List<Message> allMessages = readMessagesFromFile();
-        allMessages.removeIf(m -> m.getId().equals(id));
-        writeMessagesToFile(allMessages);
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

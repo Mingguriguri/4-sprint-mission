@@ -21,5 +21,5 @@ test {
 
 application {
     // 실행할 메인 클래스의 경로를 정확히 입력
-    mainClass = 'com.sprint.mission.JavaApplication'
+    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
 }
