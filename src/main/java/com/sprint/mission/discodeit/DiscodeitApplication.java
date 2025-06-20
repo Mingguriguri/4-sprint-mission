@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequestDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -15,19 +15,22 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class DiscodeitApplication {
 	static User setupUser(UserService userService) {
-		CreateUserRequestDto requestDto = new CreateUserRequestDto(
+		CreateUserRequestDto userRequestDto = new CreateUserRequestDto(
 				"woody",
 				"woody@codeit.com",
 				"woody1234",
 				null
 				);
-		User user = userService.create(requestDto);
-		return user;
+		return userService.create(userRequestDto);
 	}
 
 	static Channel setupChannel(ChannelService channelService) {
-		Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
-		return channel;
+		CreatePublicChannelRequestDto channelRequestDto = new CreatePublicChannelRequestDto(
+				"공지",
+				"공지 채널입니다"
+			);
+
+		return channelService.createPublicChannel(channelRequestDto);
 	}
 
 	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
@@ -47,8 +50,10 @@ public class DiscodeitApplication {
 		// 셋업
 		User user = setupUser(userService);
 		Channel channel = setupChannel(channelService);
+
 		// 테스트
 		messageCreateTest(messageService, channel, user);
+		System.out.println(channelService.findPublicChannel(channel.getId()));
 	}
 
 }
