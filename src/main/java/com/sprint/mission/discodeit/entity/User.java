@@ -32,27 +32,23 @@ public class User implements Serializable {
     public User(CreateUserRequestDto requestDto) {
     }
 
-    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
-        boolean anyValueUpdated = false;
-        if (newUsername != null && !newUsername.equals(this.username)) {
-            this.username = newUsername;
-            anyValueUpdated = true;
-        }
-        if (newEmail != null && !newEmail.equals(this.email)) {
-            this.email = newEmail;
-            anyValueUpdated = true;
-        }
-        if (newPassword != null && !newPassword.equals(this.password)) {
-            this.password = newPassword;
-            anyValueUpdated = true;
-        }
-        if (profileId != null && !newProfileId.equals(this.profileId)) {
-            this.profileId = newProfileId;
-            anyValueUpdated = true;
-        }
+    public void updateUsername(String newUsername) {
+        this.username = newUsername;
+    }
 
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+    public void updateEmail(String newEmail) {
+        this.email = newEmail;
+    }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+    public void updateProfileId(UUID newProfileId) {
+        this.profileId = newProfileId;
+    }
+
+    public void touch() {
+        this.updatedAt = Instant.now();
     }
 }

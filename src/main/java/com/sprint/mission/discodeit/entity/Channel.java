@@ -26,6 +26,18 @@ public class Channel implements Serializable {
         this.description = description;
     }
 
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateDescription(String description) {
+        this.description = description;
+    }
+
+    public void touch() {
+        this.updatedAt = Instant.now();
+    }
+
     public void update(String newName, String newDescription) {
         boolean anyValueUpdated = false;
         if (newName != null && !newName.equals(this.name)) {

@@ -25,19 +25,15 @@ public class ReadStatus {
         this.channelId = channelId;
     }
 
-    public void update(UUID userId, UUID channelId) {
-        boolean anyValueUpdated = false;
-        if (userId != null && !userId.equals(this.userId)) {
-            this.userId = userId;
-            anyValueUpdated = true;
-        }
-        if (channelId != null && !channelId.equals(this.channelId)) {
-            this.channelId = channelId;
-            anyValueUpdated = true;
-        }
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+    public void updateUserId(UUID userId) {
+        this.userId = userId;
+    }
 
+    public void updateChannelId(UUID channelId) {
+        this.channelId = channelId;
+    }
+
+    public void touch() {
+        this.updatedAt = Instant.now();
     }
 }

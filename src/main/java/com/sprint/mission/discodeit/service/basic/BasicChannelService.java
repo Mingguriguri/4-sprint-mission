@@ -39,7 +39,9 @@ public class BasicChannelService implements ChannelService {
     public Channel update(UUID channelId, String newName, String newDescription) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
-        channel.update(newName, newDescription);
+        channel.updateName(newName);
+        channel.updateDescription(newDescription);
+
         return channelRepository.save(channel);
     }
 

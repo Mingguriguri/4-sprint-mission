@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -54,7 +53,9 @@ public class BasicMessageService implements MessageService {
     public Message update(UUID messageId, String newContent) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
-        message.update(newContent);
+        message.updateContent(newContent);
+        message.touch();
+
         return messageRepository.save(message);
     }
 

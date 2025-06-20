@@ -74,7 +74,6 @@ public class BasicUserService implements UserService {
                         Function.identity()      // value: UserStatus 객체 자체
                 ));
 
-
         List<UserResponseDto> dtoList = userList.stream()
                 .map(user -> {
                     UserStatus status = statusMap.get(user.getId());
@@ -97,11 +96,12 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(updateUserRequestDto.getId())
                 .orElseThrow(() -> new NoSuchElementException("User with id " + updateUserRequestDto.getId() + " not found"));
 
-        user.update(updateUserRequestDto.getUsername(),
-                updateUserRequestDto.getEmail(),
-                updateUserRequestDto.getPassword(),
-                updateUserRequestDto.getProfileId()
-        );
+        user.updateUsername(updateUserRequestDto.getUsername());
+        user.updateEmail(updateUserRequestDto.getEmail());
+        user.updatePassword(updateUserRequestDto.getPassword());
+        user.updateProfileId(updateUserRequestDto.getProfileId());
+        user.touch();
+
         return userRepository.save(user);
     }
 

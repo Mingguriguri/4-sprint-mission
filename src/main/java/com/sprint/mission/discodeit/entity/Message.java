@@ -19,7 +19,7 @@ public class Message implements Serializable {
 
     private UUID channelId;
     private UUID authorId;
-    private List<UUID> attatchmentIds;
+    private List<UUID> attachmentIds;
 
     public Message(String content, UUID channelId, UUID authorId) {
         this.id = UUID.randomUUID();
@@ -30,15 +30,17 @@ public class Message implements Serializable {
         this.authorId = authorId;
     }
 
-    public void update(String newContent) {
-        boolean anyValueUpdated = false;
-        if (newContent != null && !newContent.equals(this.content)) {
-            this.content = newContent;
-            anyValueUpdated = true;
-        }
 
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+    public void updateContent(String newContent) {
+        this.content = newContent;
     }
+
+    public void changeAttachmentIds(List<UUID> attachmentIds) {
+        this.attachmentIds = attachmentIds;
+    }
+
+    public void touch() {
+        this.updatedAt = Instant.now();
+    }
+
 }

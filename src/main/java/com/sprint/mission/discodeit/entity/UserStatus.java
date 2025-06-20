@@ -13,7 +13,8 @@ import java.util.UUID;
 public class UserStatus {
     private final UUID id;
     private final Instant createdAt;
-    private Instant updatedAt; // 접속시간
+    private Instant updatedAt;
+    private Instant lastConnectedAt;
 
     private UUID userId;
 
@@ -23,15 +24,20 @@ public class UserStatus {
         this.userId = userId;
     }
 
+    public void updateLastConnectedAt() {
+        this.lastConnectedAt = Instant.now();
+    }
+
     public void touch() {
         this.updatedAt = Instant.now();
     }
+
     /*
     * 마지막 접속 시간을 기준으로 현재 로그인한 유저로 판단할 수 있는 메소드
     * */
     public boolean isOnline() {
         // 마지막 접속 시간이 현재 시간으로부터 5분 이내이면 현재 접속 중인 유저로 간주
-        return updatedAt != null &&
-                updatedAt.isBefore(Instant.now().plusSeconds(300));
+        return lastConnectedAt != null &&
+                lastConnectedAt.isBefore(Instant.now().plusSeconds(300));
     }
 }
