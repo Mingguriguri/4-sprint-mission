@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -28,7 +29,10 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public void update(String newUsername, String newEmail, String newPassword) {
+    public User(CreateUserRequestDto requestDto) {
+    }
+
+    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
         boolean anyValueUpdated = false;
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
@@ -40,6 +44,10 @@ public class User implements Serializable {
         }
         if (newPassword != null && !newPassword.equals(this.password)) {
             this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if (profileId != null && !newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
             anyValueUpdated = true;
         }
 

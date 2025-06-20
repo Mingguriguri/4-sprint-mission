@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -14,7 +15,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class DiscodeitApplication {
 	static User setupUser(UserService userService) {
-		User user = userService.create("woody", "woody@codeit.com", "woody1234");
+		CreateUserRequestDto requestDto = new CreateUserRequestDto(
+				"woody",
+				"woody@codeit.com",
+				"woody1234",
+				null
+				);
+		User user = userService.create(requestDto);
 		return user;
 	}
 
@@ -32,18 +39,10 @@ public class DiscodeitApplication {
 		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
 		// context에서 Bean을 조회하여 각 서비스 구현체 할당
-		// 레포지토리 초기화
-
 		// 서비스 초기화
 		UserService userService = context.getBean(UserService.class);
 		ChannelService channelService = context.getBean(ChannelService.class);
 		MessageService messageService = context.getBean(MessageService.class);
-
-
-		// 서비스 초기화
-//		UserService userService = new BasicUserService(userRepository);
-//		ChannelService channelService = new BasicChannelService(channelRepository);
-//		MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
 
 		// 셋업
 		User user = setupUser(userService);
