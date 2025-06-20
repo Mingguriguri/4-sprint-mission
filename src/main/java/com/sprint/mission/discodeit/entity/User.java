@@ -30,6 +30,11 @@ public class User implements Serializable {
     }
 
     public User(CreateUserRequestDto requestDto) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.username = requestDto.getUsername();
+        this.email = requestDto.getEmail();
+        this.password = requestDto.getPassword();
     }
 
     public void updateUsername(String newUsername) {
