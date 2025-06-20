@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateUserRequestDto {
+public class UserUpdateDto {
     @NotBlank
     private UUID id;
 

@@ -32,7 +32,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createPrivateChannel(CreatePrivateChannelRequestDto privateChannelRequestDto) {
+    public Channel createPrivateChannel(PrivateChannelCreateDto privateChannelRequestDto) {
         Channel channel = new Channel(privateChannelRequestDto);
         // 채널에 참여하는 User의 정보를 받아 User별 ReadStatus 정보를 생성
         ReadStatus readStatus = new ReadStatus(privateChannelRequestDto.getUserId(), channel.getId());
@@ -42,7 +42,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createPublicChannel(CreatePublicChannelRequestDto publicChannelRequestDto) {
+    public Channel createPublicChannel(PublicChannelCreateDto publicChannelRequestDto) {
         Channel channel = new Channel(publicChannelRequestDto);
         return channelRepository.save(channel);
     }
@@ -112,7 +112,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(UpdatePublicChannelRequestDto updatePublicChannelRequestDto) {
+    public Channel update(PublicChannelUpdateDto updatePublicChannelRequestDto) {
         Channel channel = channelRepository.findById(updatePublicChannelRequestDto.getId())
                 .filter(c -> c.getType() == ChannelType.PUBLIC) // PRIVATE는 수정 불가
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + updatePublicChannelRequestDto.getId() + " not found"));

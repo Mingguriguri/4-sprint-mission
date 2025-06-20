@@ -9,7 +9,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateUserRequestDto {
+public class UserCreateDto {
     @NotBlank
     private String username;
 
