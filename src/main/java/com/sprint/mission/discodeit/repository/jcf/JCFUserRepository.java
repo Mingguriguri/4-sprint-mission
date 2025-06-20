@@ -26,6 +26,13 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByUsername(String username) {
+        return this.data.values().stream()
+                .filter(u -> u.getUsername().equals(username))
+                .findFirst();
+    }
+
+    @Override
     public List<User> findAll() {
         return this.data.values().stream().toList();
     }
@@ -37,12 +44,13 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public boolean existsByUsername(String username) {
-        return false;
+        return findByUsername(username).isPresent();
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return false;
+        return this.data.values().stream()
+                .anyMatch(u -> u.getEmail().equals(email));
     }
 
     @Override
