@@ -66,11 +66,7 @@ public class BasicChannelService implements ChannelService {
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        return new PrivateChannelResponseDto(
-                channel.getId(),
-                userId,
-                channel.getLastMessageSentAt()
-        );
+        return PrivateChannelResponseDto.from(channel, userId);
     }
 
     @Override
@@ -78,12 +74,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
 
-        return new PublicChannelResponseDto(
-                channel.getId(),
-                channel.getName(),
-                channel.getDescription(),
-                channel.getLastMessageSentAt()
-        );
+        return PublicChannelResponseDto.from(channel);
     }
 
     @Override
@@ -91,14 +82,7 @@ public class BasicChannelService implements ChannelService {
         // PUBLIC
         List<Channel> publicChannels = channelRepository.findAllByChannelType(ChannelType.PUBLIC);
         List<PublicChannelResponseDto> publicChannelDtos = publicChannels.stream()
-                .map(channel -> {
-                    return new PublicChannelResponseDto(
-                            channel.getId(),
-                            channel.getName(),
-                            channel.getDescription(),
-                            channel.getLastMessageSentAt()
-                    );
-                })
+                .map(PublicChannelResponseDto::from)
                 .toList();
         // PRIVATE
         List<Channel> privateChannels = channelRepository.findAllByChannelType(ChannelType.PRIVATE).stream()
@@ -106,11 +90,7 @@ public class BasicChannelService implements ChannelService {
                 .toList();
         List<PrivateChannelResponseDto> privateChannelDtos = privateChannels.stream()
                 .map(channel -> {
-                    return new PrivateChannelResponseDto(
-                            channel.getId(),
-                            userId,
-                            channel.getLastMessageSentAt()
-                    );
+                    return PrivateChannelResponseDto.from(channel, userId);
                 })
                 .toList();
 

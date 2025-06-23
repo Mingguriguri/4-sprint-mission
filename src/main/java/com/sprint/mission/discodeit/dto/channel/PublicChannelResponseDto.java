@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.channel;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,13 @@ public class PublicChannelResponseDto {
     private String name;
     private String description;
     private Instant lastMessageSentAt;
+
+    public static PublicChannelResponseDto from(Channel channel) {
+        return new PublicChannelResponseDto(
+                channel.getId(),
+                channel.getName(),
+                channel.getDescription(),
+                channel.getLastMessageSentAt()
+        );
+    }
 }
