@@ -8,14 +8,14 @@ import java.util.UUID;
 
 public interface ChannelService {
     Channel create(ChannelType type, String name, String description);
-    Channel createPrivateChannel(CreatePrivateChannelRequestDto privateChannelRequestDto);
-    Channel createPublicChannel(CreatePublicChannelRequestDto publicChannelRequestDto);
+    Channel createPrivateChannel(PrivateChannelCreateDto privateChannelRequestDto);
+    Channel createPublicChannel(PublicChannelCreateDto publicChannelRequestDto);
 
     PrivateChannelResponseDto findPrivateChannel(UUID channelId);
     PublicChannelResponseDto findPublicChannel(UUID channelId);
     AllChannelByUserIdResponseDto findAllByUserId(UUID userId);
 
-    Channel update(UpdatePublicChannelRequestDto updatePublicChannelRequestDto);
+    Channel update(PublicChannelUpdateDto updatePublicChannelRequestDto);
 
     void delete(UUID channelId);
 }

@@ -33,7 +33,11 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel createPrivateChannel(PrivateChannelCreateDto privateChannelRequestDto) {
-        Channel channel = new Channel(privateChannelRequestDto);
+        Channel channel = new Channel(
+                ChannelType.PRIVATE,
+                null,
+                null
+        );
         // 채널에 참여하는 User의 정보를 받아 User별 ReadStatus 정보를 생성
         ReadStatus readStatus = new ReadStatus(privateChannelRequestDto.getUserId(), channel.getId());
         readStatusRepository.save(readStatus);
@@ -43,7 +47,11 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel createPublicChannel(PublicChannelCreateDto publicChannelRequestDto) {
-        Channel channel = new Channel(publicChannelRequestDto);
+        Channel channel = new Channel(
+                ChannelType.PUBLIC,
+                publicChannelRequestDto.getName(),
+                publicChannelRequestDto.getDescription()
+        );
         return channelRepository.save(channel);
     }
 
@@ -94,7 +102,7 @@ public class BasicChannelService implements ChannelService {
                 .toList();
         // PRIVATE
         List<Channel> privateChannels = channelRepository.findAllByChannelType(ChannelType.PRIVATE).stream()
-                .filter(c -> readStatusRepository.existsByUserId(userId))
+                .filter(c -> readStatusRepository.existsByUserIdAndChannelId(userId, c.getId()))
                 .toList();
         List<PrivateChannelResponseDto> privateChannelDtos = privateChannels.stream()
                 .map(channel -> {
@@ -106,9 +114,10 @@ public class BasicChannelService implements ChannelService {
                 })
                 .toList();
 
-        return new AllChannelByUserIdResponseDto(publicChannelDtos, privateChannelDtos);
-
-
+        return new AllChannelByUserIdResponseDto(
+                publicChannelDtos,
+                privateChannelDtos
+        );
     }
 
     @Override

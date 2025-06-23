@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequestDto;
-import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequestDto;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelResponseDto;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -24,28 +21,14 @@ public class Channel implements Serializable {
     public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-
+        this.updatedAt = Instant.now();
+        this.lastMessageSentAt = this.createdAt;
         this.type = type;
         this.name = name;
         this.description = description;
     }
 
-    public Channel(CreatePrivateChannelRequestDto privateChannelRequestDto) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.type = ChannelType.PRIVATE;
-        this.name = null;
-        this.description = null;
-    }
-
-    public Channel(CreatePublicChannelRequestDto publicChannelRequestDto) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.type = ChannelType.PUBLIC;
-        this.name = publicChannelRequestDto.getName();
-        this.description = publicChannelRequestDto.getDescription();
-    }
-
+    // 공개채널
     public void updateName(String name) {
         this.name = name;
     }
@@ -54,6 +37,7 @@ public class Channel implements Serializable {
         this.description = description;
     }
 
+    // 메시지 보낼 때마다 시간 갱신
     public void updateLastMessageSentAt() {
         this.lastMessageSentAt = Instant.now();
     }

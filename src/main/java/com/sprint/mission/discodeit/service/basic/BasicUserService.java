@@ -28,14 +28,20 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(UserCreateDto requestDto) {
-        if (userRepository.existsByUsername(requestDto.getUsername())) {
+        // TODO: 프로필 처리 필요
+        String username = requestDto.getUsername();
+        String email = requestDto.getEmail();
+        String password = requestDto.getPassword();
+        UUID profileId = requestDto.getProfileId();
+
+        if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("이미 사용 중인 username 입니다.");
         }
-        if (userRepository.existsByEmail(requestDto.getEmail())) {
+        if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("이미 사용 중인 email 입니다.");
         }
 
-        User user = new User(requestDto);
+        User user = new User(username, email, password, profileId);
 
         // UserStatus도 함께 저장
         UserStatus userStatus = new UserStatus(user.getId());

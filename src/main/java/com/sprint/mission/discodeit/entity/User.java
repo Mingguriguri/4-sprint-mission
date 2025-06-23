@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -21,20 +21,13 @@ public class User implements Serializable {
 
     private UUID profileId;
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.username = username;
         this.email = email;
         this.password = password;
-    }
-
-    public User(CreateUserRequestDto requestDto) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.username = requestDto.getUsername();
-        this.email = requestDto.getEmail();
-        this.password = requestDto.getPassword();
+        this.profileId = UUID.randomUUID();
     }
 
     public void updateUsername(String newUsername) {
