@@ -22,6 +22,7 @@ public class UserStatus {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
+        this.lastConnectedAt = Instant.now();
         this.userId = userId;
     }
 
