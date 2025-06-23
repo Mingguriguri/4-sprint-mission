@@ -88,14 +88,17 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(updateUserRequestDto.getId())
                 .orElseThrow(() -> new NoSuchElementException("User with id " + updateUserRequestDto.getId() + " not found"));
 
-        if (updateUserRequestDto.getProfileId() == null || !binaryContentRepository.existsById(updateUserRequestDto.getProfileId())) {
-            throw new NoSuchElementException("Binary Content with id " +  updateUserRequestDto.getProfileId() +" not found");
+        // profile image 처리
+        UUID newProfileId = updateUserRequestDto.getProfileId();
+        if (newProfileId != null) {
+            if (!binaryContentRepository.existsById(updateUserRequestDto.getProfileId())) {
+                throw new NoSuchElementException("Binary Content with id " +  updateUserRequestDto.getProfileId() +" not found");
+            }
+            user.updateProfileId(newProfileId);
         }
-
         user.updateUsername(updateUserRequestDto.getUsername());
         user.updateEmail(updateUserRequestDto.getEmail());
         user.updatePassword(updateUserRequestDto.getPassword());
-        user.updateProfileId(updateUserRequestDto.getProfileId());
         user.touch();
 
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
