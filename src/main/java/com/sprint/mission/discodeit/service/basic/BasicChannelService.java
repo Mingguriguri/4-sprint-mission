@@ -26,13 +26,7 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
 
     @Override
-    public Channel create(ChannelType type, String name, String description) {
-        Channel channel = new Channel(type, name, description);
-        return channelRepository.save(channel);
-    }
-
-    @Override
-    public Channel createPrivateChannel(PrivateChannelCreateDto privateChannelRequestDto) {
+    public PrivateChannelResponseDto createPrivateChannel(PrivateChannelCreateDto privateChannelRequestDto) {
         Channel channel = new Channel(
                 ChannelType.PRIVATE,
                 null,
@@ -41,18 +35,19 @@ public class BasicChannelService implements ChannelService {
         // 채널에 참여하는 User의 정보를 받아 User별 ReadStatus 정보를 생성
         ReadStatus readStatus = new ReadStatus(privateChannelRequestDto.getUserId(), channel.getId());
         readStatusRepository.save(readStatus);
-
-        return channelRepository.save(channel);
+        channelRepository.save(channel);
+        return PrivateChannelResponseDto.from(channel, privateChannelRequestDto.getUserId());
     }
 
     @Override
-    public Channel createPublicChannel(PublicChannelCreateDto publicChannelRequestDto) {
+    public PublicChannelResponseDto createPublicChannel(PublicChannelCreateDto publicChannelRequestDto) {
         Channel channel = new Channel(
                 ChannelType.PUBLIC,
                 publicChannelRequestDto.getName(),
                 publicChannelRequestDto.getDescription()
         );
-        return channelRepository.save(channel);
+        channelRepository.save(channel);
+        return PublicChannelResponseDto.from(channel);
     }
 
     @Override
@@ -101,7 +96,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(PublicChannelUpdateDto updatePublicChannelRequestDto) {
+    public PublicChannelResponseDto update(PublicChannelUpdateDto updatePublicChannelRequestDto) {
         Channel channel = channelRepository.findById(updatePublicChannelRequestDto.getId())
                 .filter(c -> c.getType() == ChannelType.PUBLIC) // PRIVATE는 수정 불가
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + updatePublicChannelRequestDto.getId() + " not found"));
@@ -109,7 +104,8 @@ public class BasicChannelService implements ChannelService {
         channel.updateName(updatePublicChannelRequestDto.getName());
         channel.updateDescription(updatePublicChannelRequestDto.getDescription());
 
-        return channelRepository.save(channel);
+        channelRepository.save(channel);
+        return PublicChannelResponseDto.from(channel);
     }
 
     @Override

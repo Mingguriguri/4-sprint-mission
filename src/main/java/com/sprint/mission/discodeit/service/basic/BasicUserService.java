@@ -27,7 +27,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(UserCreateDto requestDto) {
+    public UserResponseDto create(UserCreateDto requestDto) {
         // TODO: 프로필 처리 필요
         String username = requestDto.getUsername();
         String email = requestDto.getEmail();
@@ -47,7 +47,8 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
 
-        return userRepository.save(user);
+        userRepository.save(user);
+        return UserResponseDto.from(user, userStatus.isOnline());
     }
 
     @Override
@@ -62,7 +63,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDtos findAll() {
+    public List<UserResponseDto> findAll() {
         List<User> userList = userRepository.findAll();
         List<UserStatus> statusList = userStatusRepository.findAll();
 
@@ -72,17 +73,16 @@ public class BasicUserService implements UserService {
                         Function.identity()      // value: UserStatus 객체 자체
                 ));
 
-        List<UserResponseDto> dtoList = userList.stream()
+        return userList.stream()
                 .map(user -> {
                     UserStatus status = statusMap.get(user.getId());
                     boolean online = status != null && status.isOnline();
                     return UserResponseDto.from(user, online);
                 }).toList();
-        return new UserResponseDtos(dtoList);
     }
 
     @Override
-    public User update(UserUpdateDto updateUserRequestDto) {
+    public UserResponseDto update(UserUpdateDto updateUserRequestDto) {
         User user = userRepository.findById(updateUserRequestDto.getId())
                 .orElseThrow(() -> new NoSuchElementException("User with id " + updateUserRequestDto.getId() + " not found"));
 
@@ -92,7 +92,11 @@ public class BasicUserService implements UserService {
         user.updateProfileId(updateUserRequestDto.getProfileId());
         user.touch();
 
-        return userRepository.save(user);
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new NoSuchElementException("User with id " + user.getId() + " not found"));
+
+        userRepository.save(user);
+        return UserResponseDto.from(user, userStatus.isOnline());
     }
 
     @Override

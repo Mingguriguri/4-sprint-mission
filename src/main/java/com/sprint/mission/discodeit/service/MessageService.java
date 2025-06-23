@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-    Message create(MessageCreateDto createMessageRequestDto);
+    MessageResponseDto create(MessageCreateDto createMessageRequestDto);
     MessageResponseDto find(UUID messageId);
     List<MessageResponseDto> findAllByChannelId(UUID channelId);
-    Message update(MessageUpdateDto updateMessageDto);
+    MessageResponseDto update(MessageUpdateDto updateMessageDto);
     void delete(UUID messageId);
 }

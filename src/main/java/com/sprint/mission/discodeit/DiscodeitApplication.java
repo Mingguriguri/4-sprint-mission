@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateDto;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -18,7 +20,7 @@ import java.util.ArrayList;
 
 @SpringBootApplication
 public class DiscodeitApplication {
-	static User setupUser(UserService userService) {
+	static UserResponseDto setupUser(UserService userService) {
 		UserCreateDto userRequestDto = new UserCreateDto(
 				"woody",
 				"woody@codeit.com",
@@ -28,7 +30,7 @@ public class DiscodeitApplication {
 		return userService.create(userRequestDto);
 	}
 
-	static Channel setupChannel(ChannelService channelService) {
+	static PublicChannelResponseDto setupPublicChannel(ChannelService channelService) {
 		PublicChannelCreateDto channelRequestDto = new PublicChannelCreateDto(
 				"공지",
 				"공지 채널입니다"
@@ -37,14 +39,14 @@ public class DiscodeitApplication {
 		return channelService.createPublicChannel(channelRequestDto);
 	}
 
-	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+	static void messageCreateTest(MessageService messageService, PublicChannelResponseDto channel, UserResponseDto author) {
 		MessageCreateDto messageRequestDto = new MessageCreateDto(
 				"안녕하세요",
 				channel.getId(),
 				author.getId(),
 				new ArrayList<>()
 		);
-		Message message = messageService.create(messageRequestDto);
+		MessageResponseDto message = messageService.create(messageRequestDto);
 		System.out.println("메시지 생성: " + message.getId() +  "-" + message.getContent() + "(" + message.getAuthorId() + "," + message.getCreatedAt() + ")");
 	}
 
@@ -58,8 +60,8 @@ public class DiscodeitApplication {
 		MessageService messageService = context.getBean(MessageService.class);
 
 		// 셋업
-		User user = setupUser(userService);
-		Channel channel = setupChannel(channelService);
+		UserResponseDto user = setupUser(userService);
+		PublicChannelResponseDto channel = setupPublicChannel(channelService);
 
 		// 테스트
 		messageCreateTest(messageService, channel, user);

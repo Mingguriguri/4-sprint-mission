@@ -6,12 +6,13 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    User create(UserCreateDto createUserRequestDto);
+    UserResponseDto create(UserCreateDto createUserRequestDto);
     UserResponseDto find(UUID userId);
-    UserResponseDtos findAll();
-    User update(UserUpdateDto updateUserRequestDto);
+    List<UserResponseDto> findAll();
+    UserResponseDto update(UserUpdateDto updateUserRequestDto);
     void delete(UUID userId);
 }
