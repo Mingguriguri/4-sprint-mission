@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.user;
 
+import com.sprint.mission.discodeit.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,4 +19,16 @@ public class UserResponseDto {
     private boolean isOnline;
     private Instant createdAt;
     private Instant updatedAt;
+
+    public static UserResponseDto from(User u, boolean online) {
+        return new UserResponseDto(
+                u.getId(),
+                u.getUsername(),
+                u.getEmail(),
+                u.getProfileId(),
+                online,
+                u.getCreatedAt(),
+                u.getUpdatedAt()
+        );
+    }
 }

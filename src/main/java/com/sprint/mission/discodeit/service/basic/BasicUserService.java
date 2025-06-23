@@ -58,15 +58,7 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-        return new UserResponseDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getProfileId(),
-                userStatus.isOnline(),
-                user.getCreatedAt(),
-                user.getUpdatedAt()
-        );
+        return UserResponseDto.from(user, userStatus.isOnline());
     }
 
     @Override
@@ -84,15 +76,7 @@ public class BasicUserService implements UserService {
                 .map(user -> {
                     UserStatus status = statusMap.get(user.getId());
                     boolean online = status != null && status.isOnline();
-                    return new UserResponseDto(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getProfileId(),
-                        online,
-                        user.getCreatedAt(),
-                        user.getUpdatedAt()
-                    );
+                    return UserResponseDto.from(user, online);
                 }).toList();
         return new UserResponseDtos(dtoList);
     }
