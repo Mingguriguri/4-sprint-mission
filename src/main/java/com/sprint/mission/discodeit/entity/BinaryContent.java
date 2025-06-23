@@ -14,17 +14,14 @@ import java.util.UUID;
 public class BinaryContent {
     private final UUID id;
     private final Instant createdAt;
-
-    private UUID userId;
-    private UUID MessageId;
     private final byte[] bytes;
+    private final BinaryContentType type;
 
-    public BinaryContent(byte[] bytes, UUID messageId, UUID userId) {
+    public BinaryContent(byte[] bytes, BinaryContentType type) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         this.bytes = bytes;
-        this.MessageId = messageId;
-        this.userId = userId;
+        this.type = type;
     }
 }
