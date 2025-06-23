@@ -24,6 +24,7 @@ public class User implements Serializable {
     public User(String username, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.username = username;
         this.email = email;
         this.password = password;

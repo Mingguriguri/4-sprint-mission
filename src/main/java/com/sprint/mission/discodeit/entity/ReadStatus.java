@@ -21,6 +21,7 @@ public class ReadStatus {
     public ReadStatus(UUID userId, UUID channelId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.userId = userId;
         this.channelId = channelId;
     }
