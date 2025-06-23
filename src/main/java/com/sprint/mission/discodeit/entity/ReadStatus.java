@@ -13,7 +13,7 @@ import java.util.UUID;
 public class ReadStatus {
     private final UUID id;
     private final Instant createdAt;
-    private Instant updatedAt; // == lastReadAt
+    private Instant lastReadAt; // == updatedAt
 
     private UUID userId;
     private UUID channelId;
@@ -21,7 +21,7 @@ public class ReadStatus {
     public ReadStatus(UUID userId, UUID channelId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+        this.lastReadAt = Instant.now();
         this.userId = userId;
         this.channelId = channelId;
     }
@@ -35,6 +35,6 @@ public class ReadStatus {
     }
 
     public void touch() {
-        this.updatedAt = Instant.now();
+        this.lastReadAt = Instant.now();
     }
 }
