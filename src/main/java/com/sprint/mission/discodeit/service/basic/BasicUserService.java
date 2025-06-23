@@ -28,26 +28,28 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto create(UserCreateDto requestDto) {
-        // TODO: 프로필 처리 필요
         String username = requestDto.getUsername();
         String email = requestDto.getEmail();
         String password = requestDto.getPassword();
         UUID profileId = requestDto.getProfileId();
 
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("이미 사용 중인 username 입니다.");
+            throw new IllegalArgumentException("This username" + username + "is already in use");
         }
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("이미 사용 중인 email 입니다.");
+            throw new IllegalArgumentException("This email " + email + " is already in use");
+        }
+        if (profileId != null && !binaryContentRepository.existsById(profileId)) {
+            throw new NoSuchElementException("Binary Content with id " +  profileId +" not found");
         }
 
         User user = new User(username, email, password, profileId);
+        userRepository.save(user);
 
         // UserStatus도 함께 저장
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
 
-        userRepository.save(user);
         return UserResponseDto.from(user, userStatus.isOnline());
     }
 
@@ -85,6 +87,10 @@ public class BasicUserService implements UserService {
     public UserResponseDto update(UserUpdateDto updateUserRequestDto) {
         User user = userRepository.findById(updateUserRequestDto.getId())
                 .orElseThrow(() -> new NoSuchElementException("User with id " + updateUserRequestDto.getId() + " not found"));
+
+        if (updateUserRequestDto.getProfileId() == null || !binaryContentRepository.existsById(updateUserRequestDto.getProfileId())) {
+            throw new NoSuchElementException("Binary Content with id " +  updateUserRequestDto.getProfileId() +" not found");
+        }
 
         user.updateUsername(updateUserRequestDto.getUsername());
         user.updateEmail(updateUserRequestDto.getEmail());

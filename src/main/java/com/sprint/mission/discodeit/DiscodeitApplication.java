@@ -1,14 +1,15 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -16,16 +17,37 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.UUID;
 
 @SpringBootApplication
 public class DiscodeitApplication {
-	static UserResponseDto setupUser(UserService userService) {
+	static UserResponseDto setupUser(UserService userService, BinaryContentService binaryContentService) {
+		// 프로필 이미지 생성
+		UUID profileId = null;
+		Path p = Paths.get("src/main/resources/static/test.png");
+		System.out.println("Looking at: " + p.toAbsolutePath());
+		System.out.println("Exists? " + Files.exists(p));
+		try {
+			byte[] img = Files.readAllBytes(p);
+			System.out.println("프로필 이미지 업로드 성공");
+			BinaryContentCreateDto binaryContentCreateDto = new BinaryContentCreateDto(img, BinaryContentType.PROFILE);
+			BinaryContentResponseDto bc = binaryContentService.create(binaryContentCreateDto);
+			profileId = bc.getId();
+		} catch(IOException e) {
+			throw new UncheckedIOException("프로필 이미지 읽기 실패", e);
+		}
+
 		UserCreateDto userRequestDto = new UserCreateDto(
 				"woody",
 				"woody@codeit.com",
 				"woody1234",
-				null
+				profileId
 				);
 		return userService.create(userRequestDto);
 	}
@@ -58,9 +80,9 @@ public class DiscodeitApplication {
 		UserService userService = context.getBean(UserService.class);
 		ChannelService channelService = context.getBean(ChannelService.class);
 		MessageService messageService = context.getBean(MessageService.class);
-
+		BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
 		// 셋업
-		UserResponseDto user = setupUser(userService);
+		UserResponseDto user = setupUser(userService, binaryContentService);
 		PublicChannelResponseDto channel = setupPublicChannel(channelService);
 
 		// 테스트
