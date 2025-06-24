@@ -16,7 +16,7 @@ public class UserMapper {
                 dto.getUsername(),
                 dto.getEmail(),
                 dto.getPassword(),
-                dto.getProfileId()
+                null
         );
     }
 
@@ -27,7 +27,6 @@ public class UserMapper {
         if (dto.getUsername() != null) user.updateUsername(dto.getUsername());
         if (dto.getEmail()    != null) user.updateEmail(dto.getEmail());
         if (dto.getPassword() != null) user.updatePassword(dto.getPassword());
-        if (dto.getProfileId()!= null) user.updateProfileId(dto.getProfileId());
         user.touch();
     }
 

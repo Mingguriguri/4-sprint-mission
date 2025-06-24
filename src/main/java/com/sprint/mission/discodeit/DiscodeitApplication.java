@@ -47,7 +47,7 @@ public class DiscodeitApplication {
 				"woody",
 				"woody@codeit.com",
 				"woody1234",
-				profileId
+				null
 				);
 		return userService.create(userRequestDto);
 	}

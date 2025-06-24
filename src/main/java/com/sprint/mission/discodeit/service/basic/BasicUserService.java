@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -26,13 +28,12 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapper userMapper;
+    private final BinaryContentMapper binaryContentMapper;
 
     @Override
     public UserResponseDto create(UserCreateDto requestDto) {
         String username = requestDto.getUsername();
         String email = requestDto.getEmail();
-        String password = requestDto.getPassword();
-        UUID profileId = requestDto.getProfileId();
 
         if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("This username " + username + " is already in use");
@@ -40,11 +41,14 @@ public class BasicUserService implements UserService {
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("This email " + email + " is already in use");
         }
-        if (profileId != null && !binaryContentRepository.existsById(profileId)) {
-            throw new NoSuchElementException("Binary Content with id " +  profileId +" not found");
-        }
 
         User createUser = userMapper.toEntity(requestDto);
+        if(requestDto.getBinaryContent() != null) {
+            BinaryContent binaryContent = binaryContentMapper.toEntity(requestDto.getBinaryContent());
+            binaryContentRepository.save(binaryContent);
+            createUser.updateProfileId(binaryContent.getId());
+        }
+
         userRepository.save(createUser);
 
         // UserStatus도 함께 저장
@@ -85,23 +89,24 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto update(UserUpdateDto updateUserRequestDto) {
-        User user = userRepository.findById(updateUserRequestDto.getId())
-                .orElseThrow(() -> new NoSuchElementException("User with id " + updateUserRequestDto.getId() + " not found"));
+    public UserResponseDto update(UserUpdateDto requestDto) {
+        User updateUser = userRepository.findById(requestDto.getId())
+                .orElseThrow(() -> new NoSuchElementException("User with id " + requestDto.getId() + " not found"));
 
-        // profile image 처리
-        UUID newProfileId = updateUserRequestDto.getProfileId();
-        if (newProfileId != null && !binaryContentRepository.existsById(updateUserRequestDto.getProfileId())) {
-            throw new NoSuchElementException("Binary Content with id " +  updateUserRequestDto.getProfileId() +" not found");
+        if (requestDto.getBinaryContent() != null) {
+            binaryContentRepository.deleteByProfileId(requestDto.getId()); // 기존 프로필 이미지 삭제
+            BinaryContent binaryContent = binaryContentMapper.toEntity(requestDto.getBinaryContent());
+            binaryContentRepository.save(binaryContent); // 새로운 프로필 이미지 저장
+            updateUser.updateProfileId(binaryContent.getId());
         }
 
-        userMapper.updateEntity(updateUserRequestDto, user);
+        userMapper.updateEntity(requestDto, updateUser);
 
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new NoSuchElementException("User with id " + user.getId() + " not found"));
+        UserStatus userStatus = userStatusRepository.findByUserId(updateUser.getId())
+                .orElseThrow(() -> new NoSuchElementException("User with id " + updateUser.getId() + " not found"));
 
-        userRepository.save(user);
-        return userMapper.toDto(user, userStatus.isOnline());
+        userRepository.save(updateUser);
+        return userMapper.toDto(updateUser, userStatus.isOnline());
     }
 
     @Override

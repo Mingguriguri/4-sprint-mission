@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import jakarta.annotation.Nullable;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-
-import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
@@ -19,6 +17,5 @@ public class UserCreateDto {
     @NotBlank
     private String password;
 
-    @Nullable
-    private UUID profileId;
+    private BinaryContentCreateDto binaryContent;
 }
