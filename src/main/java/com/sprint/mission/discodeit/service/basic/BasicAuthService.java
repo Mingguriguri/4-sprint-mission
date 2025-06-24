@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.auth.LoginUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -17,6 +18,7 @@ public class BasicAuthService implements AuthService {
     @Qualifier("JCFUserRepository")
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private final UserMapper userMapper;
 
     @Override
     public UserResponseDto login(LoginUserDto loginUserDto) {
@@ -39,6 +41,6 @@ public class BasicAuthService implements AuthService {
         userStatus.touch();
         userStatus.updateLastConnectedAt();
 
-        return UserResponseDto.from(user, userStatus.isOnline());
+        return userMapper.toDto(user, userStatus.isOnline());
     }
 }
