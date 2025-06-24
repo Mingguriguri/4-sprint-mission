@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateDto;
-import com.sprint.mission.discodeit.dto.channel.PublicChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelCreateDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
@@ -52,16 +52,18 @@ public class DiscodeitApplication {
 		return userService.create(userRequestDto);
 	}
 
-	static PublicChannelResponseDto setupPublicChannel(ChannelService channelService) {
-		PublicChannelCreateDto channelRequestDto = new PublicChannelCreateDto(
+	static ChannelResponseDto setupPublicChannel(ChannelService channelService) {
+		ChannelCreateDto channelCreateDto = new ChannelCreateDto(
+				ChannelType.PUBLIC,
 				"공지",
-				"공지 채널입니다"
-			);
-
-		return channelService.createPublicChannel(channelRequestDto);
+				"공지 채널입니다",
+				null,
+				null
+		);
+		return channelService.createPublicChannel(channelCreateDto);
 	}
 
-	static void messageCreateTest(MessageService messageService, PublicChannelResponseDto channel, UserResponseDto author) {
+	static void messageCreateTest(MessageService messageService, ChannelResponseDto channel, UserResponseDto author) {
 		MessageCreateDto messageRequestDto = new MessageCreateDto(
 				"안녕하세요",
 				channel.getId(),
@@ -83,11 +85,11 @@ public class DiscodeitApplication {
 		BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
 		// 셋업
 		UserResponseDto user = setupUser(userService, binaryContentService);
-		PublicChannelResponseDto channel = setupPublicChannel(channelService);
+		ChannelResponseDto channel = setupPublicChannel(channelService);
 
 		// 테스트
 		messageCreateTest(messageService, channel, user);
-		System.out.println(channelService.findPublicChannel(channel.getId()));
+		System.out.println(channelService.find(channel.getId(), user.getId()));
 	}
 
 }

@@ -12,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public class AllChannelByUserIdResponseDto {
-    List<PublicChannelResponseDto> publicChannels;
-    List<PrivateChannelResponseDto> privateChannels;
+    List<ChannelResponseDto> publicChannels;
+    List<ChannelResponseDto> privateChannels;
 }
