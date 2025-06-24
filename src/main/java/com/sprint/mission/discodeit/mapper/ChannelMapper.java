@@ -37,32 +37,29 @@ public class ChannelMapper {
     }
 
     /**
-     * Public Channel → ChannelResponseDto 변환
+     * Channel → ChannelResponseDto 변환
      */
-    public ChannelResponseDto toDtoPublic(Channel channel) {
-        return new ChannelResponseDto(
-                channel.getId(),
-                ChannelType.PUBLIC,
-                channel.getName(),
-                channel.getDescription(),
-                null,
-                null,
-                null
-        );
-    }
-
-    /**
-     * Private Channel → ChannelResponseDto 변환
-     */
-    public ChannelResponseDto toDtoPrivate(Channel channel, UUID userId, UUID otherUserId) {
-        return new ChannelResponseDto(
-                channel.getId(),
-                ChannelType.PRIVATE,
-                null,
-                null,
-                userId,
-                otherUserId,
-                channel.getLastMessageSentAt()
-        );
+    public ChannelResponseDto toDto(Channel channel, UUID userId, UUID otherUserId) {
+        if (channel.getType() == ChannelType.PUBLIC) {
+            return new ChannelResponseDto(
+                    channel.getId(),
+                    ChannelType.PUBLIC,
+                    channel.getName(),
+                    channel.getDescription(),
+                    null,
+                    null,
+                    null
+            );
+        } else {
+            return new ChannelResponseDto(
+                    channel.getId(),
+                    ChannelType.PRIVATE,
+                    null,
+                    null,
+                    userId,
+                    otherUserId,
+                    channel.getLastMessageSentAt()
+            );
+        }
     }
 }

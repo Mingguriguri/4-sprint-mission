@@ -39,7 +39,7 @@ public class BasicChannelService implements ChannelService {
 
         Channel channel = channelMapper.toEntity(dto);
         channelRepository.save(channel);
-        return channelMapper.toDtoPublic(channel);
+        return channelMapper.toDto(channel, null, null);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class BasicChannelService implements ChannelService {
         readStatusRepository.save(new ReadStatus(dto.getUserId(), saved.getId()));
         readStatusRepository.save(new ReadStatus(dto.getOtherUserId(), saved.getId()));
 
-        return channelMapper.toDtoPrivate(saved, dto.getUserId(), dto.getOtherUserId());
+        return channelMapper.toDto(saved, dto.getUserId(), dto.getOtherUserId());
     }
 
     @Override
@@ -66,14 +66,14 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
         if (channel.getType() == ChannelType.PUBLIC) {
-            return channelMapper.toDtoPublic(channel);
+            return channelMapper.toDto(channel, null, null);
         } else {
             // PRIVATE 채널의 경우 상대방 ID 조회
             UUID otherId = readStatusRepository.findById(channel.getId()).stream()
                     .map(ReadStatus::getUserId)
                     .findFirst()
                     .orElseThrow(() -> new NoSuchElementException("Other user not found"));
-            return channelMapper.toDtoPrivate(channel, otherId, userId);
+            return channelMapper.toDto(channel, otherId, userId);
         }
     }
 
@@ -83,7 +83,7 @@ public class BasicChannelService implements ChannelService {
         List<ChannelResponseDto> publicDtos = channelRepository
                 .findAllByChannelType(ChannelType.PUBLIC)
                 .stream()
-                .map(channelMapper::toDtoPublic)
+                .map(channel -> channelMapper.toDto(channel, null, null))
                 .toList();
 
         // PRIVATE 채널 중, 이 userId가 속한 채널만 조회
@@ -98,7 +98,7 @@ public class BasicChannelService implements ChannelService {
                             .filter(id -> !id.equals(userId))
                             .findFirst()
                             .orElse(null);
-                    return channelMapper.toDtoPrivate(ch, userId, other);
+                    return channelMapper.toDto(ch, userId, other);
                 })
                 .toList();
 
@@ -113,7 +113,7 @@ public class BasicChannelService implements ChannelService {
 
         channelMapper.updateEntity(channelUpdateDto, channel);
         channelRepository.save(channel);
-        return channelMapper.toDtoPublic(channel);
+        return channelMapper.toDto(channel, null, null);
     }
 
     @Override
