@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -25,6 +26,8 @@ public class BasicUserStatusService implements UserStatusService {
     @Qualifier("JCFUserRepository")
     private final UserRepository userRepository;
 
+    private final UserStatusMapper userStatusMapper;
+
     @Override
     public UserStatusResponseDto create(UserStatusCreateDto userStatusCreateDto) {
         UUID userId = userStatusCreateDto.getUserId();
@@ -33,26 +36,26 @@ public class BasicUserStatusService implements UserStatusService {
                 .orElseThrow(() -> new NoSuchElementException("User not found with id " + userId));
 
         // 같은 User와 관련된 객체가 이미 존재하면 예외
-        if (userStatusRepository.existsById(userId)) {
+        if (userStatusRepository.existsByUserId(userId)) {
             throw new IllegalArgumentException("User with id " + userId + " objects already exist");
         }
 
-        UserStatus userStatus = new UserStatus(userId);
+        UserStatus userStatus = userStatusMapper.toEntity(userStatusCreateDto);
         userStatusRepository.save(userStatus);
-        return UserStatusResponseDto.from(userStatus);
+        return userStatusMapper.toDto(userStatus);
     }
 
     @Override
     public UserStatusResponseDto find(UUID id) {
         return userStatusRepository.findById(id)
-                .map(UserStatusResponseDto::from)
+                .map(userStatusMapper::toDto)
                 .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + id + " not found"));
     }
 
     @Override
     public List<UserStatusResponseDto> findAll() {
         return userStatusRepository.findAll().stream()
-                .map(UserStatusResponseDto::from)
+                .map(userStatusMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -61,9 +64,9 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus userStatus = userStatusRepository.findById(userStatusUpdateDto.getId())
                 .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + userStatusUpdateDto.getId() + " not found"));
         // 사용자가 마지막으로 확인된 접속 시간 업데이트
-        userStatus.touch();
+        userStatusMapper.updateEntity(userStatusUpdateDto, userStatus);
         userStatusRepository.save(userStatus);
-        return UserStatusResponseDto.from(userStatus);
+        return userStatusMapper.toDto(userStatus);
     }
 
     @Override
@@ -71,9 +74,12 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("UserStatus for userId " + userId + " not found"));
         // 사용자가 마지막으로 확인된 접속 시간 업데이트
-        userStatus.touch();
+        userStatusMapper.updateEntity(
+                new UserStatusUpdateDto(userStatus.getId()),
+                userStatus
+        );
         userStatusRepository.save(userStatus);
-        return UserStatusResponseDto.from(userStatus);
+        return userStatusMapper.toDto(userStatus);
     }
 
     @Override

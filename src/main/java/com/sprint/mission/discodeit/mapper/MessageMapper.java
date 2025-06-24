@@ -37,7 +37,9 @@ public class MessageMapper {
         msg.touch();
     }
 
-    /** Message →  MessageResponseDto 변환 */
+    /**
+     * Message →  MessageResponseDto 변환
+     */
     public MessageResponseDto toDto(Message msg) {
         return new MessageResponseDto(
                 msg.getId(),

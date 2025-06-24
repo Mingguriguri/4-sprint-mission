@@ -14,6 +14,4 @@ import java.util.UUID;
 public class UserStatusUpdateDto {
     @NotNull
     UUID id;
-    @NotNull
-    Instant lastConnectedAt;
 }

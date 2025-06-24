@@ -15,12 +15,4 @@ public class UserStatusResponseDto {
     UUID id;
     UUID userId;
     Instant lastConnectedAt;
-
-    public static UserStatusResponseDto from(UserStatus us) {
-        return new UserStatusResponseDto(
-                us.getId(),
-                us.getUserId(),
-                us.getLastConnectedAt()
-        );
-    }
 }
