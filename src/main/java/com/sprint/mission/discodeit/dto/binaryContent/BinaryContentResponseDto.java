@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -15,12 +16,5 @@ public class BinaryContentResponseDto {
     UUID id;
     byte[] bytes;
     BinaryContentType type;
-
-    public static BinaryContentResponseDto from(BinaryContent b) {
-        return new BinaryContentResponseDto(
-                b.getId(),
-                b.getBytes(),
-                b.getType()
-        );
-    }
+    Instant createdAt;
 }

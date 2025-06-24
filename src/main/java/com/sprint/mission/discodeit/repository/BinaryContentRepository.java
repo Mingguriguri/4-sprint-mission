@@ -10,8 +10,6 @@ public interface BinaryContentRepository {
     BinaryContent save(BinaryContent binaryContent);
 
     Optional<BinaryContent> findById(UUID id);
-    Optional<BinaryContent> findByProfileId(UUID profileId);
-    List<BinaryContent> findByMessageId(UUID messageId);
     List<BinaryContent> findAllByIdIn(List<UUID> ids);
 
     List<BinaryContent> findAll();
