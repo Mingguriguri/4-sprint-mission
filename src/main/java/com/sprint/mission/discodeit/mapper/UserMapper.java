@@ -1,0 +1,48 @@
+package com.sprint.mission.discodeit.mapper;
+
+import com.sprint.mission.discodeit.dto.user.UserCreateDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.entity.User;
+import org.springframework.stereotype.Component;
+
+@Component
+public class UserMapper {
+    /**
+     * UserCreateDto → User 엔티티 변환 (id, timestamps 제외)
+     */
+    public User toEntity(UserCreateDto dto) {
+        User user = new User(
+                dto.getUsername(),
+                dto.getEmail(),
+                dto.getPassword(),
+                dto.getProfileId()
+        );
+        return user;
+    }
+
+    /**
+     * UserUpdateDto → 기존 User 엔티티 덮어쓰기
+     */
+    public void updateEntity(UserUpdateDto dto, User user) {
+        if (dto.getUsername() != null) user.updateUsername(dto.getUsername());
+        if (dto.getEmail()    != null) user.updateEmail(dto.getEmail());
+        if (dto.getPassword() != null) user.updatePassword(dto.getPassword());
+        if (dto.getProfileId()!= null) user.updateProfileId(dto.getProfileId());
+        user.touch();
+    }
+
+
+    /** User + online flag → UserResponseDto 변환 */
+    public UserResponseDto toDto(User user, boolean online) {
+        return new UserResponseDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getProfileId(),
+                online,
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
+    }
+}
