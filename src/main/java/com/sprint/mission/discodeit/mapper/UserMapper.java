@@ -12,13 +12,12 @@ public class UserMapper {
      * UserCreateDto → User 엔티티 변환 (id, timestamps 제외)
      */
     public User toEntity(UserCreateDto dto) {
-        User user = new User(
+        return new User(
                 dto.getUsername(),
                 dto.getEmail(),
                 dto.getPassword(),
                 dto.getProfileId()
         );
-        return user;
     }
 
     /**
@@ -33,7 +32,9 @@ public class UserMapper {
     }
 
 
-    /** User + online flag → UserResponseDto 변환 */
+    /**
+     * User + online flag → UserResponseDto 변환
+     */
     public UserResponseDto toDto(User user, boolean online) {
         return new UserResponseDto(
                 user.getId(),

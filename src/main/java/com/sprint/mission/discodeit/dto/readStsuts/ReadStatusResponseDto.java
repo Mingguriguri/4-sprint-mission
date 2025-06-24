@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ReadStatusResponseDto {
     private UUID id;
-    private Instant updatedAt;
+    private Instant lastReadAt;
     private UUID userId;
     private UUID channelId;
 
