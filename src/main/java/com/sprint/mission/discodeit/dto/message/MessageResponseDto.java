@@ -20,16 +20,4 @@ public class MessageResponseDto {
     List<UUID> attachmentIds;
     Instant createdAt;
     Instant updatedAt;
-
-    public static MessageResponseDto from(Message m) {
-        return new MessageResponseDto(
-                m.getId(),
-                m.getChannelId(),
-                m.getAuthorId(),
-                m.getContent(),
-                m.getAttachmentIds(),
-                m.getCreatedAt(),
-                m.getUpdatedAt()
-        );
-    }
 }

@@ -15,6 +15,7 @@ import java.util.UUID;
 public class MessageUpdateDto {
     @NotNull
     UUID id;
+    @NotBlank
     String content;
     List<UUID> attachmentIds;
 }
