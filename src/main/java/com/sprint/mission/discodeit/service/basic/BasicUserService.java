@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
@@ -12,9 +13,11 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
 import java.util.function.Function;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class BasicUserService implements UserService {
     @Qualifier("JCFUserRepository")
     private final UserRepository userRepository;
@@ -31,25 +35,11 @@ public class BasicUserService implements UserService {
     private final BinaryContentMapper binaryContentMapper;
 
     @Override
-    public UserResponseDto create(UserCreateDto requestDto) {
-        String username = requestDto.getUsername();
-        String email = requestDto.getEmail();
-
-        if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("This username " + username + " is already in use");
-        }
-        if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("This email " + email + " is already in use");
-        }
-
+    public UserResponseDto create(@Valid UserCreateDto requestDto) {
+        validateCreate(requestDto);
         User createUser = userMapper.toEntity(requestDto);
-        if(requestDto.getBinaryContent() != null) {
-            BinaryContent binaryContent = binaryContentMapper.toEntity(requestDto.getBinaryContent());
-            binaryContentRepository.save(binaryContent);
-            createUser.updateProfileId(binaryContent.getId());
-        }
-
         userRepository.save(createUser);
+        handleProfileImage(createUser, requestDto.getBinaryContent());
 
         // UserStatus도 함께 저장
         UserStatus userStatus = new UserStatus(createUser.getId());
@@ -60,12 +50,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto find(UUID userId) {
-        User user =  userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-
+        User user = requireUser(userId);
+        UserStatus userStatus = requireStatus(userId);
         return userMapper.toDto(user, userStatus.isOnline());
     }
 
@@ -84,33 +70,117 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto update(UserUpdateDto requestDto) {
-        User updateUser = userRepository.findById(requestDto.getId())
-                .orElseThrow(() -> new NoSuchElementException("User with id " + requestDto.getId() + " not found"));
+    public UserResponseDto update(@Valid UserUpdateDto requestDto) {
+        User existingUser = requireUser(requestDto.getId());
 
-        if (requestDto.getBinaryContent() != null) {
-            binaryContentRepository.deleteByProfileId(requestDto.getId()); // 기존 프로필 이미지 삭제
-            BinaryContent binaryContent = binaryContentMapper.toEntity(requestDto.getBinaryContent());
-            binaryContentRepository.save(binaryContent); // 새로운 프로필 이미지 저장
-            updateUser.updateProfileId(binaryContent.getId());
+        // 변경된 경우에만 중복체크
+        if (!existingUser.getUsername().equals(requestDto.getUsername())) {
+            validateExistUsername(requestDto.getUsername());
         }
+        if (!existingUser.getEmail().equals(requestDto.getEmail())) {
+            validateExistEmail(requestDto.getEmail());
+        }
+        UserStatus userStatus = requireStatus(existingUser.getId());
 
-        userMapper.updateEntity(requestDto, updateUser);
+        handleProfileImage(existingUser, requestDto.getBinaryContent());
 
-        UserStatus userStatus = userStatusRepository.findByUserId(updateUser.getId())
-                .orElseThrow(() -> new NoSuchElementException("User with id " + updateUser.getId() + " not found"));
-
-        userRepository.save(updateUser);
-        return userMapper.toDto(updateUser, userStatus.isOnline());
+        userMapper.updateEntity(requestDto, existingUser);
+        userRepository.save(existingUser);
+        return userMapper.toDto(existingUser, userStatus.isOnline());
     }
 
     @Override
     public void delete(UUID userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " not found");
-        }
+        requireUser(userId);
         binaryContentRepository.deleteByProfileId(userId);
         userStatusRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
     }
+
+
+    /* =========================================================
+     * INTERNAL VALIDATION HELPERS
+     * ========================================================= */
+    /**
+     * 사용자 생성 시 중복 여부를 검증합니다.
+     *
+     * @param dto 사용자 생성 요청 DTO
+     * @throws IllegalArgumentException 사용자명 또는 이메일이 중복되는 경우
+     */
+    private void validateCreate(UserCreateDto dto) {
+        validateExistUsername(dto.getUsername());
+        validateExistEmail(dto.getEmail());
+    }
+
+    /**
+     * 사용자명 중복 여부를 검증합니다.
+     *
+     * @param username 사용자명
+     * @throws IllegalArgumentException null, 공백이거나 이미 존재하는 사용자명인 경우
+     */
+    private void validateExistUsername(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be null");
+        }
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("This username " + username + " is already in use");
+        }
+    }
+
+    /**
+     * 이메일 중복 여부를 검증합니다.
+     *
+     * @param email 이메일
+     * @throws IllegalArgumentException null, 공백이거나 이미 존재하는 이메일인 경우
+     */
+    private void validateExistEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be null");
+        }
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("This email " + email + " is already in use");
+        }
+    }
+
+    /**
+     * 프로필 이미지가 존재하면 저장하고 사용자 엔티티에 반영합니다.
+     *
+     * @param user 사용자 엔티티
+     * @param bcDto 프로필 이미지 DTO
+     */
+    private void handleProfileImage(User user, BinaryContentCreateDto bcDto) {
+        if (bcDto == null) return;
+        if (user.getProfileId() != null) {
+            binaryContentRepository.deleteByProfileId(user.getId());
+        }
+        BinaryContent bc = binaryContentMapper.toEntity(bcDto);
+        binaryContentRepository.save(bc);
+        user.updateProfileId(bc.getId());
+        userRepository.save(user);
+    }
+
+    /**
+     * 사용자 ID로 사용자 정보를 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @return 사용자 엔티티
+     * @throws NoSuchElementException 존재하지 않는 경우
+     */
+    private User requireUser(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+    }
+
+    /**
+     * 사용자 ID로 UserStatus 정보를 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @return UserStatus 엔티티
+     * @throws NoSuchElementException 존재하지 않는 경우
+     */
+    private UserStatus requireStatus(UUID userId) {
+        return userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException("UserStatus for id " + userId + " not found"));
+    }
+
 }

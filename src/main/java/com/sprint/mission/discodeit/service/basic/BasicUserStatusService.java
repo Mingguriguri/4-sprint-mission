@@ -8,17 +8,19 @@ import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class BasicUserStatusService implements UserStatusService {
     @Qualifier("JCFUserStatusRepository")
     private final UserStatusRepository userStatusRepository;
@@ -29,17 +31,8 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusMapper userStatusMapper;
 
     @Override
-    public UserStatusResponseDto create(UserStatusCreateDto userStatusCreateDto) {
-        UUID userId = userStatusCreateDto.getUserId();
-        // 관련된 User가 존재하지 않으면 예외
-        userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User not found with id " + userId));
-
-        // 같은 User와 관련된 객체가 이미 존재하면 예외
-        if (userStatusRepository.existsByUserId(userId)) {
-            throw new IllegalArgumentException("User with id " + userId + " objects already exist");
-        }
-
+    public UserStatusResponseDto create(@Valid UserStatusCreateDto userStatusCreateDto) {
+        validateCreate(userStatusCreateDto);
         UserStatus userStatus = userStatusMapper.toEntity(userStatusCreateDto);
         userStatusRepository.save(userStatus);
         return userStatusMapper.toDto(userStatus);
@@ -47,9 +40,8 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusResponseDto find(UUID id) {
-        return userStatusRepository.findById(id)
-                .map(userStatusMapper::toDto)
-                .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + id + " not found"));
+        UserStatus userStatus = requireUserStatusById(id);
+        return userStatusMapper.toDto(userStatus);
     }
 
     @Override
@@ -59,9 +51,8 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResponseDto update(UserStatusUpdateDto userStatusUpdateDto) {
-        UserStatus userStatus = userStatusRepository.findById(userStatusUpdateDto.getId())
-                .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + userStatusUpdateDto.getId() + " not found"));
+    public UserStatusResponseDto update(@Valid UserStatusUpdateDto userStatusUpdateDto) {
+        UserStatus userStatus = requireUserStatusById(userStatusUpdateDto.getId());
         // 사용자가 마지막으로 확인된 접속 시간 업데이트
         userStatusMapper.updateEntity(userStatusUpdateDto, userStatus);
         userStatusRepository.save(userStatus);
@@ -70,22 +61,82 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusResponseDto updateByUserId(UUID userId) {
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("UserStatus for userId " + userId + " not found"));
+        UserStatus userStatus = requireUserStatusByUserId(userId);
         // 사용자가 마지막으로 확인된 접속 시간 업데이트
-        userStatusMapper.updateEntity(
-                new UserStatusUpdateDto(userStatus.getId()),
-                userStatus
-        );
+        userStatusMapper.updateEntity(new UserStatusUpdateDto(userStatus.getId()), userStatus);
         userStatusRepository.save(userStatus);
         return userStatusMapper.toDto(userStatus);
     }
 
     @Override
     public void delete(UUID id) {
-        if (!userStatusRepository.existsById(id)) {
-            throw new NoSuchElementException("UserStatus with id " + id + " not found");
-        }
+        requireUserStatusById(id);
         userStatusRepository.deleteById(id);
+    }
+
+    /* =========================================================
+     * INTERNAL VALIDATION HELPERS
+     * ========================================================= */
+
+    /**
+     * 사용자 상태 생성 시 유효성 검사
+     * - 사용자 존재 여부
+     * - 중복 상태 존재 여부
+     *
+     * @param dto 사용자 상태 생성 DTO
+     * @throws NoSuchElementException 사용자가 존재하지 않는 경우
+     * @throws IllegalArgumentException 상태가 이미 존재하는 경우
+     */
+    private void validateCreate(UserStatusCreateDto dto) {
+        validateUserExists(dto.getUserId());
+        validateUserStatusNotExistsByUserId(dto.getUserId());
+    }
+
+    /**
+     * 사용자 ID 존재 여부를 확인합니다.
+     *
+     * @param userId 사용자 ID
+     * @throws NoSuchElementException 존재하지 않는 경우
+     */
+    private void validateUserExists(UUID userId) {
+        if (!userStatusRepository.existsById(userId)) {
+            throw new NoSuchElementException("UserStatus with id " + userId + " not found");
+        }
+    }
+
+    /**
+     * 해당 사용자에 대한 UserStatus 정보가 이미 존재하는지 검사합니다.
+     *
+     * @param userId 사용자 ID
+     * @throws IllegalArgumentException 이미 존재할 경우
+     */
+    private void validateUserStatusNotExistsByUserId(UUID userId) {
+        if (userStatusRepository.existsByUserId(userId)) {
+            throw new IllegalArgumentException("UserStatus already exists for userId " + userId);
+        }
+    }
+
+    /**
+     * 사용자 상태를 ID로 조회합니다.
+     *
+     * @param id 상태 ID
+     * @return 사용자 상태 엔티티
+     * @throws NoSuchElementException 존재하지 않는 경우
+     */
+    private UserStatus requireUserStatusById(UUID id) {
+        return userStatusRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + id + " not found"));
+    }
+
+    /**
+     * 사용자 ID로 사용자 상태를 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @return 사용자 상태 엔티티
+     * @throws NoSuchElementException 존재하지 않는 경우
+     */
+    private UserStatus  requireUserStatusByUserId(UUID userId) {
+        return userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException("UserStatus for userId " + userId + " not found"));
     }
 }

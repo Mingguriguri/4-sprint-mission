@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import java.util.UUID;
 
@@ -12,11 +15,17 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserUpdateDto {
-    @NotBlank
+    @NotNull
     private UUID id;
 
+    @NotBlank
     private String username;
+
+    @Email
+    @NotBlank
     private String email;
+
+    @NotBlank
     private String password;
 
     private BinaryContentCreateDto binaryContent;

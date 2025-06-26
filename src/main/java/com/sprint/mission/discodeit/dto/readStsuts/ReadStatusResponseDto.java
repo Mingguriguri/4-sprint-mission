@@ -16,13 +16,4 @@ public class ReadStatusResponseDto {
     private Instant lastReadAt;
     private UUID userId;
     private UUID channelId;
-
-    public static ReadStatusResponseDto from(ReadStatus r) {
-        return new ReadStatusResponseDto(
-                r.getId(),
-                r.getLastReadAt(),
-                r.getUserId(),
-                r.getChannelId()
-        );
-    }
 }
