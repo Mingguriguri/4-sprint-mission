@@ -36,7 +36,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusMapper readStatusMapper;
 
     @Override
-    public ReadStatusResponseDto create(@Valid ReadStatusCreateDto readStatusCreateDto) {
+    public ReadStatusResponseDto create(ReadStatusCreateDto readStatusCreateDto) {
         validateCreateReadStatus(readStatusCreateDto);
         ReadStatus readStatus = readStatusMapper.toEntity(readStatusCreateDto);
         readStatusRepository.save(readStatus);
@@ -57,7 +57,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusResponseDto update(@Valid ReadStatusUpdateDto readStatusUpdateDto) {
+    public ReadStatusResponseDto update(ReadStatusUpdateDto readStatusUpdateDto) {
         ReadStatus readStatus = requireReadStatus(readStatusUpdateDto.getId());
         readStatusMapper.updateEntity(readStatusUpdateDto, readStatus);
         readStatusRepository.save(readStatus);

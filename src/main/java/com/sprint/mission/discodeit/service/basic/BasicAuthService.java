@@ -24,7 +24,7 @@ public class BasicAuthService implements AuthService {
     private final UserMapper userMapper;
 
     @Override
-    public UserResponseDto login(@Valid LoginUserDto loginUserDto) {
+    public UserResponseDto login(LoginUserDto loginUserDto) {
         User user = requireUserByUsername(loginUserDto.getUsername());
         validatePassword(loginUserDto.getPassword(), user.getPassword());
 

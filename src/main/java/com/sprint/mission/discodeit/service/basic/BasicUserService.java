@@ -35,7 +35,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentMapper binaryContentMapper;
 
     @Override
-    public UserResponseDto create(@Valid UserCreateDto requestDto) {
+    public UserResponseDto create(UserCreateDto requestDto) {
         validateCreate(requestDto);
         User createUser = userMapper.toEntity(requestDto);
         userRepository.save(createUser);
@@ -70,7 +70,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto update(@Valid UserUpdateDto requestDto) {
+    public UserResponseDto update(UserUpdateDto requestDto) {
         User existingUser = requireUser(requestDto.getId());
 
         // 변경된 경우에만 중복체크

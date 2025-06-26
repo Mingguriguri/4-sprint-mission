@@ -31,7 +31,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusMapper userStatusMapper;
 
     @Override
-    public UserStatusResponseDto create(@Valid UserStatusCreateDto userStatusCreateDto) {
+    public UserStatusResponseDto create(UserStatusCreateDto userStatusCreateDto) {
         validateCreate(userStatusCreateDto);
         UserStatus userStatus = userStatusMapper.toEntity(userStatusCreateDto);
         userStatusRepository.save(userStatus);
@@ -51,7 +51,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusResponseDto update(@Valid UserStatusUpdateDto userStatusUpdateDto) {
+    public UserStatusResponseDto update(UserStatusUpdateDto userStatusUpdateDto) {
         UserStatus userStatus = requireUserStatusById(userStatusUpdateDto.getId());
         // 사용자가 마지막으로 확인된 접속 시간 업데이트
         userStatusMapper.updateEntity(userStatusUpdateDto, userStatus);

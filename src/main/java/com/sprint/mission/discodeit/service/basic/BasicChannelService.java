@@ -32,7 +32,7 @@ public class BasicChannelService implements ChannelService {
     private final ChannelMapper channelMapper;
 
     @Override
-    public ChannelResponseDto createPublicChannel(@Valid ChannelCreateDto dto) {
+    public ChannelResponseDto createPublicChannel(ChannelCreateDto dto) {
         validateCreateChannel(dto, ChannelType.PUBLIC);
 
         Channel channel = channelMapper.toEntity(dto);
@@ -41,7 +41,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto createPrivateChannel(@Valid ChannelCreateDto dto) {
+    public ChannelResponseDto createPrivateChannel(ChannelCreateDto dto) {
         validateCreateChannel(dto, ChannelType.PRIVATE);
 
         Channel channel = channelMapper.toEntity(dto);
@@ -86,7 +86,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto update(@Valid ChannelUpdateDto channelUpdateDto) {
+    public ChannelResponseDto update(ChannelUpdateDto channelUpdateDto) {
         Channel channel = requirePublicChannel(channelUpdateDto.getId());
         String newName = channelUpdateDto.getName();
         if (newName != null && !newName.equalsIgnoreCase(channel.getName())) {

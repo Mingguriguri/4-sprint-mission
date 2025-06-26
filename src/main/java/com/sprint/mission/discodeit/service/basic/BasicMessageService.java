@@ -39,7 +39,7 @@ public class BasicMessageService implements MessageService {
     private final MessageMapper messageMapper;
 
     @Override
-    public MessageResponseDto create(@Valid MessageCreateDto createMessageDto) {
+    public MessageResponseDto create(MessageCreateDto createMessageDto) {
         validateChannelExists(createMessageDto.getChannelId());
         validateAuthorExists(createMessageDto.getAuthorId());
 
@@ -61,7 +61,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageResponseDto update(@Valid MessageUpdateDto updateMessageDto) {
+    public MessageResponseDto update(MessageUpdateDto updateMessageDto) {
         Message message = requireMessage(updateMessageDto.getId());
         messageMapper.updateEntity(updateMessageDto, message);
         messageRepository.save(message);
