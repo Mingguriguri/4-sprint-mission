@@ -70,8 +70,11 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void delete(UUID messageId) {
-        validateMessageExists(messageId);
-        binaryContentRepository.deleteByMessageId(messageId);
+        Message message = requireMessage(messageId);
+        List<UUID> attachmentIds = message.getAttachmentIds();
+        if (attachmentIds != null && !attachmentIds.isEmpty()) {
+            attachmentIds.forEach(binaryContentRepository::deleteById);
+        }
         messageRepository.deleteById(messageId);
     }
 

@@ -91,8 +91,10 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        requireUser(userId);
-        binaryContentRepository.deleteByProfileId(userId);
+        User user = requireUser(userId);
+        if (user.getProfileId() != null) {
+            binaryContentRepository.deleteById(user.getProfileId());
+        }
         userStatusRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
     }
@@ -151,7 +153,7 @@ public class BasicUserService implements UserService {
     private void handleProfileImage(User user, BinaryContentCreateDto bcDto) {
         if (bcDto == null) return;
         if (user.getProfileId() != null) {
-            binaryContentRepository.deleteByProfileId(user.getId());
+            binaryContentRepository.deleteById(user.getProfileId());
         }
         BinaryContent bc = binaryContentMapper.toEntity(bcDto);
         binaryContentRepository.save(bc);

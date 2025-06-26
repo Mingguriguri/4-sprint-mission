@@ -16,6 +16,4 @@ public interface BinaryContentRepository {
 
     boolean existsById(UUID id);
     void deleteById(UUID id);
-    void deleteByProfileId(UUID profileId);
-    void deleteByMessageId(UUID messageId);
 }

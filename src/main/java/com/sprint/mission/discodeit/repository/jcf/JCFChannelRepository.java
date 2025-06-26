@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.stereotype.Repository;
 
@@ -26,8 +27,15 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
+    public List<Channel> findAllByChannelType(ChannelType channelType) {
+        return this.data.values().stream()
+                .filter(c -> c.getType() == channelType)
+                .toList();
+    }
+
+    @Override
     public List<Channel> findAll() {
-        return this.data.values().stream().toList();
+        return new ArrayList<>(this.data.values());
     }
 
     @Override
