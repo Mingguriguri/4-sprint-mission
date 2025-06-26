@@ -32,35 +32,42 @@ public class FileMessageRepository implements MessageRepository {
         return DIRECTORY.resolve(id + EXTENSION);
     }
 
+    /**
+     * 직렬화
+     */
+    private void writeMessagesToFile(Message message, Path path) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(path))) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException("Serialization failed for " + path, e);
+        }
+    }
+
+    /**
+     * 역직렬화
+     */
+    private Message readMessagesFromFile(Path path) {
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
+            return (Message) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Deserialization failed for " + path, e);
+        }
+    }
+
     @Override
     public Message save(Message message) {
         Path path = resolvePath(message.getId());
-        try (
-                FileOutputStream fos = new FileOutputStream(path.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-            oos.writeObject(message);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        writeMessagesToFile(message, path);
         return message;
     }
 
     @Override
     public Optional<Message> findById(UUID id) {
-        Message messageNullable = null;
         Path path = resolvePath(id);
         if (Files.exists(path)) {
-            try (
-                    FileInputStream fis = new FileInputStream(path.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                messageNullable = (Message) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            return Optional.of(readMessagesFromFile(path));
         }
-        return Optional.ofNullable(messageNullable);
+        return Optional.empty();
     }
 
     @Override
@@ -68,20 +75,18 @@ public class FileMessageRepository implements MessageRepository {
         try {
             return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            return (Message) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
+                    .map(this::readMessagesFromFile)
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return findAll().stream()
+                .filter(m -> m.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
@@ -94,9 +99,18 @@ public class FileMessageRepository implements MessageRepository {
     public void deleteById(UUID id) {
         Path path = resolvePath(id);
         try {
-            Files.delete(path);
+            Files.deleteIfExists(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        // 채널에 속한 메시지 파일들을 모두 삭제
+        findAllByChannelId(channelId)
+                .stream()
+                .map(Message::getId)
+                .forEach(this::deleteById);
     }
 }

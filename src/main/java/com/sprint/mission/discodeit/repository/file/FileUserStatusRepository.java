@@ -1,24 +1,26 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import org.springframework.stereotype.Repository;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-@Repository
-public class FileUserRepository implements UserRepository {
+public class FileUserStatusRepository implements UserStatusRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileUserRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+    public FileUserStatusRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
@@ -35,9 +37,9 @@ public class FileUserRepository implements UserRepository {
     /**
      * 직렬화
      */
-    private void writeUsersToFile(User user, Path path) {
+    private void writeUserStatusesToFile(UserStatus userStatus, Path path) {
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(path))) {
-            oos.writeObject(user);
+            oos.writeObject(userStatus);
         } catch (IOException e) {
             throw new RuntimeException("Serialization failed for " + path, e);
         }
@@ -46,47 +48,48 @@ public class FileUserRepository implements UserRepository {
     /**
      * 역직렬화
      */
-    private User readUsersFromFile(Path path) {
+    private UserStatus readUserStatusesFromFile(Path path) {
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
-            return (User) ois.readObject();
+            return (UserStatus) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("Deserialization failed for " + path, e);
         }
     }
 
+
     @Override
-    public User save(User user) {
-        Path path = resolvePath(user.getId());
-        writeUsersToFile(user, path);
-        return user;
+    public UserStatus save(UserStatus userStatus) {
+        Path path = resolvePath(userStatus.getId());
+        writeUserStatusesToFile(userStatus, path);
+        return userStatus;
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
+    public Optional<UserStatus> findById(UUID id) {
         Path path = resolvePath(id);
         if (Files.exists(path)) {
-            return Optional.of(readUsersFromFile(path));
+            return Optional.of(readUserStatusesFromFile(path));
         }
         return Optional.empty();
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
+    public Optional<UserStatus> findByUserId(UUID userId) {
         return findAll()
                 .stream()
-                .filter(u -> u.getUsername().equals(username))
+                .filter(us -> us.getUserId().equals(userId))
                 .findFirst();
     }
 
     @Override
-    public List<User> findAll() {
+    public List<UserStatus> findAll() {
         try {
             return Files.list(DIRECTORY)
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(this::readUsersFromFile)
-                    .toList();
+                    .filter(p -> p.toString().endsWith(EXTENSION))
+                    .map(this::readUserStatusesFromFile)
+                    .collect(Collectors.toList());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to list ReadStatus files in " + DIRECTORY, e);
         }
     }
 
@@ -97,15 +100,8 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean existsByUsername(String username) {
-        return findByUsername(username).isPresent();
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return findAll()
-                .stream()
-                .anyMatch(u -> u.getEmail().equals(email));
+    public boolean existsByUserId(UUID userId) {
+        return findByUserId(userId).isPresent();
     }
 
     @Override
@@ -116,5 +112,10 @@ public class FileUserRepository implements UserRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        findByUserId(userId).ifPresent(u -> deleteById(u.getId()));
     }
 }

@@ -1,24 +1,24 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import org.springframework.stereotype.Repository;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
-@Repository
-public class FileUserRepository implements UserRepository {
+public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileUserRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+    public FileBinaryContentRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
@@ -35,9 +35,9 @@ public class FileUserRepository implements UserRepository {
     /**
      * 직렬화
      */
-    private void writeUsersToFile(User user, Path path) {
+    private void writeBinaryContentsToFile(BinaryContent binaryContent, Path path) {
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(path))) {
-            oos.writeObject(user);
+            oos.writeObject(binaryContent);
         } catch (IOException e) {
             throw new RuntimeException("Serialization failed for " + path, e);
         }
@@ -46,47 +46,47 @@ public class FileUserRepository implements UserRepository {
     /**
      * 역직렬화
      */
-    private User readUsersFromFile(Path path) {
+    private BinaryContent readBinaryContentsFromFile(Path path) {
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
-            return (User) ois.readObject();
+            return (BinaryContent) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("Deserialization failed for " + path, e);
         }
     }
 
     @Override
-    public User save(User user) {
-        Path path = resolvePath(user.getId());
-        writeUsersToFile(user, path);
-        return user;
+    public BinaryContent save(BinaryContent binaryContent) {
+        Path path = resolvePath(binaryContent.getId());
+        writeBinaryContentsToFile(binaryContent, path);
+        return binaryContent;
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
+    public Optional<BinaryContent> findById(UUID id) {
         Path path = resolvePath(id);
         if (Files.exists(path)) {
-            return Optional.of(readUsersFromFile(path));
+            return Optional.of(readBinaryContentsFromFile(path));
         }
         return Optional.empty();
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return findAll()
-                .stream()
-                .filter(u -> u.getUsername().equals(username))
-                .findFirst();
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        Set<UUID> idSet = new HashSet<>(ids);
+        return findAll().stream()
+                .filter(bc -> idSet.contains(bc.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<User> findAll() {
+    public List<BinaryContent> findAll() {
         try {
             return Files.list(DIRECTORY)
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(this::readUsersFromFile)
-                    .toList();
+                    .filter(p -> p.toString().endsWith(EXTENSION))
+                    .map(this::readBinaryContentsFromFile)
+                    .collect(Collectors.toList());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to list Binary Content files in " + DIRECTORY, e);
         }
     }
 
@@ -94,18 +94,6 @@ public class FileUserRepository implements UserRepository {
     public boolean existsById(UUID id) {
         Path path = resolvePath(id);
         return Files.exists(path);
-    }
-
-    @Override
-    public boolean existsByUsername(String username) {
-        return findByUsername(username).isPresent();
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return findAll()
-                .stream()
-                .anyMatch(u -> u.getEmail().equals(email));
     }
 
     @Override

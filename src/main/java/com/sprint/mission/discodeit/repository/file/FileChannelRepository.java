@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.stereotype.Repository;
 
@@ -32,35 +33,49 @@ public class FileChannelRepository implements ChannelRepository {
         return DIRECTORY.resolve(id + EXTENSION);
     }
 
+    /**
+     * 직렬화
+     */
+    private void writeChannelsToFile(Channel channel, Path path) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(path))) {
+            oos.writeObject(channel);
+        } catch (IOException e) {
+            throw new RuntimeException("Serialization failed for " + path, e);
+        }
+    }
+
+    /**
+     * 역직렬화
+     */
+    private Channel readChannelsFromFile(Path path) {
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
+            return (Channel) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Deserialization failed for " + path, e);
+        }
+    }
     @Override
     public Channel save(Channel channel) {
         Path path = resolvePath(channel.getId());
-        try (
-                FileOutputStream fos = new FileOutputStream(path.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-            oos.writeObject(channel);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        writeChannelsToFile(channel, path);
         return channel;
     }
 
     @Override
     public Optional<Channel> findById(UUID id) {
-        Channel channelNullable = null;
         Path path = resolvePath(id);
         if (Files.exists(path)) {
-            try (
-                    FileInputStream fis = new FileInputStream(path.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                channelNullable = (Channel) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            return Optional.of(readChannelsFromFile(path));
         }
-        return Optional.ofNullable(channelNullable);
+        return Optional.empty();
+    }
+
+    @Override
+    public List<Channel> findAllByChannelType(ChannelType channelType) {
+        return findAll()
+                .stream()
+                .filter(c -> c.getType() == channelType)
+                .toList();
     }
 
     @Override
@@ -68,16 +83,7 @@ public class FileChannelRepository implements ChannelRepository {
         try {
             return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            return (Channel) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
+                    .map(this::readChannelsFromFile)
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -94,7 +100,7 @@ public class FileChannelRepository implements ChannelRepository {
     public void deleteById(UUID id) {
         Path path = resolvePath(id);
         try {
-            Files.delete(path);
+            Files.deleteIfExists(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
