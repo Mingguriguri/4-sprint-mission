@@ -88,6 +88,10 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelResponseDto update(@Valid ChannelUpdateDto channelUpdateDto) {
         Channel channel = requirePublicChannel(channelUpdateDto.getId());
+        String newName = channelUpdateDto.getName();
+        if (newName != null && !newName.equalsIgnoreCase(channel.getName())) {
+            validateUniqueName(newName);
+        }
         channelMapper.updateEntity(channelUpdateDto, channel);
         channelRepository.save(channel);
         return channelMapper.toDto(channel, null, null);
@@ -121,6 +125,7 @@ public class BasicChannelService implements ChannelService {
                 if (dto.getName() == null || dto.getName().isBlank()) {
                     throw new IllegalArgumentException("Public 채널 생성 시 name 이 필요합니다.");
                 }
+                validateUniqueName(dto.getName());
                 break;
             case PRIVATE:
                 if (dto.getType() != ChannelType.PRIVATE) {
@@ -132,6 +137,22 @@ public class BasicChannelService implements ChannelService {
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * PUBLIC 채널의 이름이 이미 존재하는지 검증합니다.
+     *
+     * @param name 생성하려는 채널 이름
+     * @throws IllegalArgumentException 중복일 경우
+     */
+    private void validateUniqueName(String name) {
+        boolean exists = channelRepository
+                .findAllByChannelType(ChannelType.PUBLIC)
+                .stream()
+                .anyMatch(ch -> ch.getName().equalsIgnoreCase(name.trim()));
+        if (exists) {
+            throw new IllegalArgumentException("이미 사용 중인 채널 이름입니다: " + name);
         }
     }
 
