@@ -76,16 +76,11 @@ public class BasicUserService implements UserService {
 
         Map<UUID, UserStatus> statusMap = statusList.stream()
                 .collect(Collectors.toMap(
-                        UserStatus::getUserId,   // key: userId
-                        Function.identity()      // value: UserStatus 객체 자체
+                        UserStatus::getUserId,
+                        Function.identity()
                 ));
 
-        return userList.stream()
-                .map(user -> {
-                    UserStatus status = statusMap.get(user.getId());
-                    boolean online = status != null && status.isOnline();
-                    return userMapper.toDto(user, online);
-                }).toList();
+        return userMapper.toDtoListWithStatus(userList, statusMap);
     }
 
     @Override

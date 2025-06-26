@@ -59,8 +59,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public List<MessageResponseDto> findAllByChannelId(UUID channelId) {
         List<Message> messageList = messageRepository.findAllByChannelId(channelId);
-        return messageList.stream()
-                .map(messageMapper::toDto).toList();
+        return messageMapper.toDtoList(messageList);
     }
 
     @Override

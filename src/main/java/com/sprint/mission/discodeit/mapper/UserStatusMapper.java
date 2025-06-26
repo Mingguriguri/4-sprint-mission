@@ -1,10 +1,14 @@
 package com.sprint.mission.discodeit.mapper;
 
+import com.sprint.mission.discodeit.dto.readStsuts.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class UserStatusMapper {
@@ -35,6 +39,15 @@ public class UserStatusMapper {
                 userStatus.getUserId(),
                 userStatus.getLastConnectedAt()
         );
+    }
+
+    /**
+     * UserStatus → UserStatusResponseDto 리스트로 변환
+     */
+    public List<UserStatusResponseDto> toDtoList(List<UserStatus> userStatuses) {
+        return userStatuses.stream()
+                .map(this::toDto)
+                .toList();
     }
 
 }

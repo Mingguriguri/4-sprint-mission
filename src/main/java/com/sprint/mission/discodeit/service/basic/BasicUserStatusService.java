@@ -54,9 +54,8 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public List<UserStatusResponseDto> findAll() {
-        return userStatusRepository.findAll().stream()
-                .map(userStatusMapper::toDto)
-                .collect(Collectors.toList());
+        List<UserStatus> userStatuses = userStatusRepository.findAll();
+        return userStatusMapper.toDtoList(userStatuses);
     }
 
     @Override

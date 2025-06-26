@@ -52,4 +52,13 @@ public class MessageMapper {
         );
     }
 
+    /**
+     * Message → MessageResponseDto 를 리스트로 변환
+     */
+    public List<MessageResponseDto> toDtoList(List<Message> messages) {
+        return messages.stream()
+                .map(this::toDto)
+                .toList();
+    }
+
 }

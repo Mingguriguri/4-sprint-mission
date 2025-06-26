@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.readStsuts.ReadStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class ReadStatusMapper {
     /**
@@ -36,6 +38,15 @@ public class ReadStatusMapper {
                 readStatus.getUserId(),
                 readStatus.getChannelId()
         );
+    }
+
+    /**
+     * ReadStatus → ReadStatusResponseDto 리스트로 변환
+     */
+    public List<ReadStatusResponseDto> toDtoList(List<ReadStatus> readStatuses) {
+        return readStatuses.stream()
+                .map(this::toDto)
+                .toList();
     }
 
 }

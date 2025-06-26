@@ -1,10 +1,17 @@
 package com.sprint.mission.discodeit.mapper;
 
+import com.sprint.mission.discodeit.dto.readStsuts.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class UserMapper {
@@ -45,4 +52,18 @@ public class UserMapper {
                 user.getUpdatedAt()
         );
     }
+
+    /**
+     * User → UserResponseDto 리스트로 변환
+     */
+    public List<UserResponseDto> toDtoListWithStatus(List<User> users, Map<UUID, UserStatus> statusMap) {
+        return users.stream()
+                .map(user -> {
+                    UserStatus status = statusMap.get(user.getId());
+                    boolean online = status != null && status.isOnline();
+                    return toDto(user, online);
+                })
+                .toList();
+    }
+
 }
