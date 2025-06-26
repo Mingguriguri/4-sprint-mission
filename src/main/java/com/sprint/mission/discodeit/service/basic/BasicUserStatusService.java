@@ -99,7 +99,7 @@ public class BasicUserStatusService implements UserStatusService {
      * @throws NoSuchElementException 존재하지 않는 경우
      */
     private void validateUserExists(UUID userId) {
-        if (!userStatusRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("UserStatus with id " + userId + " not found");
         }
     }

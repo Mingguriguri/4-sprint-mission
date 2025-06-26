@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import com.sprint.mission.discodeit.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -11,6 +11,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class UserResponseDto {
     private UUID id;
     private String username;
