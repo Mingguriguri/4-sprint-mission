@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -10,7 +11,9 @@ import java.util.UUID;
 * 사용자의 온라인 상태를 확인하기 위해 활용합니다.
 * */
 @Getter
-public class UserStatus {
+public class UserStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;

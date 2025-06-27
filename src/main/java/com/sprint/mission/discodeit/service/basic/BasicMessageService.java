@@ -10,9 +10,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -24,16 +22,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Validated
 public class BasicMessageService implements MessageService {
-    @Qualifier("JCFMessageRepository")
     private final MessageRepository messageRepository;
-
-    @Qualifier("JCFChannelRepository")
     private final ChannelRepository channelRepository;
-
-    @Qualifier("JCFUserRepository")
     private final UserRepository userRepository;
-
-    @Qualifier("JCFBinaryContentRepository")
     private final BinaryContentRepository binaryContentRepository;
 
     private final MessageMapper messageMapper;

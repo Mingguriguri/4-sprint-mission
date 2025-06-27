@@ -6,9 +6,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -19,7 +17,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Validated
 public class BasicBinaryContentService implements BinaryContentService {
-    @Qualifier("JCFBinaryContentRepository")
     private final BinaryContentRepository binaryContentRepository;
 
     private final BinaryContentMapper binaryContentMapper;

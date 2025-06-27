@@ -1,76 +1,81 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
+@Repository
+@ConditionalOnProperty(
+        prefix="discodeit.repository",
+        name="type",
+        havingValue="file"
+)
 public class FileUserStatusRepository implements UserStatusRepository {
-    private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
+    private final Path filePath;
 
-    public FileUserStatusRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
-        if (Files.notExists(DIRECTORY)) {
-            try {
-                Files.createDirectories(DIRECTORY);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+    public FileUserStatusRepository(
+            @Value("${discodeit.repository.file-directory}/UserStatus.ser") String filePathStr
+    ) {
+        this.filePath = Paths.get(filePathStr);
+        try {
+            Files.createDirectories(this.filePath.getParent());
+            if (Files.notExists(this.filePath)) {
+                writeToFile(new HashMap<>());
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot initialize user status file", e);
         }
-    }
-
-    private Path resolvePath(UUID id) {
-        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     /**
      * 직렬화
      */
-    private void writeUserStatusesToFile(UserStatus userStatus, Path path) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(path))) {
-            oos.writeObject(userStatus);
-        } catch (IOException e) {
-            throw new RuntimeException("Serialization failed for " + path, e);
+    private Map<UUID, UserStatus> readFromFile() {
+        try (ObjectInputStream ois = new ObjectInputStream(
+                Files.newInputStream(filePath))) {
+            return (Map<UUID, UserStatus>) ois.readObject();
+        } catch (EOFException eof) {
+            return new HashMap<>();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Failed to read user status file", e);
         }
     }
 
     /**
      * 역직렬화
      */
-    private UserStatus readUserStatusesFromFile(Path path) {
-        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
-            return (UserStatus) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Deserialization failed for " + path, e);
+    private void writeToFile(Map<UUID, UserStatus> map) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                Files.newOutputStream(filePath))) {
+            oos.writeObject(map);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write user status file", e);
         }
     }
 
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        Path path = resolvePath(userStatus.getId());
-        writeUserStatusesToFile(userStatus, path);
+        Map<UUID, UserStatus> all = readFromFile();
+        all.put(userStatus.getId(), userStatus);
+        writeToFile(all);
         return userStatus;
     }
 
     @Override
     public Optional<UserStatus> findById(UUID id) {
-        Path path = resolvePath(id);
-        if (Files.exists(path)) {
-            return Optional.of(readUserStatusesFromFile(path));
-        }
-        return Optional.empty();
+        return Optional.of(readFromFile().get(id));
     }
 
     @Override
@@ -83,20 +88,12 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public List<UserStatus> findAll() {
-        try {
-            return Files.list(DIRECTORY)
-                    .filter(p -> p.toString().endsWith(EXTENSION))
-                    .map(this::readUserStatusesFromFile)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to list ReadStatus files in " + DIRECTORY, e);
-        }
+        return new ArrayList<>(readFromFile().values());
     }
 
     @Override
     public boolean existsById(UUID id) {
-        Path path = resolvePath(id);
-        return Files.exists(path);
+        return readFromFile().containsKey(id);
     }
 
     @Override
@@ -106,11 +103,9 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void deleteById(UUID id) {
-        Path path = resolvePath(id);
-        try {
-            Files.deleteIfExists(path);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        Map<UUID, UserStatus> all = readFromFile();
+        if (all.remove(id) != null) {
+            writeToFile(all);
         }
     }
 

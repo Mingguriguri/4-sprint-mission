@@ -8,9 +8,7 @@ import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -22,12 +20,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Validated
 public class BasicUserStatusService implements UserStatusService {
-    @Qualifier("JCFUserStatusRepository")
     private final UserStatusRepository userStatusRepository;
-
-    @Qualifier("JCFUserRepository")
     private final UserRepository userRepository;
-
     private final UserStatusMapper userStatusMapper;
 
     @Override

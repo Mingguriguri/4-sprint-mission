@@ -9,9 +9,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.springframework.validation.annotation.Validated;
 
@@ -23,13 +21,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Validated
 public class BasicReadStatusService implements ReadStatusService {
-    @Qualifier("JCFReadStatusRepository")
     private final ReadStatusRepository readStatusRepository;
-
-    @Qualifier("JCFChannelRepository")
     private final ChannelRepository channelRepository;
-
-    @Qualifier("JCFUserRepository")
     private final UserRepository userRepository;
 
     private final ReadStatusMapper readStatusMapper;

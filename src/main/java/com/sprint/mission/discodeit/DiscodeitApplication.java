@@ -26,9 +26,16 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @SpringBootApplication
 public class DiscodeitApplication {
@@ -38,8 +45,8 @@ public class DiscodeitApplication {
 
 		// 1) Create
 		UserCreateDto createDto = new UserCreateDto(
-				"codeit",
-				"codeit@example.com",
+				"caremanager",
+				"caremanager@example.com",
 				"password123",
 				null
 		);
@@ -355,6 +362,27 @@ public class DiscodeitApplication {
 		System.out.println("==============================================================================");
 	}
 
+	private static void clearDataDirectory() {
+		Path dataDir = Paths.get("data/discodeit");
+		if (Files.exists(dataDir)) {
+			try (Stream<Path> paths = Files.walk(dataDir)) {
+				paths
+						.sorted(Comparator.reverseOrder())  // 파일 먼저, 디렉터리 나중
+						.forEach(p -> {
+							try {
+								Files.deleteIfExists(p);
+								System.out.println("파일 삭제 완료: " + p);
+							} catch (IOException e) {
+								// 필요에 따라 로깅
+								System.err.println("파일 삭제 실패: " + p + " – " + e.getMessage());
+							}
+						});
+			} catch (IOException e) {
+				throw new UncheckedIOException("data 디렉터리 초기화 실패", e);
+			}
+		}
+	}
+
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
@@ -368,7 +396,16 @@ public class DiscodeitApplication {
 		ReadStatusService readStatusService = context.getBean(ReadStatusService.class);
 		UserStatusService userStatusService = context.getBean(UserStatusService.class);
 
+		// ===================[ 서비스 테스트 준비 (File 기반 구현체에 한정]===================
+
+		/**
+		 * File 기반 구현체의 경우 clearDataDirectory 메서드를 실행시켜 기존 데이터를 지워줘야 합니다.
+		 * 아래 서비스 테스트와는 독립적으로 실행시켜주어야 합니다.
+		 */
+//		clearDataDirectory();
+
 		// ===============================[ 서비스 테스트 ]===============================
+
 		userServiceCRUDTest(userService);
 		channelServiceCRUDTest(channelService, userService);
         messageServiceCRUDTest(messageService, channelService, userService);
