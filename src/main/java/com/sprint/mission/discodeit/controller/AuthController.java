@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("v1/login")
+@RequestMapping("/v1/login")
 public class AuthController {
     private final AuthService authService;
 
