@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class UserCreateDto {
     @NotBlank

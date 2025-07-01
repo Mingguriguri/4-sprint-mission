@@ -46,25 +46,8 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<UserResponseDto> create(@RequestParam("username") String username,
-                                                  @RequestParam("email") String email,
-                                                  @RequestParam("password") String password,
-                                                  @RequestParam("file") MultipartFile file
-                                                  ) throws IOException {
-        System.out.println("# username "  + username);
-        System.out.println("# email "  + email);
-        System.out.println("# password "  + password);
-        System.out.println("# file "  + file.getName() + "." +file.getContentType());
-        BinaryContentCreateDto bcDto = null;
-        if (!file.isEmpty()) {
-            bcDto = new BinaryContentCreateDto(
-                    file.getBytes(),
-                    BinaryContentType.PROFILE
-            );
-        }
-        UserResponseDto created = userService.create(
-                new UserCreateDto(username, email, password, bcDto)
-        );
+    public ResponseEntity<UserResponseDto> create(@ModelAttribute UserCreateDto dto) {
+        UserResponseDto created = userService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -80,7 +63,7 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{user-id}")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable("user-id") UUID userId,
-                                                  @RequestBody UserUpdateDto dto) {
+                                                      @ModelAttribute UserUpdateDto dto) {
         return ResponseEntity.ok(userService.update(dto));
     }
 

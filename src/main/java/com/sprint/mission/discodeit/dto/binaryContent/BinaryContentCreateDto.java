@@ -5,13 +5,15 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
-@Getter
+@Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class BinaryContentCreateDto {
     @NotNull
-    byte[] bytes;
-    @NotNull
     BinaryContentType type;
+
+    private MultipartFile file;
 }

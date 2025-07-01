@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -36,7 +38,11 @@ public class BasicUserService implements UserService {
         validateCreate(requestDto);
         User createUser = userMapper.toEntity(requestDto);
         userRepository.save(createUser);
-        handleProfileImage(createUser, requestDto.getBinaryContent());
+        try {
+            handleProfileImage(createUser, requestDto.getBinaryContent());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 
         // UserStatus도 함께 저장
         UserStatus userStatus = new UserStatus(createUser.getId());
@@ -79,7 +85,11 @@ public class BasicUserService implements UserService {
         }
         UserStatus userStatus = requireStatus(existingUser.getId());
 
-        handleProfileImage(existingUser, requestDto.getBinaryContent());
+        try {
+            handleProfileImage(existingUser, requestDto.getBinaryContent());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 
         userMapper.updateEntity(requestDto, existingUser);
         userRepository.save(existingUser);
@@ -147,7 +157,7 @@ public class BasicUserService implements UserService {
      * @param user 사용자 엔티티
      * @param bcDto 프로필 이미지 DTO
      */
-    private void handleProfileImage(User user, BinaryContentCreateDto bcDto) {
+    private void handleProfileImage(User user, BinaryContentCreateDto bcDto) throws IOException {
         if (bcDto == null) return;
         if (user.getProfileId() != null) {
             binaryContentRepository.deleteById(user.getProfileId());
