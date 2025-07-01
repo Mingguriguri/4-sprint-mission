@@ -12,5 +12,5 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UserStatusCreateDto {
     @NotNull
-    UUID userId;
+    private UUID userId;
 }

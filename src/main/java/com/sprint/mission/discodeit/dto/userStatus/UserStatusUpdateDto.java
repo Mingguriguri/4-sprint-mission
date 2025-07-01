@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -13,5 +12,5 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UserStatusUpdateDto {
     @NotNull
-    UUID id;
+    private UUID id;
 }

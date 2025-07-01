@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
-import com.sprint.mission.discodeit.entity.BinaryContentType;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -13,9 +10,6 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +18,6 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
-    private final BinaryContentService binaryContentService;
 
     @PostConstruct
     public void init() {
@@ -38,11 +31,9 @@ public class UserController {
     }
 
     public UserController(UserService userService,
-                          UserStatusService userStatusService,
-                          BinaryContentService binaryContentService) {
+                          UserStatusService userStatusService) {
         this.userService = userService;
         this.userStatusService = userStatusService;
-        this.binaryContentService = binaryContentService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -61,6 +52,7 @@ public class UserController {
         return ResponseEntity.ok(userService.find(userId));
     }
 
+    // TODO: updateUser, touchOnline 나중에 PATCH로 합치기
     @RequestMapping(method = RequestMethod.PUT, value = "/{user-id}")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable("user-id") UUID userId,
                                                       @ModelAttribute UserUpdateDto dto) {

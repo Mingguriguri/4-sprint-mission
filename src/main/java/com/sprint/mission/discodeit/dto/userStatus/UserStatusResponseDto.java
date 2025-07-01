@@ -10,10 +10,9 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 @ToString
 public class UserStatusResponseDto {
-    UUID id;
-    UUID userId;
-    Instant lastConnectedAt;
+    private final UUID id;
+    private UUID userId;
+    private Instant lastConnectedAt;
 }

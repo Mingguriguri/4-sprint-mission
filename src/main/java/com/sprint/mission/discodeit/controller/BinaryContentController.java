@@ -1,21 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.BinaryContentType;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
-import jakarta.annotation.PostConstruct;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,23 +13,6 @@ import java.util.UUID;
 @RequestMapping("v1/binary-contents")
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
-
-    @PostConstruct
-    public void init() {
-        BinaryContentCreateDto createProfile = new BinaryContentCreateDto(
-                new byte[]{10,20,30},
-                BinaryContentType.PROFILE
-        );
-        BinaryContentResponseDto content1 = binaryContentService.create(createProfile);
-
-        BinaryContentCreateDto createAttachment = new BinaryContentCreateDto(
-                new byte[]{10,20,30},
-                BinaryContentType.MESSAGE
-        );
-        BinaryContentResponseDto content2 = binaryContentService.create(createAttachment);
-        System.out.println("Binary Content 1: " + content1.getId());
-        System.out.println("Binary Content 2: " + content2.getId());
-    }
 
     public BinaryContentController(BinaryContentService binaryContentService) {
         this.binaryContentService = binaryContentService;

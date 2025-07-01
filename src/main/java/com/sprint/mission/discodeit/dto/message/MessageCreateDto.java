@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -15,11 +14,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MessageCreateDto {
     @NotBlank
-    String content;
+    private String content;
     @NotNull
-    UUID channelId;
+    private UUID channelId;
     @NotNull
-    UUID authorId;
+    private UUID authorId;
     @Setter
-    List<BinaryContentCreateDto> attachments;
+    private List<BinaryContentCreateDto> attachments;
 }
