@@ -12,10 +12,9 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 @ToString
 public class BinaryContentResponseDto {
-    UUID id;
+    private final UUID id;
     byte[] bytes;
     BinaryContentType type;
     Instant createdAt;
