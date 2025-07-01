@@ -32,41 +32,40 @@ public class ChannelController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/public")
-    public ResponseEntity<ChannelResponseDto> createPublic(@RequestBody ChannelCreateDto dto) {
+    public ResponseEntity<ChannelResponseDto> createPublicChannel(@RequestBody ChannelCreateDto dto) {
         ChannelResponseDto created = channelService.createPublicChannel(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/private")
-    public ResponseEntity<ChannelResponseDto> createPrivate(@RequestBody ChannelCreateDto dto) {
+    public ResponseEntity<ChannelResponseDto> createPrivateChannel(@RequestBody ChannelCreateDto dto) {
         ChannelResponseDto created = channelService.createPrivateChannel(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<AllChannelByUserIdResponseDto> findAll(@RequestParam("user-id") UUID userId) {
+    public ResponseEntity<AllChannelByUserIdResponseDto> getChannels(@RequestParam("user-id") UUID userId) {
         return ResponseEntity.ok(channelService.findAllByUserId(userId));
     }
-
 
     /*
      * 채널 ID로 단일 조회는 요구사항에 없었지만 추가해놓았습니다
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public ResponseEntity<ChannelResponseDto> find(@PathVariable("id") UUID channelId,
+    @RequestMapping(method = RequestMethod.GET, value = "/{channel-id}")
+    public ResponseEntity<ChannelResponseDto> getChannel(@PathVariable("channel-id") UUID channelId,
                                                    @RequestParam("user-id") UUID userId) {
         return ResponseEntity.ok(channelService.find(channelId, userId));
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-    public ResponseEntity<ChannelResponseDto> update(@PathVariable("id") UUID id,
+    @RequestMapping(method = RequestMethod.PUT, value = "/{channel-id}")
+    public ResponseEntity<ChannelResponseDto> updateChannel(@PathVariable("channel-id") UUID channelId,
                                           @RequestBody ChannelUpdateDto dto) {
         return ResponseEntity.ok(channelService.update(dto));
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public ResponseEntity<ChannelResponseDto> delete(@PathVariable("id") UUID id) {
-        channelService.delete(id);
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{channel-id}")
+    public ResponseEntity<ChannelResponseDto> deleteChannel(@PathVariable("channel-id") UUID channelId) {
+        channelService.delete(channelId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

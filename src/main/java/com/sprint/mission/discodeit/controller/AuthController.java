@@ -17,7 +17,7 @@ public class AuthController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<UserResponseDto> create(@RequestBody LoginUserDto dto) {
+    public ResponseEntity<UserResponseDto> login(@RequestBody LoginUserDto dto) {
         return ResponseEntity.ok(authService.login(dto));
     }
 }

@@ -69,31 +69,32 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<UserResponseDto>> findAll() {
+    public ResponseEntity<List<UserResponseDto>> getUsers() {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public ResponseEntity<UserResponseDto> find(@PathVariable("id") UUID id) {
-        return ResponseEntity.ok(userService.find(id));
+    @RequestMapping(method = RequestMethod.GET, value = "/{user-id}")
+    public ResponseEntity<UserResponseDto> getUser(@PathVariable("user-id") UUID userId) {
+        return ResponseEntity.ok(userService.find(userId));
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-    public ResponseEntity<UserResponseDto> update(@PathVariable("id") UUID id,
+    @RequestMapping(method = RequestMethod.PUT, value = "/{user-id}")
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable("user-id") UUID userId,
                                                   @RequestBody UserUpdateDto dto) {
         return ResponseEntity.ok(userService.update(dto));
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{id}/online")
-    public ResponseEntity<UserResponseDto> touchOnline(@PathVariable("id") UUID id) {
-        userStatusService.updateByUserId(id);
-        UserResponseDto response = userService.find(id);
+
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{user-id}/online")
+    public ResponseEntity<UserResponseDto> touchOnline(@PathVariable("user-id") UUID userId) {
+        userStatusService.updateByUserId(userId);
+        UserResponseDto response = userService.find(userId);
         return ResponseEntity.ok(response);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public ResponseEntity<UserResponseDto> delete(@PathVariable("id") UUID id) {
-        userService.delete(id);
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{user-id}")
+    public ResponseEntity<UserResponseDto> deleteUser(@PathVariable("user-id") UUID userId) {
+        userService.delete(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

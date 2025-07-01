@@ -46,23 +46,23 @@ public class BinaryContentController {
     }
 
     // 단일 조회
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public ResponseEntity<BinaryContentResponseDto> findOne(@PathVariable UUID id) {
-        return ResponseEntity.ok(binaryContentService.find(id));
+    @RequestMapping(method = RequestMethod.GET, value = "/{binary-content-id}")
+    public ResponseEntity<BinaryContentResponseDto> getBinaryContent(@PathVariable("binary-content-id") UUID binaryContentId) {
+        return ResponseEntity.ok(binaryContentService.find(binaryContentId));
     }
 
     // 여러 개 조회
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContentResponseDto>> findMany(@RequestParam("ids") List<UUID> ids) {
-        return ResponseEntity.ok(binaryContentService.findAllByIdIn(ids));
+    public ResponseEntity<List<BinaryContentResponseDto>> getBinaryContents(@RequestParam("binary-content-ids") List<UUID> binaryContentIds) {
+        return ResponseEntity.ok(binaryContentService.findAllByIdIn(binaryContentIds));
     }
 
     /*
      * DELETE 는 요구사항에 없었지만 추가해놓았습니다
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public ResponseEntity<BinaryContentResponseDto> delete(@PathVariable("id") UUID id) {
-        binaryContentService.delete(id);
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{binary-content-id}")
+    public ResponseEntity<BinaryContentResponseDto> deleteBinaryContent(@PathVariable("binary-content-id") UUID binaryContentId) {
+        binaryContentService.delete(binaryContentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -24,33 +24,33 @@ public class MessageController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<MessageResponseDto> create(@RequestBody MessageCreateDto dto) {
+    public ResponseEntity<MessageResponseDto> createMessage(@RequestBody MessageCreateDto dto) {
         MessageResponseDto created = messageService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<MessageResponseDto>> findAll(@RequestParam("channel-id") UUID channelId) {
+    public ResponseEntity<List<MessageResponseDto>> getMessages(@RequestParam("channel-id") UUID channelId) {
         return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
     }
 
     /*
      * 메시지 ID로 단일 조회는 요구사항에 없었지만 추가해놓았습니다
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
-    public ResponseEntity<MessageResponseDto> find(@PathVariable("id") UUID id) {
-        return ResponseEntity.ok(messageService.find(id));
+    @RequestMapping(method = RequestMethod.GET, value = "/{message-id}")
+    public ResponseEntity<MessageResponseDto> getMessage(@PathVariable("message-id") UUID messageId) {
+        return ResponseEntity.ok(messageService.find(messageId));
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-    public ResponseEntity<MessageResponseDto> update(@PathVariable("id") UUID id,
+    @RequestMapping(method = RequestMethod.PUT, value = "/{message-id}")
+    public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable("message-id") UUID messageId,
                                                   @RequestBody MessageUpdateDto dto) {
         return ResponseEntity.ok(messageService.update(dto));
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
-    public ResponseEntity<MessageResponseDto> delete(@PathVariable("id") UUID id) {
-        messageService.delete(id);
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{message-id}")
+    public ResponseEntity<MessageResponseDto> deleteMessage(@PathVariable("message-id") UUID messageId) {
+        messageService.delete(messageId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
