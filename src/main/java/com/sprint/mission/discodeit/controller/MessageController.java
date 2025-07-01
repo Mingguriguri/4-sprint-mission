@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("v1")
+@RequestMapping("/v1")
 public class MessageController {
     private final MessageService messageService;
     private final BinaryContentService binaryContentService;
@@ -24,13 +24,13 @@ public class MessageController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/messages")
-    public ResponseEntity<MessageResponseDto> createMessage(@RequestBody MessageCreateDto dto) {
+    public ResponseEntity<MessageResponseDto> createMessage(@ModelAttribute MessageCreateDto dto) {
         MessageResponseDto created = messageService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/channels/{channel-id}/messages")
-    public ResponseEntity<List<MessageResponseDto>> getMessages(@RequestParam("channel-id") UUID channelId) {
+    public ResponseEntity<List<MessageResponseDto>> getMessages(@PathVariable("channel-id") UUID channelId) {
         return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
     }
 
@@ -44,7 +44,7 @@ public class MessageController {
 
     @RequestMapping(method = RequestMethod.PUT, value = "messages/{message-id}")
     public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable("message-id") UUID messageId,
-                                                  @RequestBody MessageUpdateDto dto) {
+                                                  @ModelAttribute MessageUpdateDto dto) {
         return ResponseEntity.ok(messageService.update(dto));
     }
 

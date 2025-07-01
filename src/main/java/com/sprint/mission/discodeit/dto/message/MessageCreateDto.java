@@ -13,7 +13,6 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 public class MessageCreateDto {
     @NotBlank
     String content;

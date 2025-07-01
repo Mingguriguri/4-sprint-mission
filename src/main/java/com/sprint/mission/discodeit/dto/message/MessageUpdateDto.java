@@ -12,7 +12,6 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
 public class MessageUpdateDto {
     @NotNull
     UUID id;

@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
 
 @Service
@@ -37,7 +39,11 @@ public class BasicMessageService implements MessageService {
         validateAuthorExists(createMessageDto.getAuthorId());
 
         Message message = messageMapper.toEntity(createMessageDto);
-        handleAttachments(message, createMessageDto.getAttachments());
+        try {
+            handleAttachments(message, createMessageDto.getAttachments());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 
         messageRepository.save(message);
         return messageMapper.toDto(message);
@@ -62,7 +68,11 @@ public class BasicMessageService implements MessageService {
         List<BinaryContentCreateDto> atts = updateMessageDto.getAttachments();
         if (atts != null && !atts.isEmpty()) {
             deleteExistingAttachments(message);
-            handleAttachments(message, atts);
+            try {
+                handleAttachments(message, atts);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         }
         messageMapper.updateEntity(updateMessageDto, message);
         messageRepository.save(message);
@@ -131,7 +141,7 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
-    private void handleAttachments(Message message, List<BinaryContentCreateDto> attachments) {
+    private void handleAttachments(Message message, List<BinaryContentCreateDto> attachments) throws IOException {
         if (attachments == null || attachments.isEmpty()) {
             return;
         }
