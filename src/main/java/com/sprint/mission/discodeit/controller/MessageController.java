@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("v1/messages")
+@RequestMapping("v1")
 public class MessageController {
     private final MessageService messageService;
     private final BinaryContentService binaryContentService;
@@ -23,13 +23,13 @@ public class MessageController {
         this.binaryContentService = binaryContentService;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, value = "/messages")
     public ResponseEntity<MessageResponseDto> createMessage(@RequestBody MessageCreateDto dto) {
         MessageResponseDto created = messageService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, value = "/channels/{channel-id}/messages")
     public ResponseEntity<List<MessageResponseDto>> getMessages(@RequestParam("channel-id") UUID channelId) {
         return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
     }
@@ -37,18 +37,18 @@ public class MessageController {
     /*
      * 메시지 ID로 단일 조회는 요구사항에 없었지만 추가해놓았습니다
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/{message-id}")
+    @RequestMapping(method = RequestMethod.GET, value = "messages/{message-id}")
     public ResponseEntity<MessageResponseDto> getMessage(@PathVariable("message-id") UUID messageId) {
         return ResponseEntity.ok(messageService.find(messageId));
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/{message-id}")
+    @RequestMapping(method = RequestMethod.PUT, value = "messages/{message-id}")
     public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable("message-id") UUID messageId,
                                                   @RequestBody MessageUpdateDto dto) {
         return ResponseEntity.ok(messageService.update(dto));
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{message-id}")
+    @RequestMapping(method = RequestMethod.DELETE, value = "messages/{message-id}")
     public ResponseEntity<MessageResponseDto> deleteMessage(@PathVariable("message-id") UUID messageId) {
         messageService.delete(messageId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
