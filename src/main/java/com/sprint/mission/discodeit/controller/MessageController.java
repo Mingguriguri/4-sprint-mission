@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,15 +17,13 @@ import java.util.UUID;
 @RequestMapping("/v1")
 public class MessageController {
     private final MessageService messageService;
-    private final BinaryContentService binaryContentService;
 
-    public MessageController(MessageService messageService, BinaryContentService binaryContentService) {
+    public MessageController(MessageService messageService) {
         this.messageService = messageService;
-        this.binaryContentService = binaryContentService;
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/messages")
-    public ResponseEntity<MessageResponseDto> createMessage(@ModelAttribute MessageCreateDto dto) {
+    public ResponseEntity<MessageResponseDto> createMessage(@ModelAttribute @Valid MessageCreateDto dto) {
         MessageResponseDto created = messageService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -44,7 +43,7 @@ public class MessageController {
 
     @RequestMapping(method = RequestMethod.PUT, value = "messages/{message-id}")
     public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable("message-id") UUID messageId,
-                                                  @ModelAttribute MessageUpdateDto dto) {
+                                                  @ModelAttribute @Valid MessageUpdateDto dto) {
         return ResponseEntity.ok(messageService.update(dto));
     }
 

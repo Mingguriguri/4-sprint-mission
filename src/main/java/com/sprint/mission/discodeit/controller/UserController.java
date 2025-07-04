@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<UserResponseDto> create(@ModelAttribute UserCreateDto dto) {
+    public ResponseEntity<UserResponseDto> create(@ModelAttribute @Valid UserCreateDto dto) {
         UserResponseDto created = userService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -55,12 +56,12 @@ public class UserController {
     // TODO: updateUser, touchOnline 나중에 PATCH로 합치기
     @RequestMapping(method = RequestMethod.PUT, value = "/{user-id}")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable("user-id") UUID userId,
-                                                      @ModelAttribute UserUpdateDto dto) {
+                                                      @ModelAttribute @Valid  UserUpdateDto dto) {
         return ResponseEntity.ok(userService.update(dto));
     }
 
 
-    @RequestMapping(method = RequestMethod.PATCH, value = "/{user-id}/online")
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{user-id}/userstatus")
     public ResponseEntity<UserResponseDto> touchOnline(@PathVariable("user-id") UUID userId) {
         userStatusService.updateByUserId(userId);
         UserResponseDto response = userService.find(userId);

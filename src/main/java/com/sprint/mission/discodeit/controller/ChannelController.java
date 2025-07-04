@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ public class ChannelController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/channels")
     public ResponseEntity<ChannelResponseDto> createChannel(@RequestParam("channel-type") ChannelType type,
-                                                            @RequestBody ChannelCreateDto dto) {
+                                                            @RequestBody @Valid ChannelCreateDto dto) {
         ChannelResponseDto created = new ChannelResponseDto();
         switch (type) {
             case PUBLIC:
@@ -65,7 +66,7 @@ public class ChannelController {
 
     @RequestMapping(method = RequestMethod.PUT, value = "channels/{channel-id}")
     public ResponseEntity<ChannelResponseDto> updateChannel(@PathVariable("channel-id") UUID channelId,
-                                          @RequestBody ChannelUpdateDto dto) {
+                                          @RequestBody @Valid ChannelUpdateDto dto) {
         return ResponseEntity.ok(channelService.update(dto));
     }
 
