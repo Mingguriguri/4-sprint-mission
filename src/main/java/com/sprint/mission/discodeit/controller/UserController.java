@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.annotation.PostConstruct;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("v1/users")
+@RequestMapping("/v1/users")
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
@@ -53,13 +52,11 @@ public class UserController {
         return ResponseEntity.ok(userService.find(userId));
     }
 
-    // TODO: updateUser, touchOnline 나중에 PATCH로 합치기
     @RequestMapping(method = RequestMethod.PUT, value = "/{user-id}")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable("user-id") UUID userId,
                                                       @ModelAttribute @Valid  UserUpdateDto dto) {
         return ResponseEntity.ok(userService.update(dto));
     }
-
 
     @RequestMapping(method = RequestMethod.PATCH, value = "/{user-id}/userstatus")
     public ResponseEntity<UserResponseDto> touchOnline(@PathVariable("user-id") UUID userId) {
