@@ -10,5 +10,5 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ReadStatusUpdateDto {
     @NotNull
-    private UUID id;
+    private final UUID id;
 }

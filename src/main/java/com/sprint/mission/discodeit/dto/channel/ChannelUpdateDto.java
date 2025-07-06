@@ -15,12 +15,12 @@ public class ChannelUpdateDto {
      *  Public Channel만 수정 가능
      */
     @NotNull
-    private UUID id;
+    private final UUID id;
 
     @NotNull
-    private ChannelType type;
+    private final ChannelType type;
 
     @NotBlank
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
 }

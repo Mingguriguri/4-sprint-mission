@@ -13,6 +13,6 @@ import java.util.UUID;
 @ToString
 public class UserStatusResponseDto {
     private final UUID id;
-    private UUID userId;
-    private Instant lastConnectedAt;
+    private final UUID userId;
+    private final Instant lastConnectedAt;
 }

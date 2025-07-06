@@ -10,7 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ReadStatusCreateDto {
     @NotNull
-    private UUID userId;
+    private final UUID userId;
     @NotNull
-    private UUID channelId;
+    private final UUID channelId;
 }

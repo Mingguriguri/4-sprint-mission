@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class BinaryContentCreateDto {
     @NotNull
-    private BinaryContentType type;
+    private final BinaryContentType type;
 
-    private MultipartFile file;
+    private final MultipartFile file;
 }

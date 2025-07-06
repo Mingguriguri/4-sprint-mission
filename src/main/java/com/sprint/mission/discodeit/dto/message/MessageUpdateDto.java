@@ -13,8 +13,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MessageUpdateDto {
     @NotNull
-    private UUID id;
+    private final UUID id;
     @NotBlank
-    private String content;
-    private List<BinaryContentCreateDto> attachments;
+    private final String content;
+    private final List<BinaryContentCreateDto> attachments;
 }

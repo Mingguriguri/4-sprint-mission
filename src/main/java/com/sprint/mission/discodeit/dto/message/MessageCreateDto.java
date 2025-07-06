@@ -14,11 +14,11 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MessageCreateDto {
     @NotBlank
-    private String content;
+    private final String content;
     @NotNull
-    private UUID channelId;
+    private final UUID channelId;
     @NotNull
-    private UUID authorId;
+    private final UUID authorId;
     @Setter
     private List<BinaryContentCreateDto> attachments;
 }

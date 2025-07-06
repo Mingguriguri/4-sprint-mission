@@ -11,8 +11,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @ToString
 public class ReadStatusResponseDto {
-    private UUID id;
-    private Instant lastReadAt;
-    private UUID userId;
-    private UUID channelId;
+    private final UUID id;
+    private final Instant lastReadAt;
+    private final UUID userId;
+    private final UUID channelId;
 }

@@ -10,6 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class AllChannelByUserIdResponseDto {
-    private List<ChannelResponseDto> publicChannels;
-    private List<ChannelResponseDto> privateChannels;
+    private final List<ChannelResponseDto> publicChannels;
+    private final List<ChannelResponseDto> privateChannels;
 }

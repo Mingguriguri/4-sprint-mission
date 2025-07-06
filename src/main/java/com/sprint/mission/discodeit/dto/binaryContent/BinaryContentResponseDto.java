@@ -13,7 +13,7 @@ import java.util.UUID;
 @ToString
 public class BinaryContentResponseDto {
     private final UUID id;
-    private byte[] bytes;
-    private BinaryContentType type;
-    private Instant createdAt;
+    private final byte[] bytes;
+    private final BinaryContentType type;
+    private final Instant createdAt;
 }

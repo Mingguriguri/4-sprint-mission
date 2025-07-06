@@ -13,17 +13,17 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserUpdateDto {
     @NotNull
-    private UUID id;
+    private final UUID id;
 
     @NotBlank
-    private String username;
+    private final String username;
 
     @Email
     @NotBlank
-    private String email;
+    private final String email;
 
     @NotBlank
-    private String password;
+    private final String password;
 
-    private BinaryContentCreateDto binaryContent;
+    private final BinaryContentCreateDto binaryContent;
 }

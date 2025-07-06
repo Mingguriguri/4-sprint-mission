@@ -11,11 +11,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @ToString
 public class UserResponseDto {
-    private UUID id;
-    private String username;
-    private String email;
-    private UUID profileId;
-    private boolean isOnline;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private final UUID id;
+    private final String username;
+    private final String email;
+    private final UUID profileId;
+    private final boolean isOnline;
+    private final Instant createdAt;
+    private final Instant updatedAt;
 }
