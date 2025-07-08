@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.ExceptionCode;
+import com.sprint.mission.discodeit.exception.FileAccessException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -17,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.*;
 
 @Service
@@ -40,7 +41,8 @@ public class BasicMessageService implements MessageService {
         try {
             handleAttachments(message, createMessageDto.getAttachments());
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            // 트랜잭션시 롤백을 고려해서 RuntimeException을 상속받은 FileAccessException 형태로 예외 전환해서 던지도록 설정했습니다.
+            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
         }
 
         messageRepository.save(message);
@@ -69,7 +71,8 @@ public class BasicMessageService implements MessageService {
             try {
                 handleAttachments(message, atts);
             } catch (IOException e) {
-                throw new UncheckedIOException(e);
+                // 트랜잭션시 롤백을 고려해서 RuntimeException을 상속받은 FileAccessException 형태로 예외 전환해서 던지도록 설정했습니다.
+                throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
             }
         }
         messageMapper.updateEntity(updateMessageDto, message);

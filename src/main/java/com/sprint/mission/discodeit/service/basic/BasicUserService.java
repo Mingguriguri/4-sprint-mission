@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.ExceptionCode;
+import com.sprint.mission.discodeit.exception.FileAccessException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -17,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,7 +40,8 @@ public class BasicUserService implements UserService {
         try {
             handleProfileImage(createUser, requestDto.getBinaryContent());
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            // 트랜잭션시 롤백을 고려해서 RuntimeException을 상속받은 FileAccessException 형태로 예외 전환해서 던지도록 설정했습니다.
+            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
         }
 
         // UserStatus도 함께 저장
@@ -86,7 +88,7 @@ public class BasicUserService implements UserService {
         try {
             handleProfileImage(existingUser, requestDto.getBinaryContent());
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
         }
 
         userMapper.updateEntity(requestDto, existingUser);

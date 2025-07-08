@@ -51,8 +51,8 @@ public enum ExceptionCode {
     /**
      * ******************************* File I/O Error CodeList ***************************************
      */
-    FILE_IO_ERROR(400, "파일 입출력 중 오류가 발생했습니다."),
-    FILE_CLASS_NOT_FOUND(400, "직렬화 클래스 로딩 중 오류가 발생했습니다.");
+    FILE_IO_ERROR(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), "파일 입출력 중 오류가 발생했습니다."),
+    FILE_CLASS_NOT_FOUND(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), "직렬화 클래스 로딩 중 오류가 발생했습니다.");
 
     @Getter
     private final int status;

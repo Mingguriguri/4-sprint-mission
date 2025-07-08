@@ -37,7 +37,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
                 writeToFile(new HashMap<>());
             }
         } catch (IOException e) {
-            throw new RuntimeException("Cannot initialize binary content file", e);
+            // 트랜잭션시 롤백을 고려해서 RuntimeException을 상속받은 FileAccessException 형태로 예외 전환해서 던지도록 설정했습니다.
+            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
         }
     }
 
