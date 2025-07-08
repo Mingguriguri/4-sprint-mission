@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 @ToString
 public class UserResponseDto {
     private final UUID id;

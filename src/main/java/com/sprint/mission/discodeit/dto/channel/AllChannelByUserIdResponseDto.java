@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 @ToString
 public class AllChannelByUserIdResponseDto {
     private final List<ChannelResponseDto> publicChannels;

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.dto.message;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.time.Instant;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 @ToString
 public class MessageResponseDto {
     private final UUID id;

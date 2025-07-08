@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.dto.readStsuts;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReadStatusUpdateDto {
     @NotNull
     private final UUID id;
