@@ -1,5 +1,6 @@
-package com.sprint.mission.discodeit.exception;
+package com.sprint.mission.discodeit.advice;
 
+import com.sprint.mission.discodeit.exception.FileAccessException;
 import com.sprint.mission.discodeit.exception.dto.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,7 @@ import java.io.UncheckedIOException;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionAdvice {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity handleNotFound(NoSuchElementException e) {
         ErrorResponseDto errorResponseDto = new ErrorResponseDto(HttpStatus.NOT_FOUND.value(), e.getMessage());
@@ -32,5 +33,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity handleBadRequest(UncheckedIOException e) {
         ErrorResponseDto errorResponseDto = new ErrorResponseDto(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), e.getMessage());
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(errorResponseDto);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity handleFileAccessException(FileAccessException e) {
+        System.out.println(e.getExceptionCode().getStatus());
+        System.out.println(e.getMessage());
+
+        return new ResponseEntity<>(HttpStatus.valueOf(e.getExceptionCode()
+                .getStatus()));
     }
 }
