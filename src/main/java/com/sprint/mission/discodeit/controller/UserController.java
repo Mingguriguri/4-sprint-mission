@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,17 +19,6 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
-
-    @PostConstruct
-    public void init() {
-        UserCreateDto createDto = new UserCreateDto(
-                "mingguriguri",
-                "minggurigrui@example.com",
-                "password123",
-                null
-        );
-        userService.create(createDto);
-    }
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<UserResponseDto> create(@ModelAttribute @Valid UserCreateDto dto) {

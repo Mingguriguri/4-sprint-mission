@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
-import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,15 +19,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ChannelController {
     private final ChannelService channelService;
-
-    @PostConstruct
-    public void init() {
-        ChannelCreateDto pubCreate = new ChannelCreateDto(
-                ChannelType.PUBLIC,
-                "공지", "공지 채널입니다",
-                null, null);
-        channelService.createPublicChannel(pubCreate);
-    }
 
     @RequestMapping(method = RequestMethod.POST, value = "/channels")
     public ResponseEntity<ChannelResponseDto> createChannel(@RequestParam("channel-type") ChannelType type,
