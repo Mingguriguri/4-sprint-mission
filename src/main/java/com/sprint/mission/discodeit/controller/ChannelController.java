@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1")
+@RequiredArgsConstructor
 public class ChannelController {
     private final ChannelService channelService;
 
@@ -26,10 +28,6 @@ public class ChannelController {
                 "공지", "공지 채널입니다",
                 null, null);
         channelService.createPublicChannel(pubCreate);
-    }
-
-    public ChannelController(ChannelService channelService) {
-        this.channelService = channelService;
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/channels")

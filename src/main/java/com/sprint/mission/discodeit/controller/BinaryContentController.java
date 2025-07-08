@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,13 +11,10 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("v1/binary-contents")
+@RequestMapping("/v1/binary-contents")
+@RequiredArgsConstructor
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
-
-    public BinaryContentController(BinaryContentService binaryContentService) {
-        this.binaryContentService = binaryContentService;
-    }
 
     // 단일 조회
     @RequestMapping(method = RequestMethod.GET, value = "/{binary-content-id}")

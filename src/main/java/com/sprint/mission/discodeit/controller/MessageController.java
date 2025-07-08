@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +15,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1")
+@RequiredArgsConstructor
 public class MessageController {
     private final MessageService messageService;
-
-    public MessageController(MessageService messageService) {
-        this.messageService = messageService;
-    }
 
     @RequestMapping(method = RequestMethod.POST, value = "/messages")
     public ResponseEntity<MessageResponseDto> createMessage(@ModelAttribute @Valid MessageCreateDto dto) {

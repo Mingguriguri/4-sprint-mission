@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/users")
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
@@ -28,12 +30,6 @@ public class UserController {
                 null
         );
         userService.create(createDto);
-    }
-
-    public UserController(UserService userService,
-                          UserStatusService userStatusService) {
-        this.userService = userService;
-        this.userStatusService = userStatusService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
