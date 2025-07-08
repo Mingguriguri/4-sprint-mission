@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.exception.FileAccessException;
 import com.sprint.mission.discodeit.exception.dto.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -24,12 +25,20 @@ public class GlobalExceptionAdvice {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDto);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<?> handleFileAccessException(FileAccessException e) {
+    @ExceptionHandler(FileAccessException.class)
+    public ResponseEntity handleFileAccessException(FileAccessException e) {
         return ResponseEntity
                 .status(HttpStatus.valueOf(e.getExceptionCode().getStatus()))
                 .body(new ErrorResponseDto(
                         e.getExceptionCode().getStatus(),
                         e.getExceptionCode().getMessage()));
     }
+
+    // 나머지 예외 처리
+    // TODO: 추후 ErrorResponse 만들어서 response에 담아서 보내기
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity handleException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
+    }
+    
 }
