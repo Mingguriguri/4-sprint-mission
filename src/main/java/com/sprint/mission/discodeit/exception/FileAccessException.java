@@ -5,9 +5,9 @@ import lombok.Getter;
 public class FileAccessException extends RuntimeException {
 
     @Getter
-    private ExceptionCode exceptionCode;
+    private ErrorCode exceptionCode;
 
-    public FileAccessException(ExceptionCode exceptionCode) {
+    public FileAccessException(ErrorCode exceptionCode) {
         super(exceptionCode.getMessage());
         this.exceptionCode = exceptionCode;
     }
