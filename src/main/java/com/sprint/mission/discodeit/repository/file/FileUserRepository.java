@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.ExceptionCode;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.FileAccessException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +35,7 @@ public class FileUserRepository implements UserRepository {
             }
         } catch (IOException e) {
             // 트랜잭션시 롤백을 고려해서 RuntimeException을 상속받은 FileAccessException 형태로 예외 전환해서 던지도록 설정했습니다.
-            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
+            throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
         }
     }
 
@@ -47,9 +47,9 @@ public class FileUserRepository implements UserRepository {
             writeToFile(all);
             return user;
         } catch (IOException e) {
-            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
+            throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
         } catch (ClassNotFoundException e) {
-            throw new FileAccessException(ExceptionCode.FILE_CLASS_NOT_FOUND);
+            throw new FileAccessException(ErrorCode.FILE_CLASS_NOT_FOUND);
         }
     }
 
@@ -58,9 +58,9 @@ public class FileUserRepository implements UserRepository {
         try {
             return Optional.ofNullable(readFromFile().get(id));
         } catch (IOException e) {
-            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
+            throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
         } catch (ClassNotFoundException e) {
-            throw new FileAccessException(ExceptionCode.FILE_CLASS_NOT_FOUND);
+            throw new FileAccessException(ErrorCode.FILE_CLASS_NOT_FOUND);
         }
     }
 
@@ -71,9 +71,9 @@ public class FileUserRepository implements UserRepository {
                     .filter(u -> u.getUsername().equals(username))
                     .findFirst();
         } catch (IOException e) {
-            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
+            throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
         } catch (ClassNotFoundException e) {
-            throw new FileAccessException(ExceptionCode.FILE_CLASS_NOT_FOUND);
+            throw new FileAccessException(ErrorCode.FILE_CLASS_NOT_FOUND);
         }
     }
 
@@ -82,9 +82,9 @@ public class FileUserRepository implements UserRepository {
         try {
             return new ArrayList<>(readFromFile().values());
         } catch (IOException e) {
-            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
+            throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
         } catch (ClassNotFoundException e) {
-            throw new FileAccessException(ExceptionCode.FILE_CLASS_NOT_FOUND);
+            throw new FileAccessException(ErrorCode.FILE_CLASS_NOT_FOUND);
         }
     }
 
@@ -93,9 +93,9 @@ public class FileUserRepository implements UserRepository {
         try {
             return readFromFile().containsKey(id);
         } catch (IOException e) {
-            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
+            throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
         } catch (ClassNotFoundException e) {
-            throw new FileAccessException(ExceptionCode.FILE_CLASS_NOT_FOUND);
+            throw new FileAccessException(ErrorCode.FILE_CLASS_NOT_FOUND);
         }
     }
 
@@ -110,9 +110,9 @@ public class FileUserRepository implements UserRepository {
             return readFromFile().values().stream()
                     .anyMatch(u -> u.getEmail().equals(email));
         } catch (IOException e) {
-            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
+            throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
         } catch (ClassNotFoundException e) {
-            throw new FileAccessException(ExceptionCode.FILE_CLASS_NOT_FOUND);
+            throw new FileAccessException(ErrorCode.FILE_CLASS_NOT_FOUND);
         }
     }
 
@@ -124,9 +124,9 @@ public class FileUserRepository implements UserRepository {
                 writeToFile(all);
             }
         } catch (IOException e) {
-            throw new FileAccessException(ExceptionCode.FILE_IO_ERROR);
+            throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
         } catch (ClassNotFoundException e) {
-            throw new FileAccessException(ExceptionCode.FILE_CLASS_NOT_FOUND);
+            throw new FileAccessException(ErrorCode.FILE_CLASS_NOT_FOUND);
         }
     }
 

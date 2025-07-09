@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.exception;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-public enum ExceptionCode {
+public enum ErrorCode {
     /**
      * ******************************* Global Error CodeList ***************************************
      * HTTP Status Code
@@ -55,13 +55,13 @@ public enum ExceptionCode {
     FILE_CLASS_NOT_FOUND(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), "직렬화 클래스 로딩 중 오류가 발생했습니다.");
 
     @Getter
-    private final int status;
+    private final int statusCode;
 
     @Getter
     private final String message;
 
-    ExceptionCode(int status, String message) {
-        this.status = status;
+    ErrorCode(int statusCode, String message) {
+        this.statusCode = statusCode;
         this.message = message;
     }
 }
