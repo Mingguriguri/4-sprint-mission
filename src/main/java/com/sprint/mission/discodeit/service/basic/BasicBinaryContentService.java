@@ -45,7 +45,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public List<BinaryContentResponseDto> findAllByIdIn(List<UUID> idList) {
         List<BinaryContent> contents = requireBinaryContents(idList);
 
-        return binaryContentMapper.toDtoList(contents);
+        return binaryContentMapper.toDtos(contents);
     }
 
     @Override

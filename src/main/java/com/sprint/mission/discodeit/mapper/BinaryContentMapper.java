@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentType;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.FileAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,6 +30,33 @@ public class BinaryContentMapper {
     }
 
     /**
+     * MultipartFile + BinaryContentType → BinaryContent 엔티티 변환
+     */
+    public BinaryContent toEntity(MultipartFile file, BinaryContentType type) {
+        try {
+            return new BinaryContent(
+                    file.getBytes(),
+                    type
+            );
+        } catch (IOException e) {
+            throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
+        }
+    }
+
+    /**
+     * List<MultipartFile> + BinaryContentType → List<BinaryContent> 변환
+     */
+    public List<BinaryContent> toEntities(
+            List<MultipartFile> files,
+            BinaryContentType type
+    ) {
+        return files.stream()
+                .filter(file -> file != null && !file.isEmpty())
+                .map(file -> toEntity(file, type))
+                .toList();
+    }
+
+    /**
      * BinaryContent → BinaryContentResponseDto 변환
      */
     public BinaryContentResponseDto toDto(BinaryContent binaryContent) {
@@ -42,7 +71,7 @@ public class BinaryContentMapper {
     /**
      * BinaryContent → BinaryContentResponseDto를 리스트로 변환
      */
-    public List<BinaryContentResponseDto> toDtoList(List<BinaryContent> binaryContents) {
+    public List<BinaryContentResponseDto> toDtos(List<BinaryContent> binaryContents) {
         return binaryContents.stream()
                 .map(this::toDto)
                 .toList();
