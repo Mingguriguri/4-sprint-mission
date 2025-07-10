@@ -6,3 +6,12 @@ discodeit:
   repository:
     type: file
     file-directory: data/discodeit
+
+springdoc:
+  override-with-generic-response: true
+  default-consumes-media-type: application/json # 소비 미디어 타입
+  default-produces-media-type: application/json # 생산 미디어 타입
+  swagger-ui:
+    operations-sorter: method # operations 정렬 방식은 HTTP Method 순 (메서드 순서 delete - get - patch - post - put)
+    tags-sorter: alpha    # tag 정렬 방식은 알파벳 순
+    path: "swagger.html"  # http://localhost:8080/swagger.html로 접속 가능
