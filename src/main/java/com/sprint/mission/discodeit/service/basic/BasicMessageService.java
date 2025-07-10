@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.FileAccessException;
@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
@@ -39,7 +40,7 @@ public class BasicMessageService implements MessageService {
 
         Message message = messageMapper.toEntity(createMessageDto);
         try {
-            handleAttachments(message, createMessageDto.getAttachments());
+            handleAttachments(message, createMessageDto.getAttachments(), createMessageDto.getAttachmentType());
         } catch (IOException e) {
             // 트랜잭션시 롤백을 고려해서 RuntimeException을 상속받은 FileAccessException 형태로 예외 전환해서 던지도록 설정했습니다.
             throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
@@ -64,12 +65,12 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageResponseDto update(MessageUpdateDto updateMessageDto) {
         Message message = requireMessage(updateMessageDto.getId());
-
-        List<BinaryContentCreateDto> atts = updateMessageDto.getAttachments();
-        if (atts != null && !atts.isEmpty()) {
+        List<MultipartFile> files = updateMessageDto.getAttachments();
+        BinaryContentType type   = updateMessageDto.getAttachmentType();
+        if (files != null && !files.isEmpty() && type != null) {
             deleteExistingAttachments(message);
             try {
-                handleAttachments(message, atts);
+                handleAttachments(message, files, type);
             } catch (IOException e) {
                 // 트랜잭션시 롤백을 고려해서 RuntimeException을 상속받은 FileAccessException 형태로 예외 전환해서 던지도록 설정했습니다.
                 throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
@@ -142,16 +143,27 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
-    private void handleAttachments(Message message, List<BinaryContentCreateDto> attachments) throws IOException {
-        if (attachments == null || attachments.isEmpty()) {
+    /**
+     * MultipartFile 목록과 타입을 받아 아래 과정을 수행합니다.
+     * 1) mapper.toEntitys() 로 BinaryContent 리스트 생성
+     * 2) saveAll()로 배치 저장
+     * 3) 생성된 ID 목록을 message 에 설정
+     * @param message 메시지 객체
+     * @param attachments 파일 리스트
+     * @param attachmentType 파일 유형(MESSAGE)
+     * @return 메시지 객체의 attachmentIds 리스트를 반환
+     */
+    private void handleAttachments(Message message,
+                                   List<MultipartFile> attachments,
+                                   BinaryContentType attachmentType) throws IOException {
+        if (attachments == null || attachments.isEmpty() || attachmentType == null) {
             return;
         }
-        List<UUID> ids = new ArrayList<>();
-        for (BinaryContentCreateDto bcDto : attachments) {
-            BinaryContent bc = binaryContentMapper.toEntity(bcDto);
-            binaryContentRepository.save(bc);
-            ids.add(bc.getId());
-        }
+        List<BinaryContent> entities = binaryContentMapper.toEntities(attachments, attachmentType);
+        List<BinaryContent> saved = binaryContentRepository.saveAll(entities);
+        List<UUID> ids = saved.stream()
+                .map(BinaryContent::getId)
+                .toList();
         message.changeAttachmentIds(ids);
     }
 

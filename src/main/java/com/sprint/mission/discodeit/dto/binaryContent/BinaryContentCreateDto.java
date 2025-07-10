@@ -14,6 +14,6 @@ public class BinaryContentCreateDto {
     @NotNull
     private BinaryContentType type;
 
-    @Schema(description = "바이너리 파일")
+    @Schema(description="바이너리 파일", type="string", format="binary")
     private MultipartFile file;
 }
