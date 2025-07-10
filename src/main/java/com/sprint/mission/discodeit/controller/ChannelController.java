@@ -23,26 +23,31 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/*
+ * 기존: /v1/channels, PathVariable: channel-id
+ * 요구사항: /api/channels, PathVariable: channelId
+ * 요구사항에 맞춰 변경하였습니다.
+ */
 @RestController
-@RequestMapping("/v1/channels")
+@RequestMapping("/api/channels")
 @RequiredArgsConstructor
 @Tag(name = "🚪Channel", description = "채널 관련 API")
 public class ChannelController {
     private final ChannelService channelService;
 
-    @PostMapping
-    @Operation(summary = "채널 생성", description = "channel-type에 따라 비공개 채널 또는 공개 채널을 생성합니다.",
-            parameters = @Parameter(name = "channel-type", in = ParameterIn.QUERY, description = "채널 타입",
-                    schema = @Schema(type = "string", allowableValues = {"PUBLIC", "PRIVATE"})
-            ),
+    /*
+    * 기존: POST /v1/channels => body의 channel-type 값에 따라 분기 처리하여 비공개/공개 채널 생성
+    * 요구사항: POST /api/channels/private, POST /api/channels/public => 핸들러 메서드 분리하여 채널 생성
+    * */
+    @PostMapping("/public")
+    @Operation(summary = "공개 채널 생성", description = "공개 채널을 생성합니다.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "채널 생성 DTO (PUBLIC인 경우 type/name/description, PRIVATE인 경우 type/userId/otherUserId)",
+                    description = "PUBLIC 채널 생성 DTO (type/name/description)",
                     required = true,
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ChannelCreateDto.class),
-                            examples = {
-                                    @ExampleObject(
+                            examples = @ExampleObject(
                                             name    = "PUBLIC 생성 예시",
                                             summary = "공개 채널 생성",
                                             value   = """
@@ -52,27 +57,14 @@ public class ChannelController {
                                                           "description": "공지를 하는 채널입니다."
                                                         }
                                                       """
-                                    ),
-                                    @ExampleObject(
-                                            name    = "PRIVATE 생성 예시",
-                                            summary = "비공개 채널 생성",
-                                            value   = """
-                                                        {
-                                                          "type": "PRIVATE",
-                                                          "userId": "55e3a449-2c32-4432-8d0d-28620130a8af",
-                                                          "otherUserId": "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a"
-                                                        }
-                                                      """
                                     )
-                            }
                     )
             )
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "정상적으로 생성되었습니다",
                     content = @Content(
-                            examples = {
-                                    @ExampleObject(
+                            examples = @ExampleObject(
                                             name = "Success Example(PUBLIC)",
                                             summary = "공개 채널 생성 성공 예시",
                                             value = """
@@ -92,29 +84,7 @@ public class ChannelController {
                                                         "timestamp": "2025-07-09T17:11:00.361902"
                                                     }
                                             """
-                                    ),
-                                    @ExampleObject(
-                                            name = "Success Example(PRIVATE)",
-                                            summary = "비공개 채널 성공 예시",
-                                            value = """
-                                                    {
-                                                        "success": true,
-                                                        "code": 201,
-                                                        "message": "요청이 성공적으로 처리되었습니다.",
-                                                        "data": {
-                                                            "id": "67b4d79c-d813-4e9a-905d-2cd29d190bf6",
-                                                            "type": "PRIVATE",
-                                                            "name": null,
-                                                            "description": null,
-                                                            "userId": "ad2343a0-a8ff-47d7-94cb-03681dbff078",
-                                                            "otherUserId": "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a",
-                                                            "lastMessageSentAt": "2025-07-09T08:11:38.417692Z"
-                                                        },
-                                                        "timestamp": "2025-07-09T17:11:38.429442"
-                                                    }
-                                            """
                                     )
-                            }
                     )),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다",
                     content = @Content(
@@ -148,27 +118,90 @@ public class ChannelController {
                             }
                     ))
     })
-    public ResponseEntity<CommonResponse<ChannelResponseDto>> createChannel(@RequestBody @Valid ChannelCreateDto dto) {
-        ChannelResponseDto created = new ChannelResponseDto();
-        switch (dto.getType()) {
-            case PUBLIC:
-                created = channelService.createPublicChannel(dto);
-            break;
-            case PRIVATE:
-                created = channelService.createPrivateChannel(dto);
-                break;
-            default:
-                break;
-        }
+    public ResponseEntity<CommonResponse<ChannelResponseDto>> createPublicChannel(@RequestBody @Valid ChannelCreateDto dto) {
+        ChannelResponseDto created = channelService.createPublicChannel(dto);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(CommonResponse.success(HttpStatus.CREATED, created));
+    }
+
+    @PostMapping("/private")
+    @Operation(summary = "비공개 채널 생성", description = "비공개 채널을 생성합니다.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "비공개 채널 생성 DTO (type/userId/otherUserId)",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ChannelCreateDto.class),
+                            examples = @ExampleObject(
+                                            name    = "PRIVATE 생성 예시",
+                                            summary = "비공개 채널 생성",
+                                            value   = """
+                                                        {
+                                                          "type": "PRIVATE",
+                                                          "userId": "55e3a449-2c32-4432-8d0d-28620130a8af",
+                                                          "otherUserId": "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a"
+                                                        }
+                                                      """
+                                    )
+                    )
+            )
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "정상적으로 생성되었습니다",
+                    content = @Content(
+                            examples = @ExampleObject(
+                                            name = "Success Example(PRIVATE)",
+                                            summary = "비공개 채널 성공 예시",
+                                            value = """
+                                                    {
+                                                        "success": true,
+                                                        "code": 201,
+                                                        "message": "요청이 성공적으로 처리되었습니다.",
+                                                        "data": {
+                                                            "id": "67b4d79c-d813-4e9a-905d-2cd29d190bf6",
+                                                            "type": "PRIVATE",
+                                                            "name": null,
+                                                            "description": null,
+                                                            "userId": "ad2343a0-a8ff-47d7-94cb-03681dbff078",
+                                                            "otherUserId": "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a",
+                                                            "lastMessageSentAt": "2025-07-09T08:11:38.417692Z"
+                                                        },
+                                                        "timestamp": "2025-07-09T17:11:38.429442"
+                                                    }
+                                            """
+                                    )
+                    )),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다",
+                    content = @Content(
+                            examples = {
+                                    @ExampleObject(
+                                            name    = "BadRequest - 유효성 검증 실패",
+                                            summary = "필드 유효성 검사에 실패한 경우",
+                                            value   = """
+                                                            {
+                                                              "success": false,
+                                                              "code": 400,
+                                                              "message": "Bad Request Exception",
+                                                              "data": "Public 채널 생성 시 name 이 필요합니다.",
+                                                              "timestamp": "2025-07-09T17:16:31.902853"
+                                                            }
+                                                      """
+                                    )
+                            }
+                    ))
+    })
+    public ResponseEntity<CommonResponse<ChannelResponseDto>> createPrivateChannel(@RequestBody @Valid ChannelCreateDto dto) {
+        ChannelResponseDto created = channelService.createPrivateChannel(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(CommonResponse.success(HttpStatus.CREATED, created));
     }
 
     @GetMapping
-    @Operation(summary = "채널 목록 조회", description = "유저 아이디(user-id)가 참여하고 있는 전체 채널을 조회합니다.",
+    @Operation(summary = "채널 목록 조회", description = "유저 아이디(userId)가 참여하고 있는 전체 채널을 조회합니다.",
             parameters = @Parameter(
-                    name        = "user-id",
+                    name        = "userId",
                     in          = ParameterIn.HEADER,
                     description = "사용자 ID (UUID)",
                     required    = true,
@@ -233,7 +266,7 @@ public class ChannelController {
                                             """
                             )
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 사용자(user-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 사용자(userId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
@@ -250,7 +283,7 @@ public class ChannelController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<AllChannelByUserIdResponseDto>> getChannels(@RequestHeader(name = "user-id") UUID userId) {
+    public ResponseEntity<CommonResponse<AllChannelByUserIdResponseDto>> getChannels(@RequestHeader(name = "userId") UUID userId) {
         return ResponseEntity
                 .ok(CommonResponse.success(HttpStatus.OK, channelService.findAllByUserId(userId)));
     }
@@ -259,18 +292,18 @@ public class ChannelController {
      * 채널 ID로 단일 조회는 요구사항에 없었지만 추가해놓았습니다.
      * userId의 경우, 헤더로부터 전달받습니다. (추후 JWT 와 같은 토큰과 같은 용도라고 보시면 좋을 것 같습니다)
      */
-    @GetMapping("/{channel-id}")
-    @Operation(summary = "채널 단일 조회", description = "채널 아이디(channel-id)로 채널을 단일 조회합니다.",
+    @GetMapping("/{channelId}")
+    @Operation(summary = "채널 단일 조회", description = "채널 아이디(channelId)로 채널을 단일 조회합니다.",
             parameters = {
                 @Parameter(
-                        name        = "channel-id",
+                        name        = "channelId",
                         in          = ParameterIn.PATH,
                         description = "채널 ID (UUID)",
                         required    = true,
                         example     = "8fba4d61-84c2-4d84-9808-ded529f5ecca"
                 ),
                 @Parameter(
-                        name        = "user-id",
+                        name        = "userId",
                         in          = ParameterIn.HEADER,
                         description = "사용자 ID (UUID)",
                         required    = true,
@@ -303,7 +336,7 @@ public class ChannelController {
                                             """
                             )
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 채널(channel-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 채널(channelId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
@@ -320,16 +353,16 @@ public class ChannelController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<ChannelResponseDto>> getChannel(@PathVariable("channel-id") UUID channelId,
-                                                                         @RequestHeader("user-id") UUID userId) {
+    public ResponseEntity<CommonResponse<ChannelResponseDto>> getChannel(@PathVariable("channelId") UUID channelId,
+                                                                         @RequestHeader("userId") UUID userId) {
         return ResponseEntity
                 .ok(CommonResponse.success(HttpStatus.OK, channelService.find(channelId, userId)));
     }
 
-    @PutMapping("/{channel-id}")
-    @Operation(summary = "채널 수정", description = "채널 아이디(channel-id)로 채널을 수정합니다.",
+    @PatchMapping("/{channelId}")
+    @Operation(summary = "채널 부분 수정", description = "채널 아이디(channelId)에 해당하는 채널을 부분적으로 수정합니다.",
             parameters = @Parameter(
-                    name        = "channel-id",
+                    name        = "channelId",
                     in          = ParameterIn.PATH,
                     description = "채널 ID (UUID)",
                     required    = true,
@@ -406,7 +439,7 @@ public class ChannelController {
                                     )
                             }
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 채널(channel-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 채널(channelId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
@@ -423,16 +456,16 @@ public class ChannelController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<ChannelResponseDto>> updateChannel(@Parameter(name = "channel-id", in = ParameterIn.PATH, description = "채널 ID")
-                                                                @PathVariable("channel-id") UUID channelId,
+    public ResponseEntity<CommonResponse<ChannelResponseDto>> updateChannel(@PathVariable("channelId") UUID channelId,
                                                           @RequestBody @Valid ChannelUpdateDto dto) {
-        return ResponseEntity.ok(CommonResponse.success(HttpStatus.OK, channelService.update(dto)));
+        ChannelResponseDto updated = channelService.update(channelId, dto);
+        return ResponseEntity.ok(CommonResponse.success(HttpStatus.OK, updated));
     }
 
-    @DeleteMapping("/{channel-id}")
-    @Operation(summary = "채널 삭제", description = "채널 아이디(channel-id)로 채널을 삭제합니다.",
+    @DeleteMapping("/{channelId}")
+    @Operation(summary = "채널 삭제", description = "채널 아이디(channelId)로 채널을 삭제합니다.",
             parameters = @Parameter(
-                        name        = "channel-id",
+                        name        = "channelId",
                         in          = ParameterIn.PATH,
                         description = "채널 ID (UUID)",
                         required    = true,
@@ -448,7 +481,7 @@ public class ChannelController {
                                     value = ""
                             )
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 채널(channel-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 채널(channelId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
@@ -465,8 +498,8 @@ public class ChannelController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<Void>> deleteChannel(@Parameter(name = "channel-id", in = ParameterIn.PATH, description = "채널 ID")
-                                                                @PathVariable("channel-id") UUID channelId) {
+    public ResponseEntity<CommonResponse<Void>> deleteChannel(@Parameter(name = "channelId", in = ParameterIn.PATH, description = "채널 ID")
+                                                                @PathVariable("channelId") UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

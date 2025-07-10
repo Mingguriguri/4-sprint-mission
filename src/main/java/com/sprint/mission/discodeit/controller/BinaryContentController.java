@@ -22,18 +22,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/*
+ * 기존: /v1/binary-contents, PathVariable: binary-content-id
+ * 요구사항: /api/binaryContents, PathVariable: binaryContentId
+ * 요구사항에 맞춰 변경하였습니다.
+ */
 @RestController
-@RequestMapping("/v1/binary-contents")
+@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
 @Tag(name = "🖇️ Binary Content", description = "Binary Content 관련 API")
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
     // 단일 조회
-    @GetMapping( "/{binary-content-id}")
+    @GetMapping( "/{binaryContentId}")
     @Operation(summary = "바이너리 컨텐츠 단일 조회", description = "바이너리 컨텐츠를 1개 조회합니다.",
             parameters = @Parameter(
-                    name        = "binary-content-id",
+                    name        = "binaryContentId",
                     in          = ParameterIn.PATH,
                     description = "바이너리 컨텐츠 ID (UUID)",
                     required    = true,
@@ -61,11 +66,11 @@ public class BinaryContentController {
                                             """
                             )
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 바이너리 컨텐츠(binary-content-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
-                                    summary = "NotFound - 해당 바이너리 컨텐츠(binary-content-id)가 존재하지 않은 경우 예시",
+                                    summary = "NotFound - 해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않은 경우 예시",
                                     value = """
                                                 {
                                                     "success": false,
@@ -78,7 +83,7 @@ public class BinaryContentController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<BinaryContentResponseDto>> getBinaryContent(@PathVariable("binary-content-id") UUID binaryContentId) {
+    public ResponseEntity<CommonResponse<BinaryContentResponseDto>> getBinaryContent(@PathVariable("binaryContentId") UUID binaryContentId) {
         return ResponseEntity.ok(CommonResponse.success(
                 HttpStatus.OK,
                 binaryContentService.find(binaryContentId)
@@ -89,10 +94,10 @@ public class BinaryContentController {
     @GetMapping
     @Operation(
             summary     = "바이너리 컨텐츠 여러 개 조회",
-            description = "쉼표(,) 로 구분된 binary-content-ids 쿼리 파라미터를 받아 여러 건을 조회합니다.",
+            description = "쉼표(,) 로 구분된 binaryContentIds 쿼리 파라미터를 받아 여러 건을 조회합니다.",
             parameters = {
                     @Parameter(
-                            name = "binary-content-ids",
+                            name = "binaryContentIds",
                             in   = ParameterIn.QUERY,
                             description = "검색할 바이너리 컨텐츠 ID 목록 (UUID)",
                             required = true,
@@ -136,11 +141,11 @@ public class BinaryContentController {
                                             """
                             )
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 바이너리 컨텐츠(binary-content-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
-                                    summary = "NotFound - 해당 바이너리 컨텐츠(binary-content-id)가 존재하지 않은 경우 예시",
+                                    summary = "NotFound - 해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않은 경우 예시",
                                     value = """
                                                 {
                                                     "success": false,
@@ -153,7 +158,7 @@ public class BinaryContentController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<List<BinaryContentResponseDto>>> getBinaryContents(@RequestParam("binary-content-ids") List<UUID> binaryContentIds) {
+    public ResponseEntity<CommonResponse<List<BinaryContentResponseDto>>> getBinaryContents(@RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
         return ResponseEntity.ok(CommonResponse.success(
                 HttpStatus.OK,
                 binaryContentService.findAllByIdIn(binaryContentIds)
@@ -163,10 +168,10 @@ public class BinaryContentController {
     /*
      * DELETE 는 요구사항에 없었지만 추가해놓았습니다
      */
-    @DeleteMapping("/{binary-content-id}")
+    @DeleteMapping("/{binaryContentId}")
     @Operation(summary = "바이너리 컨텐츠 삭제", description = "바이너리 컨텐츠를 삭제합니다.",
             parameters = @Parameter(
-                    name        = "binary-content-id",
+                    name        = "binaryContentId",
                     in          = ParameterIn.PATH,
                     description = "바이너리 컨텐츠 ID (UUID)",
                     required    = true,
@@ -198,11 +203,11 @@ public class BinaryContentController {
                                             """
                             )
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 바이너리 컨텐츠(binary-content-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
-                                    summary = "NotFound - 해당 바이너리 컨텐츠(binary-content-id)가 존재하지 않은 경우 예시",
+                                    summary = "NotFound - 해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않은 경우 예시",
                                     value = """
                                                 {
                                                     "success": false,
@@ -215,8 +220,8 @@ public class BinaryContentController {
                             )
                     ))
     })
-    public ResponseEntity<BinaryContentResponseDto> deleteBinaryContent(@Parameter(name = "binary-content-id", in = ParameterIn.PATH, description = "바이너리 컨텐츠 ID")
-                                                                            @PathVariable("binary-content-id") UUID binaryContentId) {
+    public ResponseEntity<BinaryContentResponseDto> deleteBinaryContent(@Parameter(name = "binaryContentId", in = ParameterIn.PATH, description = "바이너리 컨텐츠 ID")
+                                                                            @PathVariable("binaryContentId") UUID binaryContentId) {
         binaryContentService.delete(binaryContentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

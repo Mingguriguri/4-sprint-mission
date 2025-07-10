@@ -25,8 +25,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/*
+ * 기존: /v1/users, PathVariable: user-id
+ * 요구사항: /api/users, PathVariable: userId
+ * 요구사항에 맞춰 변경하였습니다.
+ */
 @RestController
-@RequestMapping("/v1/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Tag(name = "🙂 User", description = "사용자 관련 API")
 public class UserController {
@@ -195,10 +200,10 @@ public class UserController {
         return ResponseEntity.ok(CommonResponse.success(HttpStatus.OK, userService.findAll()));
     }
 
-    @GetMapping("/{user-id}")
-    @Operation(summary = "특정 사용자 조회", description = "특정 사용자(user-id)를 단일 조회합니다.",
+    @GetMapping("/{userId}")
+    @Operation(summary = "특정 사용자 조회", description = "특정 사용자(userId)를 단일 조회합니다.",
             parameters = @Parameter(
-                            name = "user-id",
+                            name = "userId",
                             in  = ParameterIn.PATH,
                             description = "사용자 ID (UUID)",
                             required = true,
@@ -230,11 +235,11 @@ public class UserController {
                                             """
                             )
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 사용자(user-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 사용자(userId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
-                                    summary = "NotFound - 해당 사용자(user-id)가 존재하지 않은 경우 예시",
+                                    summary = "NotFound - 해당 사용자(userId)가 존재하지 않은 경우 예시",
                                     value = """
                                                 {
                                                     "success": false,
@@ -247,17 +252,17 @@ public class UserController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<UserResponseDto>> getUser(@PathVariable("user-id") UUID userId) {
+    public ResponseEntity<CommonResponse<UserResponseDto>> getUser(@PathVariable("userId") UUID userId) {
         return ResponseEntity.ok(CommonResponse.success(HttpStatus.OK, userService.find(userId)));
     }
 
 
-    @PutMapping("/{user-id}")
+    @PatchMapping("/{userId}")
     @Operation(
-            summary = "특정 사용자 수정",
-            description = "JSON DTO + 프로필 이미지(바이너리)를 동시에 업로드하여 특정 사용자(user-id)를 수정합니다.",
+            summary = "사용자 부분 수정",
+            description = "JSON DTO + 프로필 이미지(바이너리)를 업로드하여 특정 사용자(userId)를 부분적으로 수정합니다.",
             parameters = @Parameter(
-                    name = "user-id",
+                    name = "userId",
                     in = ParameterIn.PATH,
                     description = "사용자 ID",
                     required = true,
@@ -340,7 +345,7 @@ public class UserController {
                                     )
                             }
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 사용자(user-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 사용자(userId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
@@ -373,15 +378,16 @@ public class UserController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<UserResponseDto>> updateUser(@PathVariable("user-id") UUID userId,
-                                                      @ModelAttribute @Valid  UserUpdateDto dto) {
-        return ResponseEntity.ok(CommonResponse.success(HttpStatus.OK, userService.update(dto)));
+    public ResponseEntity<CommonResponse<UserResponseDto>> updateUser(@PathVariable("userId") UUID userId,
+                                                      @ModelAttribute  UserUpdateDto dto) {
+        return ResponseEntity.ok(CommonResponse.success(HttpStatus.OK, userService.update(userId, dto)));
     }
 
-    @PatchMapping("/{user-id}/userstatus")
-    @Operation(summary = "사용자의 접속 시간 업데이트", description = "특정 사용자(user-id)의 마지막으로 확인된 접속 시간을 업데이트합니다.",
+
+    @PatchMapping("/{userId}/userStatus")
+    @Operation(summary = "사용자의 접속 시간 업데이트", description = "특정 사용자(userId)의 마지막으로 확인된 접속 시간을 업데이트합니다.",
             parameters = @Parameter(
-                            name = "user-id",
+                            name = "userId",
                             in = ParameterIn.PATH,
                             description = "사용자 ID (UUID)",
                             required = true,
@@ -413,7 +419,7 @@ public class UserController {
                                             """
                             )
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 사용자(user-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 사용자(userId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
@@ -430,16 +436,16 @@ public class UserController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<UserResponseDto>> touchOnline(@PathVariable("user-id") UUID userId) {
+    public ResponseEntity<CommonResponse<UserResponseDto>> touchOnline(@PathVariable("userId") UUID userId) {
         userStatusService.updateByUserId(userId);
         UserResponseDto response = userService.find(userId);
         return ResponseEntity.ok(CommonResponse.success(HttpStatus.OK, response));
     }
 
-    @DeleteMapping("/{user-id}")
-    @Operation(summary = "특정 사용자 삭제", description = "특장 사용자(user-id)를 삭제합니다",
+    @DeleteMapping("/{userId}")
+    @Operation(summary = "특정 사용자 삭제", description = "특장 사용자(userId)를 삭제합니다",
             parameters = @Parameter(
-                            name = "user-id",
+                            name = "userId",
                             in = ParameterIn.PATH,
                             description = "사용자 ID (UUID)",
                             required = true,
@@ -455,7 +461,7 @@ public class UserController {
                                     value = ""
                             )
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 사용자(user-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 사용자(userId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
@@ -472,7 +478,7 @@ public class UserController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<Void>> deleteUser(@PathVariable("user-id") UUID userId) {
+    public ResponseEntity<CommonResponse<Void>> deleteUser(@PathVariable("userId") UUID userId) {
         userService.delete(userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

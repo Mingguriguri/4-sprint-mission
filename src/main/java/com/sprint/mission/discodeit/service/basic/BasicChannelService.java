@@ -80,13 +80,19 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto update(ChannelUpdateDto channelUpdateDto) {
-        Channel channel = requirePublicChannel(channelUpdateDto.getId());
-        String newName = channelUpdateDto.getName();
+    public ChannelResponseDto update(UUID channelId, ChannelUpdateDto dto) {
+        Channel channel = requirePublicChannel(channelId);
+        // name 이 변경된 경우만
+        String newName = dto.getName();
         if (newName != null && !newName.equalsIgnoreCase(channel.getName())) {
-            validateUniqueName(newName);
+            validateUniqueName(dto.getName());
+            channel.updateName(dto.getName());
         }
-        channelMapper.updateEntity(channelUpdateDto, channel);
+        // description 이 들어왔으면
+        if (dto.getDescription() != null) {
+            channel.updateDescription(dto.getDescription());
+        }
+        channelMapper.updateEntity(dto, channel);
         channelRepository.save(channel);
         return channelMapper.toDto(channel, null, null);
     }

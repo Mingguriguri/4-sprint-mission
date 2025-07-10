@@ -12,6 +12,6 @@ public interface MessageService {
     MessageResponseDto create(MessageCreateDto createMessageRequestDto);
     MessageResponseDto find(UUID messageId);
     List<MessageResponseDto> findAllByChannelId(UUID channelId);
-    MessageResponseDto update(MessageUpdateDto updateMessageDto);
+    MessageResponseDto update(UUID messageId, MessageUpdateDto updateMessageDto);
     void delete(UUID messageId);
 }

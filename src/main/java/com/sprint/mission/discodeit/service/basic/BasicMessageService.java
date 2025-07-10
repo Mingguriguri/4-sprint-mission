@@ -63,8 +63,8 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageResponseDto update(MessageUpdateDto updateMessageDto) {
-        Message message = requireMessage(updateMessageDto.getId());
+    public MessageResponseDto update(UUID messageId, MessageUpdateDto updateMessageDto) {
+        Message message = requireMessage(messageId);
         List<MultipartFile> files = updateMessageDto.getAttachments();
         BinaryContentType type   = updateMessageDto.getAttachmentType();
         if (files != null && !files.isEmpty() && type != null) {

@@ -17,14 +17,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+/*
+ * 기존: /v1/login
+ * 요구사항: /api/auth/login
+ * 요구사항에 맞춰 변경하였습니다.
+ */
 @RestController
-@RequestMapping("/v1/login")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Tag(name = "🔐 Login", description = "사용자 로그인 관련 API")
 public class AuthController {
     private final AuthService authService;
 
-    @PostMapping
+    @PostMapping("/login")
     @Operation(summary = "로그인", description = "email과 password로 로그인")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "정상적으로 로그인되었습니다",

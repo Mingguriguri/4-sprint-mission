@@ -75,23 +75,15 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto update(UserUpdateDto requestDto) {
-        User existingUser = requireUser(requestDto.getId());
-
-        // 변경된 경우에만 중복체크
-        if (!existingUser.getUsername().equals(requestDto.getUsername())) {
-            validateExistUsername(requestDto.getUsername());
-        }
-        if (!existingUser.getEmail().equals(requestDto.getEmail())) {
-            validateExistEmail(requestDto.getEmail());
-        }
+    public UserResponseDto update(UUID userId, UserUpdateDto dto) {
+        User existingUser = requireUser(userId);
 
         try {
-            handleProfileImage(existingUser, requestDto.getImageFile(), requestDto.getImageType());
+            handleProfileImage(existingUser, dto.getImageFile(), dto.getImageType());
         } catch (IOException e) {
             throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
         }
-        userMapper.updateEntity(requestDto, existingUser);
+        userMapper.updateEntity(dto, existingUser);
         userRepository.save(existingUser);
         UserStatus userStatus = requireStatus(existingUser.getId());
 

@@ -24,8 +24,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+/*
+ * 기존: /v1/messages, PathVariable: message-id
+ * 요구사항: /api/messages, PathVariable: messageId
+ * 요구사항에 맞춰 변경하였습니다.
+ */
 @RestController
-@RequestMapping("/v1/messages")
+@RequestMapping("/api/messages")
 @RequiredArgsConstructor
 @Tag(name = "💬 Message", description = "메시지 관련 API")
 public class MessageController {
@@ -127,9 +132,9 @@ public class MessageController {
     }
 
     @GetMapping
-    @Operation(summary = "특정 채널의 메시지 전체 조회", description = "특정 채널(channel-id)의 메시지 목록을 전체 조회합니다.",
+    @Operation(summary = "특정 채널의 메시지 전체 조회", description = "특정 채널(channelId)의 메시지 목록을 전체 조회합니다.",
             parameters = @Parameter(
-                            name        = "channel-id",
+                            name        = "channelId",
                             in          = ParameterIn.QUERY,
                             description = "채널 ID (UUID)",
                             required    = true,
@@ -180,17 +185,17 @@ public class MessageController {
                     ))
     })
     public ResponseEntity<CommonResponse<List<MessageResponseDto>>> getMessages(
-                                                                    @RequestParam(name = "channel-id") UUID channelId) {
+                                                                    @RequestParam(name = "channeI") UUID channelId) {
         return ResponseEntity.ok(CommonResponse.success(HttpStatus.OK, messageService.findAllByChannelId(channelId)));
     }
 
     /*
      * 메시지 ID로 단일 조회는 요구사항에 없었지만 추가해놓았습니다
      */
-    @GetMapping("/{message-id}")
-    @Operation(summary = "메시지 단일 조회", description = "메시지 아이디(message-id)로 메시지를 단일 조회합니다.",
+    @GetMapping("/{messageId}")
+    @Operation(summary = "메시지 단일 조회", description = "메시지 아이디(messageId)로 메시지를 단일 조회합니다.",
             parameters = @Parameter(
-                    name = "message-id",
+                    name = "messageId",
                     in = ParameterIn.PATH,
                     description = "메시지 ID",
                     required = true,
@@ -222,7 +227,7 @@ public class MessageController {
                                             """
                             )
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 메시지(message-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 메시지(messageId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
@@ -239,16 +244,16 @@ public class MessageController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<MessageResponseDto>> getMessage(@PathVariable("message-id") UUID messageId) {
+    public ResponseEntity<CommonResponse<MessageResponseDto>> getMessage(@PathVariable("messageId") UUID messageId) {
         return ResponseEntity.ok(CommonResponse.success(HttpStatus.OK, messageService.find(messageId)));
     }
 
-    @PutMapping("/{message-id}")
+    @PatchMapping("/{messageId}")
     @Operation(
-            summary = "메시지 수정",
-            description = "JSON DTO + 이미지(바이너리)를 동시에 업로드하여 특정 메시지(message-id)를 수정합니다.",
+            summary = "메시지 부분 수정",
+            description = "JSON DTO + 이미지(바이너리)를 업로드하여 특정 메시지(messageId)를 부분적으로 수정합니다.",
             parameters = @Parameter(
-                    name = "message-id",
+                    name = "messageId",
                     in = ParameterIn.PATH,
                     description = "메시지 ID",
                     required = true,
@@ -315,7 +320,7 @@ public class MessageController {
                             )
 
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 메시지(message-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 메시지(messageId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
@@ -348,15 +353,15 @@ public class MessageController {
                             )
                     ))
     })
-    public ResponseEntity<CommonResponse<MessageResponseDto>> updateMessage(@PathVariable("message-id") UUID messageId,
-                                                  @ModelAttribute @Valid MessageUpdateDto dto) {
-        return ResponseEntity.ok(CommonResponse.success(HttpStatus.OK, messageService.update(dto)));
+    public ResponseEntity<CommonResponse<MessageResponseDto>> updateMessage(@PathVariable("messageId") UUID messageId,
+                                                  @ModelAttribute MessageUpdateDto dto) {
+        return ResponseEntity.ok(CommonResponse.success(HttpStatus.OK, messageService.update(messageId, dto)));
     }
 
-    @DeleteMapping("/{message-id}")
-    @Operation(summary = "메시지 삭제", description = "메시지 아이디(message-id)로 메시지를 삭제합니다.",
+    @DeleteMapping("/{messageId}")
+    @Operation(summary = "메시지 삭제", description = "메시지 아이디(messageId)로 메시지를 삭제합니다.",
             parameters = @Parameter(
-                    name = "message-id",
+                    name = "messageId",
                     in = ParameterIn.PATH,
                     description = "메시지 ID",
                     required = true,
@@ -372,7 +377,7 @@ public class MessageController {
                                     value = ""
                             )
                     )),
-            @ApiResponse(responseCode = "404", description = "해당 메시지(message-id)가 존재하지 않습니다",
+            @ApiResponse(responseCode = "404", description = "해당 메시지(messageId)가 존재하지 않습니다",
                     content = @Content(
                             examples = @ExampleObject(
                                     name = "NotFound Example",
@@ -389,7 +394,7 @@ public class MessageController {
                             )
                     ))
     })
-    public ResponseEntity<MessageResponseDto> deleteMessage(@PathVariable("message-id") UUID messageId) {
+    public ResponseEntity<MessageResponseDto> deleteMessage(@PathVariable("messageId") UUID messageId) {
         messageService.delete(messageId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

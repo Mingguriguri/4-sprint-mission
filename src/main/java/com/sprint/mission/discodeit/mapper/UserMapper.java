@@ -29,9 +29,15 @@ public class UserMapper {
      * UserUpdateDto → 기존 User 엔티티 덮어쓰기
      */
     public void updateEntity(UserUpdateDto dto, User user) {
-        if (dto.getUsername() != null) user.updateUsername(dto.getUsername());
-        if (dto.getEmail()    != null) user.updateEmail(dto.getEmail());
-        if (dto.getPassword() != null) user.updatePassword(dto.getPassword());
+        if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
+            user.updateUsername(dto.getUsername());
+        }
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            user.updateEmail(dto.getEmail());
+        }
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            user.updatePassword(dto.getPassword());
+        }
         user.touch();
     }
 
