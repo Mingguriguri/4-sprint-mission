@@ -57,6 +57,24 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
+    public List<BinaryContent> saveAll(List<BinaryContent> binaryContents) {
+        try {
+            Map<UUID, BinaryContent> all = readFromFile();
+
+            for (BinaryContent bc : binaryContents) {
+                all.put(bc.getId(), bc);
+            }
+            writeToFile(all);
+            return binaryContents;
+        } catch (IOException e) {
+            throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
+        } catch (ClassNotFoundException e) {
+            throw new FileAccessException(ErrorCode.FILE_CLASS_NOT_FOUND);
+        }
+    }
+
+
+    @Override
     public Optional<BinaryContent> findById(UUID id) {
         try {
             return Optional.of(readFromFile().get(id));
