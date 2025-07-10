@@ -59,7 +59,8 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     @Override
     public Optional<ReadStatus> findById(UUID id) {
         try {
-            return Optional.of(readFromFile().get(id));
+            ReadStatus rs = readFromFile().get(id);
+            return Optional.ofNullable(rs);
         } catch (IOException e) {
             throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
         } catch (ClassNotFoundException e) {
