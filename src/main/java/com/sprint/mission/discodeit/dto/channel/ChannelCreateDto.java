@@ -22,8 +22,8 @@ public class ChannelCreateDto {
     private String description;
 
     // PRIVATE 전용
-    @Schema(description = "[PRIVATE 전용] 사용자 ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    @Schema(description = "[PRIVATE 전용] 사용자 ID", example = "55e3a449-2c32-4432-8d0d-28620130a8af")
     private UUID userId;
-    @Schema(description = "[PRIVATE 전용] 상대방 ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    @Schema(description = "[PRIVATE 전용] 상대방 ID", example = "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a")
     private UUID otherUserId;
 }

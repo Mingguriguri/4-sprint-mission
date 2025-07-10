@@ -33,6 +33,6 @@ public class ChannelResponseDto {
     @Schema(description = "[PRIVATE 전용] 상대방 ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     private UUID otherUserId;
 
-    @Schema(description = "마지막으로 메시지를 보낸 시간", example = "2025-07-08T09:55:59.735Z")
+    @Schema(description = "[PRIVATE 전용] 마지막으로 메시지를 보낸 시간", example = "2025-07-08T09:55:59.735Z")
     private Instant lastMessageSentAt;
 }
