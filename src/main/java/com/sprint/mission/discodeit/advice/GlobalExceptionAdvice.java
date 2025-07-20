@@ -48,7 +48,6 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity handleBadRequest(IllegalArgumentException e) {
         ErrorCode code = ErrorCode.BAD_REQUEST_ERROR;
-        System.out.println("HERE");
         return ResponseEntity
                 .status(code.getStatusCode())
                 .body(CommonResponse.fail(code.getStatusCode(), code.getMessage(), e.getMessage()));
@@ -64,9 +63,9 @@ public class GlobalExceptionAdvice {
 
     // 나머지 예외 처리
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CommonResponse<Void>> handleAll(Exception e) {
+    public ResponseEntity<CommonResponse<String>> handleAll(Exception e) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(CommonResponse.fail(500, "알 수 없는 오류가 발생했습니다.", null));
+                .body(CommonResponse.fail(500, "알 수 없는 오류가 발생했습니다.", e.toString()));
     }
 }
