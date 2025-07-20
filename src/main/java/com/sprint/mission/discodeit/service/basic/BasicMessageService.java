@@ -34,13 +34,13 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentMapper binaryContentMapper;
 
     @Override
-    public MessageResponseDto create(MessageCreateDto createMessageDto) {
+    public MessageResponseDto create(MessageCreateDto createMessageDto, List<MultipartFile> attachments) {
         validateChannelExists(createMessageDto.getChannelId());
         validateAuthorExists(createMessageDto.getAuthorId());
 
         Message message = messageMapper.toEntity(createMessageDto);
         try {
-            handleAttachments(message, createMessageDto.getAttachments(), createMessageDto.getAttachmentType());
+            handleAttachments(message, attachments, BinaryContentType.MESSAGE);
         } catch (IOException e) {
             // 트랜잭션시 롤백을 고려해서 RuntimeException을 상속받은 FileAccessException 형태로 예외 전환해서 던지도록 설정했습니다.
             throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
@@ -52,7 +52,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageResponseDto find(UUID messageId) {
-        Message message =  requireMessage(messageId);
+        Message message = requireMessage(messageId);
         return messageMapper.toDto(message);
     }
 
@@ -66,7 +66,7 @@ public class BasicMessageService implements MessageService {
     public MessageResponseDto update(UUID messageId, MessageUpdateDto updateMessageDto) {
         Message message = requireMessage(messageId);
         List<MultipartFile> files = updateMessageDto.getAttachments();
-        BinaryContentType type   = updateMessageDto.getAttachmentType();
+        BinaryContentType type = updateMessageDto.getAttachmentType();
         if (files != null && !files.isEmpty() && type != null) {
             deleteExistingAttachments(message);
             try {
@@ -148,8 +148,9 @@ public class BasicMessageService implements MessageService {
      * 1) mapper.toEntitys() 로 BinaryContent 리스트 생성
      * 2) saveAll()로 배치 저장
      * 3) 생성된 ID 목록을 message 에 설정
-     * @param message 메시지 객체
-     * @param attachments 파일 리스트
+     *
+     * @param message        메시지 객체
+     * @param attachments    파일 리스트
      * @param attachmentType 파일 유형(MESSAGE)
      * @return 메시지 객체의 attachmentIds 리스트를 반환
      */

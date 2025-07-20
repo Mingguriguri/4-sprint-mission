@@ -34,12 +34,12 @@ public class BasicUserService implements UserService {
     private final BinaryContentMapper binaryContentMapper;
 
     @Override
-    public UserResponseDto create(UserCreateDto requestDto) {
+    public UserResponseDto create(UserCreateDto requestDto, MultipartFile profileImage) {
         validateCreate(requestDto);
         User createUser = userMapper.toEntity(requestDto);
 
         try {
-            handleProfileImage(createUser, requestDto.getImageFile(), requestDto.getImageType());
+            handleProfileImage(createUser, profileImage, BinaryContentType.PROFILE);
         } catch (IOException e) {
             // 트랜잭션시 롤백을 고려해서 RuntimeException을 상속받은 FileAccessException 형태로 예외 전환해서 던지도록 설정했습니다.
             throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
@@ -75,11 +75,11 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto update(UUID userId, UserUpdateDto dto) {
+    public UserResponseDto update(UUID userId, UserUpdateDto dto, MultipartFile profileImage) {
         User existingUser = requireUser(userId);
 
         try {
-            handleProfileImage(existingUser, dto.getImageFile(), dto.getImageType());
+            handleProfileImage(existingUser, profileImage, BinaryContentType.PROFILE);
         } catch (IOException e) {
             throw new FileAccessException(ErrorCode.FILE_IO_ERROR);
         }

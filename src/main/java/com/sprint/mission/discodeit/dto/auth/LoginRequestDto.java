@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class LoginUserDto {
+public class LoginRequestDto {
     @Schema(description = "사용자명", example = "mingguriguri")
     @NotBlank
     private String username;

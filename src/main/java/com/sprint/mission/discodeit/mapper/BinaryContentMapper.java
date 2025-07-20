@@ -21,6 +21,9 @@ public class BinaryContentMapper {
         try {
             return new BinaryContent(
                     dto.getFile().getBytes(),
+                    dto.getFile().getOriginalFilename(),
+                    dto.getFile().getContentType(),
+                    dto.getFile().getSize(),
                     dto.getType()
             );
         } catch (IOException e) {
@@ -36,6 +39,9 @@ public class BinaryContentMapper {
         try {
             return new BinaryContent(
                     file.getBytes(),
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getSize(),
                     type
             );
         } catch (IOException e) {
@@ -64,6 +70,9 @@ public class BinaryContentMapper {
                 binaryContent.getId(),
                 binaryContent.getBytes(),
                 binaryContent.getType(),
+                binaryContent.getFileName(),
+                binaryContent.getContentType(),
+                binaryContent.getSize(),
                 binaryContent.getCreatedAt()
         );
     }

@@ -2,12 +2,10 @@ package com.sprint.mission.discodeit.dto.channel;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -28,10 +26,9 @@ public class ChannelResponseDto {
     private String description;
 
     // PRIVATE 전용
-    @Schema(description = "[PRIVATE 전용] 사용자 ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
-    private UUID userId;
-    @Schema(description = "[PRIVATE 전용] 상대방 ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
-    private UUID otherUserId;
+    @Schema(description = "[PRIVATE 전용] 비공개 채널에 속한 사용자 ID 리스트",
+            example = "[\"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\"abcdef12-3456-7890-abcd-ef1234567890\"]")
+    private List<UUID> participantIds;
 
     @Schema(description = "[PRIVATE 전용] 마지막으로 메시지를 보낸 시간", example = "2025-07-08T09:55:59.735Z")
     private Instant lastMessageSentAt;

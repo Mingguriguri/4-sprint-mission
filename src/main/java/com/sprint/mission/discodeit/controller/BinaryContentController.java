@@ -1,21 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentResponseDto;
-import com.sprint.mission.discodeit.response.CommonResponse;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.Explode;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.enums.ParameterStyle;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,203 +14,30 @@ import java.util.UUID;
  * 기존: /v1/binary-contents, PathVariable: binary-content-id
  * 요구사항: /api/binaryContents, PathVariable: binaryContentId
  * 요구사항에 맞춰 변경하였습니다.
+ *
+ * CommonResponse를 만들고 스웨거 문서에 반영도 했습니다.
+ * 하지만 코드잇에서 주어진 API 스펙과 프론트엔드 코드와 맞지 않아 모두 제거했습니다.
+ * 그래서 CommonResponse가 쓰인 곳은 없지만, CommonResponse를 비롯한 에러를 담은 응답 코드에 대한 피드백을 받으면 좋을 것 같아서 함께 올립니다.
  */
 @RestController
 @RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
-@Tag(name = "🖇️ Binary Content", description = "Binary Content 관련 API")
-public class BinaryContentController {
+public class BinaryContentController implements BinaryContentApi {
     private final BinaryContentService binaryContentService;
 
     // 단일 조회
     @GetMapping( "/{binaryContentId}")
-    @Operation(summary = "바이너리 컨텐츠 단일 조회", description = "바이너리 컨텐츠를 1개 조회합니다.",
-            parameters = @Parameter(
-                    name        = "binaryContentId",
-                    in          = ParameterIn.PATH,
-                    description = "바이너리 컨텐츠 ID (UUID)",
-                    required    = true,
-                    example     = "f146d333-1cff-4db4-9e32-b45f6f207950"
-            ))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "정상적으로 조회되었습니다",
-                    content = @Content(
-                            examples = @ExampleObject(
-                                    name = "SuccessExample",
-                                    summary = "성공 예시",
-                                    value = """
-                                                {
-                                                    "success": true,
-                                                    "code": 200,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": {
-                                                        "id": "f146d333-1cff-4db4-9e32-b45f6f207950",
-                                                        "bytes": "/9j/2wCEAAEBAQEBAQEBAQECAQEBAgICAQECAg...kRRSIov/9k=",
-                                                        "type": "PROFILE",
-                                                        "createdAt": "2025-07-08T04:34:06.798136Z"
-                                                    },
-                                                    "timestamp": "2025-07-09T18:29:14.490449"
-                                                }
-                                            """
-                            )
-                    )),
-            @ApiResponse(responseCode = "404", description = "해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않습니다",
-                    content = @Content(
-                            examples = @ExampleObject(
-                                    name = "NotFound Example",
-                                    summary = "NotFound - 해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않은 경우 예시",
-                                    value = """
-                                                {
-                                                    "success": false,
-                                                    "code": 404,
-                                                    "message": "Not Found Exception",
-                                                    "data": "User with id 55e3a449-2c32-4432-8d0d-28620130a8af not found",
-                                                    "timestamp": "2025-07-09T16:18:18.43085"
-                                                }
-                                            """
-                            )
-                    ))
-    })
-    public ResponseEntity<CommonResponse<BinaryContentResponseDto>> getBinaryContent(@PathVariable("binaryContentId") UUID binaryContentId) {
-        return ResponseEntity.ok(CommonResponse.success(
-                HttpStatus.OK,
+    public ResponseEntity<BinaryContentResponseDto> getBinaryContent(@PathVariable("binaryContentId") UUID binaryContentId) {
+        return ResponseEntity.ok(
                 binaryContentService.find(binaryContentId)
-        ));
+        );
     }
 
     // 여러 개 조회
     @GetMapping
-    @Operation(
-            summary     = "바이너리 컨텐츠 여러 개 조회",
-            description = "쉼표(,) 로 구분된 binaryContentIds 쿼리 파라미터를 받아 여러 건을 조회합니다.",
-            parameters = {
-                    @Parameter(
-                            name = "binaryContentIds",
-                            in   = ParameterIn.QUERY,
-                            description = "검색할 바이너리 컨텐츠 ID 목록 (UUID)",
-                            required = true,
-                            schema = @Schema(
-                                    type  = "array",
-                                    // example 에는 JSON array 형태로라도 넣어주면 UI 상에 배열 예시가 뜹니다.
-                                    example = "[\"fe838953-90ef-4a77-89a6-27fa9a79203e\", \"216dbce6-b503-4cf0-aa3f-f71ff01ddf8b\"]"
-                            ),
-                            style   = ParameterStyle.FORM,
-                            explode = Explode.FALSE    // explode=false 이면 쉼표(CSV) 구분으로 인식
-                    )
-            }
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "정상적으로 조회되었습니다",
-                    content = @Content(
-                            examples = @ExampleObject(
-                                    name = "SuccessExample",
-                                    summary = "성공 예시",
-                                    value = """
-                                                {
-                                                    "success": true,
-                                                    "code": 200,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": [
-                                                        {
-                                                            "id": "fe838953-90ef-4a77-89a6-27fa9a79203e",
-                                                            "bytes": "/9j/4AAQSkZJRgABAQAAAQABAAD/...b7Lm7r/dC835URVkHD1/maP//Z",
-                                                            "type": "MESSAGE",
-                                                            "createdAt": "2025-07-09T09:08:31.852110Z"
-                                                        },
-                                                        {
-                                                            "id": "b85886e8-6608-4785-95af-3e539ceb369e",
-                                                            "bytes": "/9j/4AAQSkZJRgABAQAAAQABAAD/...AIVYICrmeQH+Q3CszhHLqCh7D/9k=",
-                                                            "type": "MESSAGE",
-                                                            "createdAt": "2025-07-09T09:08:31.859162Z"
-                                                        }
-                                                    ],
-                                                    "timestamp": "2025-07-09T18:30:16.61837"
-                                                }
-                                            """
-                            )
-                    )),
-            @ApiResponse(responseCode = "404", description = "해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않습니다",
-                    content = @Content(
-                            examples = @ExampleObject(
-                                    name = "NotFound Example",
-                                    summary = "NotFound - 해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않은 경우 예시",
-                                    value = """
-                                                {
-                                                    "success": false,
-                                                    "code": 404,
-                                                    "message": "Not Found Exception",
-                                                    "data": "User with id 55e3a449-2c32-4432-8d0d-28620130a8af not found",
-                                                    "timestamp": "2025-07-09T16:18:18.43085"
-                                                }
-                                            """
-                            )
-                    ))
-    })
-    public ResponseEntity<CommonResponse<List<BinaryContentResponseDto>>> getBinaryContents(@RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
-        return ResponseEntity.ok(CommonResponse.success(
-                HttpStatus.OK,
+    public ResponseEntity<List<BinaryContentResponseDto>> getBinaryContents(@RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+        return ResponseEntity.ok(
                 binaryContentService.findAllByIdIn(binaryContentIds)
-        ));
-    }
-
-    /*
-     * DELETE 는 요구사항에 없었지만 추가해놓았습니다
-     */
-    @DeleteMapping("/{binaryContentId}")
-    @Operation(summary = "바이너리 컨텐츠 삭제", description = "바이너리 컨텐츠를 삭제합니다.",
-            parameters = @Parameter(
-                    name        = "binaryContentId",
-                    in          = ParameterIn.PATH,
-                    description = "바이너리 컨텐츠 ID (UUID)",
-                    required    = true,
-                    example     = "3d7ac88a-4741-4a1a-9dec-875be29e6552"
-            )
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "정상적으로 삭제되었습니다",
-                    content = @Content(
-                            examples = @ExampleObject(
-                                    name = "SuccessExample",
-                                    summary = "성공 예시",
-                                    value = """
-                                                {
-                                                    "success": true,
-                                                    "code": 204,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": {
-                                                        "id": "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a",
-                                                        "username": "mingguriguri",
-                                                        "email": "minggurigrui@example.com",
-                                                        "profileId": null,
-                                                        "createdAt": "2025-07-08T04:31:21.124756Z",
-                                                        "updatedAt": "2025-07-08T04:31:21.124757Z",
-                                                        "online": true
-                                                    },
-                                                    "timestamp": "2025-07-09T18:18:00.968114"
-                                                }
-                                            """
-                            )
-                    )),
-            @ApiResponse(responseCode = "404", description = "해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않습니다",
-                    content = @Content(
-                            examples = @ExampleObject(
-                                    name = "NotFound Example",
-                                    summary = "NotFound - 해당 바이너리 컨텐츠(binaryContentId)가 존재하지 않은 경우 예시",
-                                    value = """
-                                                {
-                                                    "success": false,
-                                                    "code": 404,
-                                                    "message": "Not Found Exception",
-                                                    "data": "User with id 55e3a449-2c32-4432-8d0d-28620130a8af not found",
-                                                    "timestamp": "2025-07-09T16:18:18.43085"
-                                                }
-                                            """
-                            )
-                    ))
-    })
-    public ResponseEntity<BinaryContentResponseDto> deleteBinaryContent(@Parameter(name = "binaryContentId", in = ParameterIn.PATH, description = "바이너리 컨텐츠 ID")
-                                                                            @PathVariable("binaryContentId") UUID binaryContentId) {
-        binaryContentService.delete(binaryContentId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        );
     }
 }

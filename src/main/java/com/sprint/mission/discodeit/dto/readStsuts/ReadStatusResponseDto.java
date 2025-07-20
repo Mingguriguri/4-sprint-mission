@@ -23,4 +23,8 @@ public class ReadStatusResponseDto {
 
     @Schema(description = "채널 ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     private final UUID channelId;
+
+    private final Instant createdAt;
+
+    private final Instant updatedAt;
 }

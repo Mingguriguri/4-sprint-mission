@@ -5,12 +5,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.UUID;
+import java.time.Instant;
 
 @Getter
 @RequiredArgsConstructor
 public class ReadStatusUpdateDto {
-    @Schema(description = "읽음 상태(ReadStatus) ID", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    @Schema(description = "마지막으로 읽은 시간", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     @NotNull
-    private final UUID id;
+    private final Instant newLastReadAt;
 }

@@ -22,6 +22,15 @@ public class BinaryContentResponseDto {
     @Schema(description = "바이너리 컨텐츠 타입", example = "PROFILE")
     private final BinaryContentType type;
 
+    @Schema(description = "원본 파일명", example = "스크린샷.png")
+    private final String fileName;
+
+    @Schema(description = "콘텐츠 타입", example = "image/png")
+    private final String contentType;
+
+    @Schema(description = "파일 크기 (바이트)", example = "2989903")
+    private final long size;
+
     @Schema(description = "생성일", example = "2025-07-08T09:55:59.735Z")
     private final Instant createdAt;
 }
