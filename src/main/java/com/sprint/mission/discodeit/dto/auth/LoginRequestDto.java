@@ -8,11 +8,11 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class LoginRequestDto {
-    @Schema(description = "사용자명", example = "mingguriguri")
+    @Schema(description = "사용자명", example = "joy123")
     @NotBlank
     private String username;
 
-    @Schema(description = "비밀번호", example = "password123")
+    @Schema(description = "비밀번호", example = "12345678")
     @NotBlank
     private String password;
 }

@@ -10,7 +10,7 @@ import java.time.Instant;
 @Getter
 @RequiredArgsConstructor
 public class ReadStatusUpdateDto {
-    @Schema(description = "마지막으로 읽은 시간", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    @Schema(description = "마지막으로 읽은 시간", example = "2025-07-20T15:57:48.774Z")
     @NotNull
     private final Instant newLastReadAt;
 }

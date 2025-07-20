@@ -25,7 +25,7 @@ public interface BinaryContentApi {
                     in          = ParameterIn.PATH,
                     description = "조회할 첨부파일 ID (UUID)",
                     required    = true,
-                    example     = "f146d333-1cff-4db4-9e32-b45f6f207950"
+                    example     = "7cbe0d73-b1b6-4aca-9006-6c047c2c8b68"
             ))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "정상적으로 조회되었습니다",
@@ -35,17 +35,14 @@ public interface BinaryContentApi {
                                     summary = "성공 예시",
                                     value = """
                                                 {
-                                                    "success": true,
-                                                    "code": 200,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": {
-                                                        "id": "f146d333-1cff-4db4-9e32-b45f6f207950",
-                                                        "bytes": "/9j/2wCEAAEBAQEBAQEBAQECAQEBAgICAQECAg...kRRSIov/9k=",
-                                                        "type": "PROFILE",
-                                                        "createdAt": "2025-07-08T04:34:06.798136Z"
-                                                    },
-                                                    "timestamp": "2025-07-09T18:29:14.490449"
-                                                }
+                                                     "id": "9682efac-93bb-4975-9ca7-ed566580f466",
+                                                     "bytes": "iVBORw0KGgoAAAANSUhE...AAJZCAYAAADmqEFvAA",
+                                                     "type": "MESSAGE",
+                                                     "fileName": "joy.png",
+                                                     "contentType": "image/png",
+                                                     "size": 335919,
+                                                     "createdAt": "2025-07-20T14:28:57.320479Z"
+                                                 }
                                             """
                             )
                     )),
@@ -80,7 +77,7 @@ public interface BinaryContentApi {
                             schema = @Schema(
                                     type  = "array",
                                     // example 에는 JSON array 형태로라도 넣어주면 UI 상에 배열 예시가 뜹니다.
-                                    example = "[\"fe838953-90ef-4a77-89a6-27fa9a79203e\", \"216dbce6-b503-4cf0-aa3f-f71ff01ddf8b\"]"
+                                    example = "[\"9682efac-93bb-4975-9ca7-ed566580f466\", \"4ca2df6b-4cba-4e7c-ab60-894bd9790715\"]"
                             ),
                             style   = ParameterStyle.FORM,
                             explode = Explode.FALSE    // explode=false 이면 쉼표(CSV) 구분으로 인식
@@ -94,26 +91,26 @@ public interface BinaryContentApi {
                                     name = "SuccessExample",
                                     summary = "성공 예시",
                                     value = """
+                                            [
                                                 {
-                                                    "success": true,
-                                                    "code": 200,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": [
-                                                        {
-                                                            "id": "fe838953-90ef-4a77-89a6-27fa9a79203e",
-                                                            "bytes": "/9j/4AAQSkZJRgABAQAAAQABAAD/...b7Lm7r/dC835URVkHD1/maP//Z",
-                                                            "type": "MESSAGE",
-                                                            "createdAt": "2025-07-09T09:08:31.852110Z"
-                                                        },
-                                                        {
-                                                            "id": "b85886e8-6608-4785-95af-3e539ceb369e",
-                                                            "bytes": "/9j/4AAQSkZJRgABAQAAAQABAAD/...AIVYICrmeQH+Q3CszhHLqCh7D/9k=",
-                                                            "type": "MESSAGE",
-                                                            "createdAt": "2025-07-09T09:08:31.859162Z"
-                                                        }
-                                                    ],
-                                                    "timestamp": "2025-07-09T18:30:16.61837"
+                                                    "id": "9682efac-93bb-4975-9ca7-ed566580f466",
+                                                    "bytes": "iVBORw0KGgoAAAANSUhEUgA...AElFTkSuQmCC",
+                                                    "type": "MESSAGE",
+                                                    "fileName": "joy.png",
+                                                    "contentType": "image/png",
+                                                    "size": 335919,
+                                                    "createdAt": "2025-07-20T14:28:57.320479Z"
+                                                },
+                                                {
+                                                    "id": "4ca2df6b-4cba-4e7c-ab60-894bd9790715",
+                                                    "bytes": "iVBORw0KGgoAAAANSUhEU...AAASUVORK5CYII=",
+                                                    "type": "MESSAGE",
+                                                    "fileName": "1.png",
+                                                    "contentType": "image/png",
+                                                    "size": 21224,
+                                                    "createdAt": "2025-07-14T05:05:21.590644Z"
                                                 }
+                                            ]
                                             """
                             )
                     )),

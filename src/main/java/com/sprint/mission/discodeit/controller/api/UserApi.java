@@ -40,19 +40,13 @@ public interface UserApi {
                                     summary = "성공 예시",
                                     value = """
                                                 {
-                                                    "success": true,
-                                                    "code": 201,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": {
-                                                        "id": "75591592-cf73-40b0-aa93-9f01976fee79",
-                                                        "username": "maru2",
-                                                        "email": "maru2@gmail.com",
-                                                        "profileId": "76d60241-5f9c-451f-9fc4-c826fc529c9a",
-                                                        "createdAt": "2025-07-09T07:14:44.175193Z",
-                                                        "updatedAt": "2025-07-09T07:14:44.175194Z",
-                                                        "online": true
-                                                    },
-                                                    "timestamp": "2025-07-09T16:14:44.185429"
+                                                    "id": "778ab03e-0f22-403c-b788-fae4c174eae7",
+                                                    "username": "anxiety",
+                                                    "email": "anxiety@inside.out",
+                                                    "profileId": "839493de-3f94-4b06-bc10-6cad1eed8f11",
+                                                    "createdAt": "2025-07-20T15:49:09.973878Z",
+                                                    "updatedAt": "2025-07-20T15:49:09.973878Z",
+                                                    "online": true
                                                 }
                                             """
                             )
@@ -60,28 +54,6 @@ public interface UserApi {
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다 (중복 사용자, 유효성 실패 등)",
                     content = @Content(
                             examples = {
-                                    @ExampleObject(
-                                            name    = "BadRequest Example (INVALID)",
-                                            summary = "필드 유효성 검사에 실패한 경우",
-                                            value   = """
-                                                        {
-                                                            "success": false,
-                                                            "code": 400,
-                                                            "message": "유효성 검사 실패",
-                                                            "data": [
-                                                                {
-                                                                    "field": "username",
-                                                                    "message": "공백일 수 없습니다"
-                                                                },
-                                                                {
-                                                                    "field": "email",
-                                                                    "message": "공백일 수 없습니다"
-                                                                }
-                                                            ],
-                                                            "timestamp": "2025-07-09T16:27:48.716149"
-                                                        }
-                                                      """
-                                    ),
                                     @ExampleObject(
                                             name    = "BadRequest Example",
                                             summary = "이미 존재하는 사용자명인 경우 (DUPLICATE)",
@@ -124,108 +96,59 @@ public interface UserApi {
                                     name = "Success Example",
                                     summary = "성공 예시",
                                     value = """
-                                                {
-                                                    "success": true,
-                                                    "code": 200,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": [
-                                                        {
-                                                            "id": "e5fb994a-0ec7-442f-8214-92919c5fedd6",
-                                                            "username": "minggu",
-                                                            "email": "minggu@test.com",
-                                                            "profileId": null,
-                                                            "createdAt": "2025-06-27T01:03:43.553057Z",
-                                                            "updatedAt": "2025-06-27T01:03:43.553058Z",
-                                                            "online": false
-                                                        },
-                                                        {
-                                                            "id": "30055583-d546-4f29-8318-b791478d3673",
-                                                            "username": "minjeong",
-                                                            "email": "minjeong@test.com",
-                                                            "profileId": null,
-                                                            "createdAt": "2025-06-27T01:03:43.552159Z",
-                                                            "updatedAt": "2025-06-27T01:03:43.552159Z",
-                                                            "online": false
-                                                        },
-                                                        {
-                                                            "id": "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a",
-                                                            "username": "mingguriguri",
-                                                            "email": "minggurigrui@example.com",
-                                                            "profileId": null,
-                                                            "createdAt": "2025-07-08T04:31:21.124756Z",
-                                                            "updatedAt": "2025-07-08T04:31:21.124757Z",
-                                                            "online": false
-                                                        },
-                                                        {
-                                                            "id": "ad2343a0-a8ff-47d7-94cb-03681dbff078",
-                                                            "username": "maru",
-                                                            "email": "maru@gmail.com",
-                                                            "profileId": "f146d333-1cff-4db4-9e32-b45f6f207950",
-                                                            "createdAt": "2025-07-08T04:34:06.767515Z",
-                                                            "updatedAt": "2025-07-08T04:34:06.767517Z",
-                                                            "online": false
-                                                        }
-                                                    ],
-                                                    "timestamp": "2025-07-09T16:20:33.593708"
-                                                }
+                                                [
+                                                    {
+                                                        "id": "82170d94-e9e6-45df-874a-f4fb949f0835",
+                                                        "username": "joy123",
+                                                        "email": "joy123@inside.out",
+                                                        "profileId": "e2189e67-cf5e-46b9-be45-d8299a1fc298",
+                                                        "createdAt": "2025-07-14T05:25:07.135099Z",
+                                                        "updatedAt": "2025-07-20T14:30:23.159294Z",
+                                                        "online": true
+                                                    },
+                                                    {
+                                                        "id": "778ab03e-0f22-403c-b788-fae4c174eae7",
+                                                        "username": "anxiety",
+                                                        "email": "anxiety@inside.out",
+                                                        "profileId": "839493de-3f94-4b06-bc10-6cad1eed8f11",
+                                                        "createdAt": "2025-07-20T15:49:09.973878Z",
+                                                        "updatedAt": "2025-07-20T15:49:09.973878Z",
+                                                        "online": true
+                                                    },
+                                                    {
+                                                        "id": "b2679878-5a10-41a3-b4b0-008ae83da8dd",
+                                                        "username": "gosimshoi",
+                                                        "email": "gosim@email.com",
+                                                        "profileId": "7cbe0d73-b1b6-4aca-9006-6c047c2c8b68",
+                                                        "createdAt": "2025-07-14T04:36:28.804278Z",
+                                                        "updatedAt": "2025-07-14T04:36:28.804278Z",
+                                                        "online": false
+                                                    },
+                                                    {
+                                                        "id": "64fbc1f4-c9e4-4178-85c9-2ed2aa434ce4",
+                                                        "username": "maru",
+                                                        "email": "maru132@gmail.com",
+                                                        "profileId": "5d2ec995-8953-4cb4-a263-5471299c393d",
+                                                        "createdAt": "2025-07-14T04:06:32.212491Z",
+                                                        "updatedAt": "2025-07-18T07:41:11.766501Z",
+                                                        "online": false
+                                                    },
+                                                    {
+                                                        "id": "992fe09c-238b-47ee-a5a1-b38ad7a7ac95",
+                                                        "username": "saddy",
+                                                        "email": "sad@inside.out",
+                                                        "profileId": "577ceb8a-51f3-4bf6-b66c-9d5c6a9b319d",
+                                                        "createdAt": "2025-07-20T07:11:12.487842Z",
+                                                        "updatedAt": "2025-07-20T07:11:12.487842Z",
+                                                        "online": false
+                                                    }
+                                                ]
                                             """
                             )
                     ))
     })
     ResponseEntity<List<UserResponseDto>> getUsers();
 
-    @Operation(summary = "특정 사용자 조회", description = "특정 사용자(userId)를 단일 조회합니다.",
-            parameters = @Parameter(
-                    name = "userId",
-                    in  = ParameterIn.PATH,
-                    description = "사용자 ID (UUID)",
-                    required = true,
-                    example = "ad2343a0-a8ff-47d7-94cb-03681dbff078"
-            )
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "정상적으로 조회되었습니다",
-                    content = @Content(
-                            examples = @ExampleObject(
-                                    name = "SuccessExample",
-                                    summary = "성공 예시",
-                                    value = """
-                                                {
-                                                    "success": true,
-                                                    "code": 200,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": {
-                                                        "id": "ad2343a0-a8ff-47d7-94cb-03681dbff078",
-                                                        "username": "maru",
-                                                        "email": "maru@gmail.com",
-                                                        "profileId": "f146d333-1cff-4db4-9e32-b45f6f207950",
-                                                        "createdAt": "2025-07-08T04:34:06.767515Z",
-                                                        "updatedAt": "2025-07-08T04:34:06.767517Z",
-                                                        "online": false
-                                                    },
-                                                    "timestamp": "2025-07-09T16:16:17.146881"
-                                                }
-                                            """
-                            )
-                    )),
-            @ApiResponse(responseCode = "404", description = "해당 사용자(userId)가 존재하지 않습니다",
-                    content = @Content(
-                            examples = @ExampleObject(
-                                    name = "NotFound Example",
-                                    summary = "NotFound - 해당 사용자(userId)가 존재하지 않은 경우 예시",
-                                    value = """
-                                                {
-                                                    "success": false,
-                                                    "code": 404,
-                                                    "message": "Not Found Exception",
-                                                    "data": "User with id 55e3a449-2c32-4432-8d0d-28620130a8af not found",
-                                                    "timestamp": "2025-07-09T16:18:18.43085"
-                                                }
-                                            """
-                            )
-                    ))
-    })
-    ResponseEntity<UserResponseDto> getUser(UUID userId);
 
     @Operation(
             summary = "사용자 부분 수정",
@@ -235,7 +158,7 @@ public interface UserApi {
                     in = ParameterIn.PATH,
                     description = "사용자 ID",
                     required = true,
-                    example  = "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a"
+                    example  = "82170d94-e9e6-45df-874a-f4fb949f0835"
             ),
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
@@ -253,66 +176,16 @@ public interface UserApi {
                                     summary = "성공 예시",
                                     value = """
                                                 {
-                                                    "success": true,
-                                                    "code": 200,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": {
-                                                        "id": "2c2018f3-5ba8-490f-aef9-4d4521de0657",
-                                                        "username": "minjeong2",
-                                                        "email": "minjeong@gmail.com",
-                                                        "profileId": "be026d40-6b34-4583-8fa2-65ab66a08291",
-                                                        "createdAt": "2025-06-27T01:03:43.582450Z",
-                                                        "updatedAt": "2025-07-09T07:27:01.020779Z",
-                                                        "online": false
-                                                    },
-                                                    "timestamp": "2025-07-09T16:27:01.022713"
+                                                    "id": "82170d94-e9e6-45df-874a-f4fb949f0835",
+                                                    "username": "joy1234",
+                                                    "email": "joy1234@inside.out",
+                                                    "profileId": "e2189e67-cf5e-46b9-be45-d8299a1fc298",
+                                                    "createdAt": "2025-07-14T05:25:07.135099Z",
+                                                    "updatedAt": "2025-07-20T15:56:16.735601Z",
+                                                    "online": true
                                                 }
                                             """
                             )
-                    )),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다 (중복 사용자)",
-                    content = @Content(
-                            examples = {
-                                    @ExampleObject(
-                                            name    = "BadRequest Example",
-                                            summary = "필드 유효성 검사에 실패한 경우",
-                                            value   = """
-                                                        {
-                                                            "success": false,
-                                                            "code": 400,
-                                                            "message": "유효성 검사 실패",
-                                                            "data": [
-                                                                {
-                                                                    "field": "id",
-                                                                    "message": "널이어서는 안됩니다"
-                                                                },
-                                                                {
-                                                                    "field": "username",
-                                                                    "message": "공백일 수 없습니다"
-                                                                },
-                                                                {
-                                                                    "field": "email",
-                                                                    "message": "공백일 수 없습니다"
-                                                                }
-                                                            ],
-                                                            "timestamp": "2025-07-09T16:27:48.716149"
-                                                        }
-                                                      """
-                                    ),
-                                    @ExampleObject(
-                                            name    = "BadRequest - 중복 사용자",
-                                            summary = "이미 존재하는 사용자명인 경우",
-                                            value   = """
-                                                        {
-                                                          "success": false,
-                                                          "code": 400,
-                                                          "message": "Bad Request Exception",
-                                                          "data": "This username maru is already in use",
-                                                          "timestamp": "2025-07-09T15:42:13.725376"
-                                                        }
-                                                      """
-                                    )
-                            }
                     )),
             @ApiResponse(responseCode = "404", description = "해당 사용자(userId)가 존재하지 않습니다",
                     content = @Content(
@@ -356,7 +229,7 @@ public interface UserApi {
                     in = ParameterIn.PATH,
                     description = "사용자 ID (UUID)",
                     required = true,
-                    example = "ad2343a0-a8ff-47d7-94cb-03681dbff078"
+                    example = "82170d94-e9e6-45df-874a-f4fb949f0835"
             )
     )
     @ApiResponses(value = {
@@ -367,19 +240,13 @@ public interface UserApi {
                                     summary = "성공적으로 업데이트된 예시",
                                     value = """
                                                 {
-                                                    "success": true,
-                                                    "code": 200,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": {
-                                                        "id": "2c2018f3-5ba8-490f-aef9-4d4521de0657",
-                                                        "username": "minjeong2",
-                                                        "email": "minjeong@gmail.com",
-                                                        "profileId": "be026d40-6b34-4583-8fa2-65ab66a08291",
-                                                        "createdAt": "2025-06-27T01:03:43.582450Z",
-                                                        "updatedAt": "2025-07-09T07:27:01.020779Z",
-                                                        "online": true
-                                                    },
-                                                    "timestamp": "2025-07-09T16:29:57.87799"
+                                                    "id": "82170d94-e9e6-45df-874a-f4fb949f0835",
+                                                    "username": "joy123",
+                                                    "email": "joy123@inside.out",
+                                                    "profileId": "e2189e67-cf5e-46b9-be45-d8299a1fc298",
+                                                    "createdAt": "2025-07-14T05:25:07.135099Z",
+                                                    "updatedAt": "2025-07-20T14:30:23.159294Z",
+                                                    "online": true
                                                 }
                                             """
                             )

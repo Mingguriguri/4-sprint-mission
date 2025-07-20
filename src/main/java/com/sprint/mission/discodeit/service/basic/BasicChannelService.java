@@ -29,6 +29,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResponseDto createPublicChannel(ChannelCreateDto dto) {
+        dto.setChannelType(ChannelType.PUBLIC);
         validateCreateChannel(dto, ChannelType.PUBLIC);
         Channel channel = channelMapper.toEntity(dto);
 
@@ -38,6 +39,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResponseDto createPrivateChannel(ChannelCreateDto dto) {
+        dto.setChannelType(ChannelType.PRIVATE);
         validateCreateChannel(dto, ChannelType.PRIVATE);
         Channel channel = channelMapper.toEntity(dto);
         Channel saved = channelRepository.save(channel);

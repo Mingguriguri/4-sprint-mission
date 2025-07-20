@@ -14,15 +14,15 @@ import java.util.UUID;
 @Getter
 @RequiredArgsConstructor
 public class MessageCreateDto {
-    @Schema(description = "메시지 내용", example = "3번째 공지! 필독! 읽고 나서, ✅ 이모지 눌러주세요! ")
+    @Schema(description = "메시지 내용", example = "3번째 공지! 필독! ")
     @NotBlank
     private final String content;
 
-    @Schema(description = "채널 ID", example = "fb306f45-af59-46b1-adcb-449f9d3dfb04")
+    @Schema(description = "채널 ID", example = "a5a0f4f5-ca67-4d3d-ab62-d4907b21ec63")
     @NotNull
     private final UUID channelId;
 
-    @Schema(description = "작성자 ID", example = "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a")
+    @Schema(description = "작성자 ID", example = "82170d94-e9e6-45df-874a-f4fb949f0835")
     @NotNull
     private final UUID authorId;
 

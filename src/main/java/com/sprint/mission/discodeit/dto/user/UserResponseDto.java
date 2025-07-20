@@ -12,7 +12,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @ToString
 public class UserResponseDto {
-    @Schema(description = "사용자 ID", example = "ad2343a0-a8ff-47d7-94cb-03681dbff078")
+    @Schema(description = "사용자 ID", example = "82170d94-e9e6-45df-874a-f4fb949f0835")
     private final UUID id;
 
     @Schema(description = "사용자명", example = "Mingguriguri")

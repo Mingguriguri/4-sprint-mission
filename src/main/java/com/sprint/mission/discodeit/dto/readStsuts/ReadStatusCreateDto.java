@@ -18,5 +18,6 @@ import java.util.UUID;
     @NotNull
     private final UUID channelId;
 
+    @Schema(description = "마지막으로 읽은 시간", example = "2025-07-20T15:57:48.774Z")
     private final Instant lastReadAt;
 }

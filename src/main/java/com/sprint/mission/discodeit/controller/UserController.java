@@ -49,11 +49,6 @@ public class UserController implements UserApi {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserResponseDto> getUser(@PathVariable("userId") UUID userId) {
-        return ResponseEntity.ok(userService.find(userId));
-    }
-
     @PatchMapping(
             path = "/{userId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE

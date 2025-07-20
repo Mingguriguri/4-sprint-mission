@@ -27,16 +27,12 @@ public interface ReadStatusApi {
                                     summary = "성공 예시",
                                     value = """
                                                 {
-                                                    "success": true,
-                                                    "code": 201,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": {
-                                                        "id": "d7044e4d-58ff-4c17-9f27-44d4bfcd5973",
-                                                        "lastReadAt": "2025-07-09T13:21:46.307932Z",
-                                                        "userId": "2fd4b22a-2bda-4503-9adf-02f803cce082",
-                                                        "channelId": "3d0b4ba7-5b04-4287-9fe7-3a69950ad7c1"
-                                                    },
-                                                    "timestamp": "2025-07-09T22:21:46.326786"
+                                                    "id": "28cc814f-c4a7-4cab-a9a5-868046b0d23c",
+                                                    "lastReadAt": "2025-07-20T15:57:48.774Z",
+                                                    "userId": "778ab03e-0f22-403c-b788-fae4c174eae7",
+                                                    "channelId": "270d615f-8b0d-41a8-a3bc-1e008d6df0e2",
+                                                    "createdAt": "2025-07-20T15:57:48.800129Z",
+                                                    "updatedAt": "2025-07-20T15:57:48.800130Z"
                                                 }
                                             """
                             )
@@ -93,7 +89,7 @@ public interface ReadStatusApi {
                     in  = ParameterIn.QUERY,
                     description = "사용자 ID (UUID)",
                     required  = true,
-                    example = "ad2343a0-a8ff-47d7-94cb-03681dbff078"
+                    example = "778ab03e-0f22-403c-b788-fae4c174eae7"
             )
     )
     @ApiResponses(value = {
@@ -103,32 +99,40 @@ public interface ReadStatusApi {
                                     name = "Success Example",
                                     summary = "성공적으로 조회하였습니다.",
                                     value = """
-                                                {
-                                                    "success": true,
-                                                    "code": 200,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": [
-                                                        {
-                                                            "id": "6d6c0912-2c33-43bf-b3a9-2b5f0f2fb739",
-                                                            "lastReadAt": "2025-07-09T08:11:38.425541Z",
-                                                            "userId": "ad2343a0-a8ff-47d7-94cb-03681dbff078",
-                                                            "channelId": "67b4d79c-d813-4e9a-905d-2cd29d190bf6"
-                                                        },
-                                                        {
-                                                            "id": "25010975-3297-4681-a99d-44212fdf03b6",
-                                                            "lastReadAt": "2025-07-08T04:36:30.641806Z",
-                                                            "userId": "ad2343a0-a8ff-47d7-94cb-03681dbff078",
-                                                            "channelId": "ad183068-c67e-4a1d-8729-7e0ede43eb86"
-                                                        },
-                                                        {
-                                                            "id": "4242c2e3-9de0-44e5-a2d7-ac99ecc8e658",
-                                                            "lastReadAt": "2025-07-08T04:36:17.731896Z",
-                                                            "userId": "ad2343a0-a8ff-47d7-94cb-03681dbff078",
-                                                            "channelId": "3d0b4ba7-5b04-4287-9fe7-3a69950ad7c1"
-                                                        }
-                                                    ],
-                                                    "timestamp": "2025-07-10T16:29:11.992503"
-                                                }
+                                                [
+                                                    {
+                                                        "id": "c2cdedd3-f884-4097-8b93-c18d72ee207d",
+                                                        "lastReadAt": "2025-07-20T16:01:04.702Z",
+                                                        "userId": "778ab03e-0f22-403c-b788-fae4c174eae7",
+                                                        "channelId": "a5a0f4f5-ca67-4d3d-ab62-d4907b21ec63",
+                                                        "createdAt": "2025-07-20T16:01:04.750105Z",
+                                                        "updatedAt": "2025-07-20T16:01:04.750105Z"
+                                                    },
+                                                    {
+                                                        "id": "2028b9e7-948e-4cf7-8686-a5e85c349637",
+                                                        "lastReadAt": "2025-07-20T16:01:09.032499Z",
+                                                        "userId": "778ab03e-0f22-403c-b788-fae4c174eae7",
+                                                        "channelId": "3a10d6d0-c72d-4293-af9b-15eb2a859f4d",
+                                                        "createdAt": "2025-07-20T16:01:09.032523Z",
+                                                        "updatedAt": "2025-07-20T16:01:09.032523Z"
+                                                    },
+                                                    {
+                                                        "id": "28cc814f-c4a7-4cab-a9a5-868046b0d23c",
+                                                        "lastReadAt": "2025-07-20T16:00:52.855370Z",
+                                                        "userId": "778ab03e-0f22-403c-b788-fae4c174eae7",
+                                                        "channelId": "270d615f-8b0d-41a8-a3bc-1e008d6df0e2",
+                                                        "createdAt": "2025-07-20T15:57:48.800129Z",
+                                                        "updatedAt": "2025-07-20T16:00:52.855370Z"
+                                                    },
+                                                    {
+                                                        "id": "6f138062-2652-4980-8e54-d62eb4eb4304",
+                                                        "lastReadAt": "2025-07-20T15:57:50.106Z",
+                                                        "userId": "778ab03e-0f22-403c-b788-fae4c174eae7",
+                                                        "channelId": "dc464245-f51a-4920-a841-f45cda0435b2",
+                                                        "createdAt": "2025-07-20T15:57:50.114941Z",
+                                                        "updatedAt": "2025-07-20T15:57:50.114942Z"
+                                                    }
+                                                ]
                                             """
                             )
                     )),
@@ -160,7 +164,7 @@ public interface ReadStatusApi {
                     in          = ParameterIn.PATH,
                     description = "ReadStatus (마지막으로 읽은 시간) ID (UUID)",
                     required    = true,
-                    example     = "16e245c7-3848-448f-a3dc-ca702ce9a491"
+                    example     = "2028b9e7-948e-4cf7-8686-a5e85c349637"
             )
     )
     @ApiResponses(value = {
@@ -171,16 +175,12 @@ public interface ReadStatusApi {
                                     summary = "성공적으로 업데이트된 예시",
                                     value = """
                                                 {
-                                                    "success": true,
-                                                    "code": 201,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": {
-                                                        "id": "d7044e4d-58ff-4c17-9f27-44d4bfcd5973",
-                                                        "lastReadAt": "2025-07-09T13:21:46.307932Z",
-                                                        "userId": "2fd4b22a-2bda-4503-9adf-02f803cce082",
-                                                        "channelId": "3d0b4ba7-5b04-4287-9fe7-3a69950ad7c1"
-                                                    },
-                                                    "timestamp": "2025-07-09T22:21:46.326786"
+                                                    "id": "2028b9e7-948e-4cf7-8686-a5e85c349637",
+                                                    "lastReadAt": "2025-07-20T16:02:32.686870Z",
+                                                    "userId": "778ab03e-0f22-403c-b788-fae4c174eae7",
+                                                    "channelId": "3a10d6d0-c72d-4293-af9b-15eb2a859f4d",
+                                                    "createdAt": "2025-07-20T16:01:09.032523Z",
+                                                    "updatedAt": "2025-07-20T16:02:32.686870Z"
                                                 }
                                             """
                             )

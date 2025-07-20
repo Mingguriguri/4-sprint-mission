@@ -41,22 +41,15 @@ public interface MessageApi {
                                     summary = "성공 예시",
                                     value = """
                                                 {
-                                                    "success": true,
-                                                    "code": 201,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": {
-                                                        "id": "1c0d1342-6542-4afd-9c41-7ef68c353321",
-                                                        "channelId": "655d7d4f-609c-4a22-b90a-2ca1a7c49099",
-                                                        "authorId": "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a",
-                                                        "content": "첫 번째  공지! 필독! 읽고 나서 체크 이모지 눌러주세요! ",
-                                                        "attachmentIds": [
-                                                            "59589644-0e18-42f0-970e-0eaaeaa4ff09",
-                                                            "6e931d5e-3de0-44e6-8ec1-9261e0e89ca5"
-                                                        ],
-                                                        "createdAt": "2025-07-09T08:57:09.969043Z",
-                                                        "updatedAt": "2025-07-09T08:57:09.969044Z"
-                                                    },
-                                                    "timestamp": "2025-07-09T17:57:10.010431"
+                                                    "id": "d67a8775-7a3a-49ec-b2d4-018e15db0683",
+                                                    "channelId": "a5a0f4f5-ca67-4d3d-ab62-d4907b21ec63",
+                                                    "authorId": "82170d94-e9e6-45df-874a-f4fb949f0835",
+                                                    "content": "필독입니다",
+                                                    "attachmentIds": [
+                                                        "3061bca4-b6d6-42d2-93c9-1946c00d18f6"
+                                                    ],
+                                                    "createdAt": "2025-07-20T15:35:49.152194Z",
+                                                    "updatedAt": "2025-07-20T15:35:49.152195Z"
                                                 }
                                             """
                             )
@@ -118,7 +111,7 @@ public interface MessageApi {
                     in          = ParameterIn.QUERY,
                     description = "채널 ID (UUID)",
                     required    = true,
-                    example     = "655d7d4f-609c-4a22-b90a-2ca1a7c49099"
+                    example     = "a5a0f4f5-ca67-4d3d-ab62-d4907b21ec63"
             )
     )
     @ApiResponses(value = {
@@ -128,38 +121,28 @@ public interface MessageApi {
                                     name = "SuccessExample",
                                     summary = "성공 예시",
                                     value = """
-                                                {
-                                                    "success": true,
-                                                    "code": 200,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": [
-                                                        {
-                                                            "id": "1c0d1342-6542-4afd-9c41-7ef68c353321",
-                                                            "channelId": "655d7d4f-609c-4a22-b90a-2ca1a7c49099",
-                                                            "authorId": "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a",
-                                                            "content": "첫 번째  공지! 필독! 읽고 나서 체크 이모지 눌러주세요! ",
-                                                            "attachmentIds": [
-                                                                "59589644-0e18-42f0-970e-0eaaeaa4ff09",
-                                                                "6e931d5e-3de0-44e6-8ec1-9261e0e89ca5"
-                                                            ],
-                                                            "createdAt": "2025-07-09T08:57:09.969043Z",
-                                                            "updatedAt": "2025-07-09T08:57:09.969044Z"
-                                                        },
-                                                        {
-                                                            "id": "ccbae575-73d3-428b-8d41-4eba6e207e7f",
-                                                            "channelId": "655d7d4f-609c-4a22-b90a-2ca1a7c49099",
-                                                            "authorId": "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a",
-                                                            "content": "두 번째  공지! 필독! 읽고 나서, ✅ 이모지 눌러주세요! ",
-                                                            "attachmentIds": [
-                                                                "fe838953-90ef-4a77-89a6-27fa9a79203e",
-                                                                "b85886e8-6608-4785-95af-3e539ceb369e"
-                                                            ],
-                                                            "createdAt": "2025-07-09T09:08:31.851554Z",
-                                                            "updatedAt": "2025-07-09T09:08:31.851554Z"
-                                                        }
-                                                    ],
-                                                    "timestamp": "2025-07-09T18:09:12.406703"
-                                                }
+                                                [
+                                                     {
+                                                         "id": "af4a635a-eab1-43ea-a821-3b3c5fa81984",
+                                                         "channelId": "a5a0f4f5-ca67-4d3d-ab62-d4907b21ec63",
+                                                         "authorId": "64fbc1f4-c9e4-4178-85c9-2ed2aa434ce4",
+                                                         "content": "출석 인정 관련 안내\\n출석 인정 관련 중요한 내용 안내드립니다.",
+                                                         "attachmentIds": null,
+                                                         "createdAt": "2025-07-20T06:50:53.767785Z",
+                                                         "updatedAt": "2025-07-20T06:50:53.767785Z"
+                                                     },
+                                                     {
+                                                         "id": "d67a8775-7a3a-49ec-b2d4-018e15db0683",
+                                                         "channelId": "a5a0f4f5-ca67-4d3d-ab62-d4907b21ec63",
+                                                         "authorId": "82170d94-e9e6-45df-874a-f4fb949f0835",
+                                                         "content": "필독입니다",
+                                                         "attachmentIds": [
+                                                             "3061bca4-b6d6-42d2-93c9-1946c00d18f6"
+                                                         ],
+                                                         "createdAt": "2025-07-20T15:35:49.152194Z",
+                                                         "updatedAt": "2025-07-20T15:35:49.152195Z"
+                                                     }
+                                                 ]
                                             """
                             )
                     ))
@@ -175,7 +158,7 @@ public interface MessageApi {
                     in = ParameterIn.PATH,
                     description = "메시지 ID",
                     required = true,
-                    example = "cbd2c76f-0bf1-4927-847a-e13877fbbea1"
+                    example = "af4a635a-eab1-43ea-a821-3b3c5fa81984"
             ),
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
@@ -193,21 +176,15 @@ public interface MessageApi {
                                     summary = "성공 예시",
                                     value = """
                                                 {
-                                                    "success": true,
-                                                    "code": 200,
-                                                    "message": "요청이 성공적으로 처리되었습니다.",
-                                                    "data": {
-                                                        "id": "1c0d1342-6542-4afd-9c41-7ef68c353321",
-                                                        "channelId": "655d7d4f-609c-4a22-b90a-2ca1a7c49099",
-                                                        "authorId": "ebfe591d-e39e-4a48-aa65-b489c4fc7d3a",
-                                                        "content": "첫 번째  공지입니다. 모두 읽고 나서 체크 이모지(✅) 눌러주세요! ",
-                                                        "attachmentIds": [
-                                                            "9768f2cc-2bc4-4f56-a41c-07434b1ce7e8"
-                                                        ],
-                                                        "createdAt": "2025-07-09T08:57:09.969043Z",
-                                                        "updatedAt": "2025-07-09T09:15:49.558163Z"
-                                                    },
-                                                    "timestamp": "2025-07-09T18:15:49.559753"
+                                                    "id": "d67a8775-7a3a-49ec-b2d4-018e15db0683",
+                                                    "channelId": "a5a0f4f5-ca67-4d3d-ab62-d4907b21ec63",
+                                                    "authorId": "82170d94-e9e6-45df-874a-f4fb949f0835",
+                                                    "content": "필독입니다2",
+                                                    "attachmentIds": [
+                                                        "3061bca4-b6d6-42d2-93c9-1946c00d18f6"
+                                                    ],
+                                                    "createdAt": "2025-07-20T15:35:49.152194Z",
+                                                    "updatedAt": "2025-07-20T15:40:17.041192Z"
                                                 }
                                             """
                             )

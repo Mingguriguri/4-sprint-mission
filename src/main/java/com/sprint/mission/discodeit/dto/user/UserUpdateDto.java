@@ -10,13 +10,13 @@ import lombok.*;
 @NoArgsConstructor
 @Schema(name = "UserUpdateDto", description = "사용자 수정 요청 DTO")
 public class UserUpdateDto {
-    @Schema(description = "사용자명", example = "mingguriUpdate")
+    @Schema(description = "사용자명", example = "joy123")
     private String newUsername;
 
-    @Schema(description = "이메일", example = "mingguriguri123@gmail.com")
+    @Schema(description = "이메일", example = "joy123@inside.out")
     @Email
     private String newEmail;
 
-    @Schema(description = "비밀번호", example = "1q2w3e4r!")
+    @Schema(description = "비밀번호", example = "12345678")
     private String newPassword;
 }
