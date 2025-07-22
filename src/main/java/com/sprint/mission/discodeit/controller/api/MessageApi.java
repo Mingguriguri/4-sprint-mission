@@ -286,5 +286,5 @@ public interface MessageApi {
                             )
                     ))
     })
-    ResponseEntity<MessageResponseDto> deleteMessage(UUID messageId);
+    ResponseEntity<Void> deleteMessage(UUID messageId);
 }

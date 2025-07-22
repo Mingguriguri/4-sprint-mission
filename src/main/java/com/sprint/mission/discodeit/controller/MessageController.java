@@ -55,7 +55,7 @@ public class MessageController implements MessageApi {
     }
 
     @DeleteMapping("/{messageId}")
-    public ResponseEntity<MessageResponseDto> deleteMessage(@PathVariable("messageId") UUID messageId) {
+    public ResponseEntity<Void> deleteMessage(@PathVariable("messageId") UUID messageId) {
         messageService.delete(messageId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
