@@ -5,6 +5,18 @@ spring:
     multipart:
       maxFileSize: 10MB       # 파일 하나의 최대 크기
       maxRequestSize: 30MB    # 한 번에 최대 업로드 가능 용량
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update    # 개발 단계는 update, 운영은 none 권장
+    show-sql: true       # 실행 쿼리 확인
+    properties:
+      hibernate:
+        format_sql: true # SQL 포맷팅 가독성
 
 discodeit:
   repository:
@@ -19,3 +31,8 @@ springdoc:
     operations-sorter: method # operations 정렬 방식은 HTTP Method 순 (메서드 순서 delete - get - patch - post - put)
     tags-sorter: alpha    # tag 정렬 방식은 알파벳 순
     path: "swagger.html"  # http://localhost:8080/swagger.html로 접속 가능
+
+logging:
+  level:
+    root: INFO # DEBUG, INFO, WARN
+#    org.hibernate.SQL: DEBUG
