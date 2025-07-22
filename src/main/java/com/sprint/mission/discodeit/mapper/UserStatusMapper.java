@@ -23,7 +23,6 @@ public class UserStatusMapper {
     public void updateEntity(UserStatusUpdateDto dto, UserStatus userStatus) {
         if (dto.getId() != null) {
             // 사용자가 마지막으로 확인된 접속 시간 업데이트
-            userStatus.touch();
             userStatus.updateLastConnectedAt();
         }
     }

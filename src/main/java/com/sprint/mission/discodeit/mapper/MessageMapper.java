@@ -27,7 +27,6 @@ public class MessageMapper {
      */
     public void updateEntity(MessageUpdateDto dto, Message msg) {
         if (dto.getContent() != null && !dto.getContent().isBlank()) msg.updateContent(dto.getContent());
-        msg.touch();
     }
 
     /**

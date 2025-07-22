@@ -1,36 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
+@NoArgsConstructor
 @Getter
-public class Channel implements Serializable {
-    private static final long serialVersionUID = 1L;
+@Entity
+@Table(name = "channels")
+public class Channel extends BaseUpdateEntity {
 
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
-    private Instant lastMessageSentAt; // 가장 최근 메시지의 시간
-
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ChannelType type;
+
+    @Column(length = 100)
     private String name;
+
+    @Column(length = 500)
     private String description;
 
-    private List<UUID> participantIds;
+//    private List<User> participants;
 
-    public Channel(ChannelType type, String name, String description, List<UUID> participantIds) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
-        this.lastMessageSentAt = this.createdAt;
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReadStatus> readStatuses;
+
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages;
+
+    public Channel(ChannelType type, String name, String description, List<User> participants) {
+        super();
         this.type = type;
         this.name = name;
         this.description = description;
-        this.participantIds = participantIds;
+//        this.participants = participants;
     }
 
     // 공개채널
@@ -40,14 +45,5 @@ public class Channel implements Serializable {
 
     public void updateDescription(String description) {
         this.description = description;
-    }
-
-    // 메시지 보낼 때마다 시간 갱신
-    public void updateLastMessageSentAt() {
-        this.lastMessageSentAt = Instant.now();
-    }
-
-    public void touch() {
-        this.updatedAt = Instant.now();
     }
 }

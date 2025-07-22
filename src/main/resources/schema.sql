@@ -24,8 +24,8 @@ CREATE TABLE user_statuses(
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     user_id UUID NOT NULL UNIQUE
-    REFERENCES users(id)
-    ON DELETE CASCADE,
+        REFERENCES users(id)
+        ON DELETE CASCADE,
     last_active_at TIMESTAMP NOT NULL
 );
 

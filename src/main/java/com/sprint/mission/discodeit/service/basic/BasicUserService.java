@@ -166,7 +166,7 @@ public class BasicUserService implements UserService {
         BinaryContent bc = binaryContentMapper.toEntity(file, type);
         BinaryContent saved = binaryContentRepository.save(bc);
 
-        user.updateProfileId(saved.getId());
+        user.updateProfile(saved.getId());
     }
 
     /**

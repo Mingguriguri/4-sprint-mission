@@ -1,40 +1,36 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 
 /**
 * 사용자 별 마지막으로 확인된 접속 시간을 표현하는 도메인 모델입니다.<br>
 * 사용자의 온라인 상태를 확인하기 위해 활용합니다.
 * */
-@Getter
-public class UserStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+@NoArgsConstructor
+@Getter
+@Entity
+@Table(name = "user_statuses")
+public class UserStatus extends BaseUpdateEntity  {
+
+    @OneToOne
+    @JoinColumn(nullable = false, unique = true)
+    private User user;
+
+    @Column(name="last_active_at", nullable=false)
     private Instant lastConnectedAt;
 
-    private UUID userId;
-
-    public UserStatus(UUID userId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+    public UserStatus(User user) {
+        this.user = user;
         this.lastConnectedAt = Instant.now();
-        this.userId = userId;
     }
 
     public void updateLastConnectedAt() {
         this.lastConnectedAt = Instant.now();
-    }
-
-    public void touch() {
-        this.updatedAt = Instant.now();
     }
 
     /*

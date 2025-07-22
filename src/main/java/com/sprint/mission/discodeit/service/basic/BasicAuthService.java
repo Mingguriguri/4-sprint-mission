@@ -30,7 +30,6 @@ public class BasicAuthService implements AuthService {
                     userStatusRepository.save(newUserStatus);
                     return newUserStatus;
                 });
-        userStatus.touch();
         userStatus.updateLastConnectedAt();
 
         return userMapper.toDto(user, userStatus.isOnline());

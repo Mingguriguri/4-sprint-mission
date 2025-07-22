@@ -1,46 +1,48 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
+@NoArgsConstructor
 @Getter
-public class Message implements Serializable {
-    private static final long serialVersionUID = 1L;
+@Entity
+@Table(name = "messages")
+public class Message extends BaseUpdateEntity {
 
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
-
+    @Column
     private String content;
 
-    private UUID channelId;
-    private UUID authorId;
-    private List<UUID> attachmentIds;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
 
-    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "message_attachments",
+            joinColumns = @JoinColumn(name = "message_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id")
+    )
+    private List<BinaryContent> attachments;
+
+    public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
         this.content = content;
-        this.channelId = channelId;
-        this.authorId = authorId;
-        this.attachmentIds = attachmentIds;
+        this.channel = channel;
+        this.author = author;
+        this.attachments = attachments;
     }
 
     public void updateContent(String newContent) {
         this.content = newContent;
     }
 
-    public void changeAttachmentIds(List<UUID> attachmentIds) {
-        this.attachmentIds = attachmentIds;
+    public void changeAttachments(List<BinaryContent> attachments) {
+        this.attachments = attachments;
     }
-
-    public void touch() {
-        this.updatedAt = Instant.now();
-    }
-
 }

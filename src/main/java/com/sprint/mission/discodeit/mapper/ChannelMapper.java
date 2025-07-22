@@ -38,7 +38,6 @@ public class ChannelMapper {
             if (dto.getName() != null)        channel.updateName(dto.getName());
             if (dto.getDescription() != null) channel.updateDescription(dto.getDescription());
         }
-        channel.touch();
     }
 
     /**

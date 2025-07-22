@@ -38,7 +38,6 @@ public class UserMapper {
         if (dto.getNewPassword() != null && !dto.getNewPassword().isBlank()) {
             user.updatePassword(dto.getNewPassword());
         }
-        user.touch();
     }
 
 

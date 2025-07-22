@@ -165,7 +165,7 @@ public class BasicMessageService implements MessageService {
         List<UUID> ids = saved.stream()
                 .map(BinaryContent::getId)
                 .toList();
-        message.changeAttachmentIds(ids);
+        message.changeAttachments(ids);
     }
 
 

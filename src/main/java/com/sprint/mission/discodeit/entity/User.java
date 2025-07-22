@@ -1,33 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import java.util.List;
 
+@NoArgsConstructor
 @Getter
-public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
+@Entity
+@Table(name = "users")
+public class User extends BaseUpdateEntity {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
+
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
+
+    @Column(nullable = false, length = 60)
     private String password;
 
-    private UUID profileId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
 
-    public User(String username, String email, String password, UUID profileId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserStatus status;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReadStatus> readStatuses;
+
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages;
+
+    public User(String username, String email, String password, BinaryContent profile) {
+        super();
         this.username = username;
         this.email = email;
         this.password = password;
-        this.profileId = profileId;
+        this.profile = profile;
     }
 
     public void updateUsername(String newUsername) {
@@ -42,11 +54,7 @@ public class User implements Serializable {
         this.password = newPassword;
     }
 
-    public void updateProfileId(UUID newProfileId) {
-        this.profileId = newProfileId;
-    }
-
-    public void touch() {
-        this.updatedAt = Instant.now();
+    public void updateProfile(BinaryContent newProfile) {
+        this.profile = newProfile;
     }
 }
